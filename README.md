@@ -15,6 +15,23 @@ Each draw writes a complete paper:
 - four figures in the Ling Lab house style (blue/red conditions, open offset axes, italic labels, V1–V3 small multiples, per-observer gray lines, parameter asterisks, dark/light bar pairs): a trial schematic, the main CRF or tuning result, a per-observer scatter, and the effect by ROI
 - a reference list of real papers, filtered to those published before the fake paper's year
 
+## Nuts and bolts
+
+The **Nuts and bolts** button opens the machine's housing and shows the publication machine: ten stations, one per representation, piped into the big red button.
+
+- Corpus hopper (the real source paper)
+- Title press (template grammar, with its slots)
+- Modulator valve
+- Feature tuner
+- Region selector
+- Mechanism gearbox
+- Effect dial (with effect size)
+- Observer vat (N and noise)
+- Method rig
+- Journal chute
+
+Lock any station to hold that part fixed across presses. With "Hold this draw" on, changing a station re-synthesizes the same random draw, so only that part of the paper changes.
+
 Open `index.html` directly, or enable GitHub Pages (Settings → Pages → Deploy from branch → `main` / root).
 
 All generated papers are fictional.
