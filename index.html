@@ -85,6 +85,16 @@ body{
 .nutsbtn[aria-expanded="true"]{background:var(--screen-ink); color:var(--screen)}
 .nutsbtn[aria-expanded="true"] svg{color:var(--haz-y)}
 .nutsbtn[aria-expanded="true"] svg circle{fill:var(--screen-ink)}
+@property --w{syntax:"<length>"; inherits:true; initial-value:1px}
+.mm{cursor:zoom-in; outline:none; transition:--w .7s cubic-bezier(.2,.8,.2,1)}
+.mm:focus-visible{outline:2px solid var(--accent); outline-offset:4px}
+.mm span{--a:var(--a-l); --b:var(--b-l);
+  background-image:repeating-linear-gradient(90deg, var(--a) 0 var(--w), var(--b) var(--w) calc(var(--w) * 2));
+  -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .mm span{--a:var(--a-d); --b:var(--b-d)} }
+:root[data-theme="dark"] .mm span{--a:var(--a-d); --b:var(--b-d)}
+.mm:hover, .mm.reveal{--w:9px}
+@media (prefers-reduced-motion: reduce){ .mm{transition:none} }
 /* The machine */
 .machine{grid-column:1 / -1; position:relative; display:grid; grid-template-columns:auto minmax(0,1fr); gap:20px 30px; align-items:center;
   padding:22px 26px; border-radius:10px; background:color-mix(in srgb, var(--screen-ink) 11%, var(--screen));
@@ -264,7 +274,7 @@ footer a{color:inherit}
     <div class="brand">
       <canvas id="gabor" width="144" height="144" aria-hidden="true"></canvas>
       <div class="titles" id="titles">
-        <h1>METAMERS</h1>
+        <h1 id="mmTitle" class="mm" aria-label="Metamers" tabindex="0">METAMERS</h1>
         <p class="tagline">LLM <span class="h1sub">(Large Ling Model)</span></p>
       </div>
     </div>
@@ -274,6 +284,7 @@ footer a{color:inherit}
     </div>
     <dialog class="what" id="what" aria-labelledby="whatTitle">
       <h2 id="whatTitle">What's happening?</h2>
+      <p>The title is itself a set of metamers. Every letter is a different physical stimulus: fine stripes of two colors that differ in hue but not luminance, with a different pair for each letter. The stripes are finer than your chromatic acuity, so each letter averages to the same color. Hover over or tap the title to magnify the stripes.</p>
       <p>Built from a dissection of 53 real Ling Lab papers (2004–2026). Each draw writes a complete paper: title, abstract, introduction, methods, results with simulated observers and real statistics, four figures, a parameter table, discussion and references.</p>
       <button class="whatclose" id="whatClose" type="button">Got it</button>
     </dialog>
@@ -1561,6 +1572,23 @@ $("unlockAll").addEventListener("click", () => {
   resynth("hopper");
 });
 function litStations(f){ document.querySelectorAll(".station").forEach((el, i, all) => el.classList.toggle("lit", f > 0 && i < Math.ceil(f * all.length))); }
+/* ---------- Metameric title ---------- */
+(function metamerTitle(){
+  const toLin = c => c <= 0.04045 ? c/12.92 : Math.pow((c+0.055)/1.055, 2.4);
+  const toS = l => l <= 0.0031308 ? 12.92*l : 1.055*Math.pow(l, 1/2.4) - 0.055;
+  const hex = lin => "#" + lin.map(l => Math.round(Math.min(1, Math.max(0, toS(l)))*255).toString(16).padStart(2,"0")).join("");
+  // Isoluminant directions (zero change in Rec. 709 luminance): red–green and blue–yellow axes
+  const e1 = [1, -0.2126/0.7152, 0], e2 = [0, -0.0722/0.7152, 1];
+  const pairs = (target, n, phase) => { const T = target.map(v => toLin(v/255));
+    return [...Array(n)].map((_, i) => { const th = phase + i*Math.PI/n, d = e1.map((v,j) => Math.cos(th)*v + Math.sin(th)*e2[j]);
+      const k = 0.96*Math.min(...d.map((dv,j) => Math.abs(dv) < 1e-6 ? Infinity : Math.min(T[j], 1-T[j])/Math.abs(dv)));
+      return [hex(T.map((t,j) => t + k*d[j])), hex(T.map((t,j) => t - k*d[j]))]; }); };
+  const h = $("mmTitle"), letters = [...h.textContent];
+  const L = pairs([66,66,70], letters.length, 0.2), D = pairs([196,196,200], letters.length, 0.2);
+  h.innerHTML = letters.map((ch, i) => `<span aria-hidden="true" style="--a-l:${L[i][0]};--b-l:${L[i][1]};--a-d:${D[i][0]};--b-d:${D[i][1]}">${ch}</span>`).join("");
+  h.addEventListener("click", () => h.classList.toggle("reveal"));
+  h.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " "){ e.preventDefault(); e.stopPropagation(); h.classList.toggle("reveal"); } });
+})();
 const whatDlg = $("what");
 $("whatBtn").addEventListener("click", () => { try { whatDlg.showModal(); } catch(e){ whatDlg.setAttribute("open", ""); } });
 $("whatClose").addEventListener("click", () => whatDlg.close());
