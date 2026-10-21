@@ -57,7 +57,7 @@ body{
 .top{display:grid; grid-template-columns:minmax(0,1fr); gap:14px}
 .brand{display:flex; align-items:center; gap:clamp(12px, 2.5vw, 26px)}
 .titles{min-width:0}
-#gabor{width:120px; height:120px; flex:none; border-radius:50%; display:block}
+#gabor{width:120px; height:120px; flex:none; display:block}
 .top h1{font-family:var(--f-display); font-weight:300; font-size:clamp(1.9rem, 4.2vw, 2.8rem); line-height:1.05; margin:0; letter-spacing:-0.01em; text-wrap:balance}
 .whatbtn{margin-top:0; display:inline-flex; align-items:center; gap:8px; font:500 .8rem/1 var(--f-mono); padding:7px 12px 7px 7px; border-radius:999px; border:1px solid color-mix(in srgb, var(--screen-ink) 25%, transparent); background:transparent; color:var(--screen-ink); cursor:pointer}
 .whatbtn span{display:grid; place-items:center; width:18px; height:18px; border-radius:50%; background:var(--screen-ink); color:var(--screen); font-weight:700; font-size:.72rem}
@@ -1253,8 +1253,8 @@ const gab = document.getElementById("gabor");
 let gaborPhase = 0, current = null, currentC = null;
 function drawGabor(){
   const g = gab.getContext("2d"), S = gab.width, mid = hexRGB(css("--screen") || "#a5a8ad");
-  const ori = current ? current.gaborOri : 0.6, img = g.createImageData(S, S), c0 = S/2, sig = S*0.22, freq = 4.2/S*Math.PI*2, co = Math.cos(ori), si = Math.sin(ori);
-  for (let y = 0; y < S; y++) for (let x = 0; x < S; x++){ const dx = x-c0, dy = y-c0, env = Math.exp(-(dx*dx+dy*dy)/(2*sig*sig)), v = Math.sin((dx*co+dy*si)*freq + gaborPhase)*env*0.9, i = (y*S+x)*4;
+  const ori = current ? current.gaborOri : 0.6, img = g.createImageData(S, S), c0 = S/2, sig = S*0.175, freq = 4.6/S*Math.PI*2, co = Math.cos(ori), si = Math.sin(ori);
+  for (let y = 0; y < S; y++) for (let x = 0; x < S; x++){ const dx = x-c0, dy = y-c0, rr = Math.sqrt(dx*dx+dy*dy)/c0, taper = rr >= 1 ? 0 : 0.5+0.5*Math.cos(Math.PI*rr*rr), env = Math.exp(-(dx*dx+dy*dy)/(2*sig*sig))*taper, v = Math.sin((dx*co+dy*si)*freq + gaborPhase)*env*0.95, i = (y*S+x)*4;
     for (let k = 0; k < 3; k++) img.data[i+k] = v > 0 ? mid[k] + (255-mid[k])*v : mid[k] + mid[k]*v; img.data[i+3] = 255; }
   g.putImageData(img, 0, 0);
 }
