@@ -83,6 +83,15 @@ body{
 .era input:focus-visible + label{outline:2px solid var(--accent); outline-offset:1px}
 .pills{display:flex; flex-wrap:wrap; gap:8px}
 .nutsbtn svg{width:18px; height:18px; color:var(--screen-ink)}
+.nutsbtn{position:relative; overflow:hidden; isolation:isolate}
+.nutsbtn::after{content:""; position:absolute; inset:-2px; z-index:-1; pointer-events:none; transform:translateX(-130%);
+  background:linear-gradient(105deg, transparent 30%, color-mix(in srgb, #fff 55%, transparent) 48%, color-mix(in srgb, var(--haz-y) 35%, transparent) 52%, transparent 70%);
+  animation:glint 7.5s ease-in-out 2.5s infinite}
+.nutsbtn:not([aria-expanded="true"]) svg{animation:nuttwist 7.5s ease-in-out 2.5s infinite}
+@keyframes glint{0%{transform:translateX(-130%)} 11%{transform:translateX(130%)} 100%{transform:translateX(130%)}}
+@keyframes nuttwist{0%{transform:rotate(0)} 4%{transform:rotate(0)} 12%{transform:rotate(60deg)} 100%{transform:rotate(60deg)}}
+.nutsbtn[aria-expanded="true"]::after{animation:none; opacity:0}
+@media (prefers-reduced-motion: reduce){ .nutsbtn::after, .nutsbtn svg{animation:none} }
 .nutsbtn[aria-expanded="true"]{background:var(--screen-ink); color:var(--screen)}
 .nutsbtn[aria-expanded="true"] svg{color:var(--haz-y)}
 .nutsbtn[aria-expanded="true"] svg circle{fill:var(--screen-ink)}
