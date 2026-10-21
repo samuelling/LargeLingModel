@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,560;1,6..72,400&display=swap">
 <style>
-/* Layout: the page is a psychophysics display at mean-luminance gray; the generated paper is a sheet presented on it, with the corpus dissection beside it. */
+/* Layout: the page is a psychophysics display at mean-luminance gray; the generated paper is a full article sheet presented on it, with contents and the corpus dissection beside it. */
 :root{
   --screen:#a5a8ad;
   --screen-ink:#14161a;
@@ -47,95 +47,100 @@ body{
   padding-right:max(16px, env(safe-area-inset-right, 0px));
   padding-block:28px 40px;
 }
-.wrap{max-width:1120px; margin:0 auto; display:flex; flex-direction:column; gap:24px}
+.wrap{max-width:1140px; margin:0 auto; display:flex; flex-direction:column; gap:24px}
 
 /* Header */
 .top{display:grid; grid-template-columns:auto 1fr; gap:18px 20px; align-items:center}
 #gabor{width:72px; height:72px; border-radius:50%; display:block}
-.top h1{
-  font-family:var(--f-display); font-weight:560; font-size:clamp(1.9rem, 4.2vw, 2.8rem);
-  line-height:1.05; margin:0; letter-spacing:-0.01em; text-wrap:balance;
-}
-.top p{margin:6px 0 0; color:var(--screen-muted); max-width:62ch; font-size:.95rem}
+.top h1{font-family:var(--f-display); font-weight:560; font-size:clamp(1.9rem, 4.2vw, 2.8rem); line-height:1.05; margin:0; letter-spacing:-0.01em; text-wrap:balance}
+.top p{margin:6px 0 0; color:var(--screen-muted); max-width:64ch; font-size:.95rem}
 .controls{grid-column:1 / -1; display:flex; flex-wrap:wrap; gap:12px; align-items:center}
 .era{display:flex; flex-wrap:wrap; gap:4px; border:0; margin:0; padding:3px; background:color-mix(in srgb, var(--screen-ink) 9%, transparent); border-radius:999px}
 .era legend{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0)}
 .era input{position:absolute; opacity:0; pointer-events:none}
-.era label{
-  font-family:var(--f-mono); font-size:.78rem; padding:6px 12px; border-radius:999px;
-  cursor:pointer; color:var(--screen-muted); white-space:nowrap;
-}
+.era label{font-family:var(--f-mono); font-size:.78rem; padding:6px 12px; border-radius:999px; cursor:pointer; color:var(--screen-muted); white-space:nowrap}
 .era input:checked + label{background:var(--paper); color:var(--ink)}
 .era input:focus-visible + label{outline:2px solid var(--accent); outline-offset:1px}
-.go{
-  display:inline-flex; align-items:center; gap:10px;
-  font:700 1rem/1 var(--f-body); padding:12px 20px; border-radius:999px; border:0;
-  background:var(--screen-ink); color:var(--screen); cursor:pointer;
-}
+.go{display:inline-flex; align-items:center; gap:10px; font:700 1rem/1 var(--f-body); padding:12px 20px; border-radius:999px; border:0; background:var(--screen-ink); color:var(--screen); cursor:pointer}
 .go:hover{filter:brightness(1.15)}
 .go:focus-visible{outline:2px solid var(--accent); outline-offset:3px}
 .go .dot{width:9px; height:9px; border-radius:50%; background:var(--fix)}
 .hint{font-family:var(--f-mono); font-size:.75rem; color:var(--screen-muted)}
 
 /* Main grid */
-.grid{display:grid; grid-template-columns:minmax(0, 1fr) 300px; gap:24px; align-items:start}
-@media (max-width:880px){ .grid{grid-template-columns:minmax(0,1fr)} }
+.grid{display:grid; grid-template-columns:minmax(0, 1fr) 280px; gap:24px; align-items:start}
+@media (max-width:900px){ .grid{grid-template-columns:minmax(0,1fr)} .toc{display:none} }
 
 /* The paper */
-.paper{
-  background:var(--paper); color:var(--ink); border-radius:4px;
-  padding:clamp(20px, 4vw, 44px); min-width:0;
-  box-shadow:0 1px 0 color-mix(in srgb, #000 12%, transparent), 0 14px 40px -18px color-mix(in srgb, #000 45%, transparent);
-}
+.paper{background:var(--paper); color:var(--ink); border-radius:4px; padding:clamp(20px, 4.5vw, 52px); min-width:0;
+  box-shadow:0 1px 0 color-mix(in srgb, #000 12%, transparent), 0 14px 40px -18px color-mix(in srgb, #000 45%, transparent)}
 .paper.flash .body{animation:onset .32s ease-out}
 @keyframes onset{from{opacity:.15}to{opacity:1}}
 @media (prefers-reduced-motion: reduce){ .paper.flash .body{animation:none} }
+.body{max-width:720px; margin:0 auto}
 .cite-line{font-family:var(--f-mono); font-size:.78rem; color:var(--ink-2); display:flex; flex-wrap:wrap; gap:4px 14px}
 .cite-line b{color:var(--ink); font-weight:500}
-.paper h2{
-  font-family:var(--f-display); font-weight:560; font-size:clamp(1.55rem, 3.4vw, 2.25rem);
-  line-height:1.14; margin:14px 0 12px; text-wrap:balance; letter-spacing:-0.005em;
-}
-.authors{margin:0 0 22px; font-size:1rem; color:var(--ink)}
+.paper h2{font-family:var(--f-display); font-weight:560; font-size:clamp(1.6rem, 3.5vw, 2.3rem); line-height:1.14; margin:14px 0 12px; text-wrap:balance; letter-spacing:-0.005em}
+.authors{margin:0 0 8px; font-size:1.02rem}
 .authors .me{font-weight:700; text-decoration:underline; text-decoration-color:var(--fix); text-decoration-thickness:2px; text-underline-offset:3px}
+.authors sup, .affs sup{font-size:.68em; color:var(--ink-2); margin-left:1px}
+.affs{list-style:none; margin:0 0 6px; padding:0; font-size:.82rem; color:var(--ink-2); display:flex; flex-direction:column; gap:2px}
+.dates{font-family:var(--f-mono); font-size:.72rem; color:var(--ink-2); margin:10px 0 26px; display:flex; flex-wrap:wrap; gap:4px 16px}
 .sec{font-family:var(--f-mono); font-size:.72rem; letter-spacing:.09em; text-transform:uppercase; color:var(--ink-2); margin:0 0 6px}
-.abstract{margin:0 0 26px; max-width:68ch; hyphens:auto}
-figure{margin:0 0 26px; border-top:1px solid var(--rule); border-bottom:1px solid var(--rule); padding-block:16px 12px}
-#fig{display:block; width:100%; height:300px}
-figcaption{font-size:.88rem; color:var(--ink-2); margin-top:8px; max-width:72ch}
-figcaption b{color:var(--ink)}
-.lay{margin:0 0 24px; padding:14px 16px; background:var(--chip); border-radius:4px; max-width:68ch}
+.abstract{margin:0 0 22px; hyphens:auto}
+.sig{margin:0 0 22px; padding:14px 16px; border:1px solid var(--rule); border-radius:4px}
+.sig p:last-child{margin:0; font-size:.95rem}
+.lay{margin:0 0 22px; padding:14px 16px; background:var(--chip); border-radius:4px}
 .lay p:not(.sec){margin:0; font-family:var(--f-display); font-style:italic; font-size:1.08rem; line-height:1.45}
-.kw{display:flex; flex-wrap:wrap; gap:6px; margin:0 0 24px; padding:0; list-style:none}
+.kw{display:flex; flex-wrap:wrap; gap:6px; margin:0 0 8px; padding:0; list-style:none}
 .kw li{font-family:var(--f-mono); font-size:.75rem; padding:3px 9px; border:1px solid var(--rule); border-radius:3px; color:var(--ink-2)}
-.remix{margin:0 0 22px; padding:0; list-style:none; display:flex; flex-direction:column; gap:6px; font-size:.88rem; color:var(--ink-2)}
+.article h3{font-family:var(--f-display); font-weight:560; font-size:1.45rem; margin:38px 0 10px; padding-top:18px; border-top:1px solid var(--rule); scroll-margin-top:16px}
+.article h4{font-family:var(--f-body); font-weight:700; font-size:1rem; margin:22px 0 6px}
+.article p{margin:0 0 12px; hyphens:auto}
+.eq{display:flex; justify-content:space-between; align-items:baseline; gap:12px; margin:8px 0 16px; padding:10px 0 10px 18px; overflow-x:auto}
+.eq .m{font-family:var(--f-display); font-style:italic; font-size:1.1rem; white-space:nowrap}
+.eq .no{font-family:var(--f-mono); font-size:.8rem; color:var(--ink-2)}
+.fig{margin:22px 0 24px; border-top:1px solid var(--rule); border-bottom:1px solid var(--rule); padding-block:16px 12px}
+.fig canvas{display:block; width:100%; height:300px}
+.fig figcaption, .tbl caption{font-size:.86rem; color:var(--ink-2); margin-top:8px; text-align:left; line-height:1.5}
+.fig figcaption b, .tbl caption b{color:var(--ink)}
+.tblwrap{overflow-x:auto; margin:20px 0 24px}
+.tbl{border-collapse:collapse; width:100%; font-size:.86rem; font-variant-numeric:tabular-nums; caption-side:top}
+.tbl caption{margin:0 0 8px}
+.tbl th, .tbl td{padding:6px 10px; text-align:right; white-space:nowrap}
+.tbl th:first-child, .tbl td:first-child{text-align:left}
+.tbl thead th{border-top:1.5px solid var(--ink); border-bottom:1px solid var(--ink); font-weight:700}
+.tbl tbody tr:last-child td{border-bottom:1.5px solid var(--ink)}
+.refs{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:7px; font-size:.86rem}
+.refs li{padding-left:1.6em; text-indent:-1.6em}
+.refs b{font-weight:700}
+.backmatter p{font-size:.9rem}
+.remix{margin:0 0 18px; padding:0; list-style:none; display:flex; flex-direction:column; gap:6px; font-size:.86rem; color:var(--ink-2)}
 .remix i{color:var(--ink)}
-.actions{display:flex; flex-wrap:wrap; gap:10px; align-items:center}
-.btn2{
-  font:500 .8rem/1 var(--f-mono); padding:9px 14px; border-radius:3px; cursor:pointer;
-  border:1px solid var(--rule); background:transparent; color:var(--ink);
-}
+.actions{display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-top:8px}
+.btn2{font:500 .8rem/1 var(--f-mono); padding:9px 14px; border-radius:3px; cursor:pointer; border:1px solid var(--rule); background:transparent; color:var(--ink)}
 .btn2:hover{border-color:var(--ink-2)}
 .btn2:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
 .toast{font-family:var(--f-mono); font-size:.75rem; color:var(--accent)}
 .disclaimer{font-size:.78rem; color:var(--ink-2); margin:18px 0 0}
 
-/* Dissection */
+/* Side */
 .side{display:flex; flex-direction:column; gap:22px; color:var(--screen-ink); min-width:0}
 .side h3{font-family:var(--f-mono); font-size:.72rem; letter-spacing:.09em; text-transform:uppercase; margin:0 0 10px; color:var(--screen-muted); font-weight:500}
+.toc ol{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:2px}
+.toc button{all:unset; cursor:pointer; font-size:.88rem; padding:3px 6px; border-radius:3px; display:block}
+.toc button:hover{background:color-mix(in srgb, var(--screen-ink) 9%, transparent)}
+.toc button:focus-visible{outline:2px solid var(--accent)}
 .stat{font-family:var(--f-display); font-size:1.5rem; line-height:1.2; margin:0}
 .stat span{font-family:var(--f-body); font-size:.85rem; color:var(--screen-muted); display:block}
 .bars{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:5px}
 .bars li{display:grid; grid-template-columns:minmax(0,1fr) 2.2em; gap:8px; align-items:center; font-size:.84rem}
 .bars .lbl{position:relative; padding:2px 6px; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
-.bars .lbl::before{content:""; position:absolute; inset:0 auto 0 0; width:var(--w); background:color-mix(in srgb, var(--screen-ink) 14%, transparent); border-radius:2px; z-index:0}
+.bars .lbl::before{content:""; position:absolute; inset:0 auto 0 0; width:var(--w); background:color-mix(in srgb, var(--screen-ink) 14%, transparent); border-radius:2px}
 .bars .lbl span{position:relative}
 .bars .n{font-family:var(--f-mono); font-size:.78rem; text-align:right; font-variant-numeric:tabular-nums; color:var(--screen-muted)}
 .hist{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:4px}
-.hist button{
-  all:unset; cursor:pointer; display:block; font-size:.84rem; line-height:1.35; padding:5px 6px; border-radius:3px;
-  color:var(--screen-ink);
-}
+.hist button{all:unset; cursor:pointer; display:block; font-size:.84rem; line-height:1.35; padding:5px 6px; border-radius:3px; color:var(--screen-ink)}
 .hist button:hover{background:color-mix(in srgb, var(--screen-ink) 9%, transparent)}
 .hist button:focus-visible{outline:2px solid var(--accent)}
 .hist .y{font-family:var(--f-mono); font-size:.72rem; color:var(--screen-muted)}
@@ -151,7 +156,7 @@ footer a{color:inherit}
     <canvas id="gabor" width="144" height="144" aria-hidden="true"></canvas>
     <div>
       <h1>Large Ling Model</h1>
-      <p>Built from a dissection of 53 real Ling Lab papers (2004–2026). Each draw recombines their title structures, modulators, methods and effect types into a new paper, complete with a fitted Figure 1.</p>
+      <p>Built from a dissection of 53 real Ling Lab papers (2004–2026). Each draw writes a complete paper: title, abstract, introduction, methods, results with simulated observers and real statistics, four figures, a parameter table, discussion and references.</p>
     </div>
     <div class="controls">
       <fieldset class="era" id="era">
@@ -168,30 +173,11 @@ footer a{color:inherit}
 
   <main class="grid">
     <article class="paper" id="paper" aria-live="polite">
-      <div class="body">
-        <div class="cite-line" id="citeLine"></div>
-        <h2 id="title"></h2>
-        <p class="authors" id="authors"></p>
-        <p class="sec">Abstract</p>
-        <p class="abstract" id="abstract"></p>
-        <figure>
-          <canvas id="fig" role="img" aria-label="Figure 1"></canvas>
-          <figcaption id="caption"></figcaption>
-        </figure>
-        <div class="lay"><p class="sec">Lay summary</p><p id="lay"></p></div>
-        <p class="sec">Keywords</p>
-        <ul class="kw" id="kw"></ul>
-        <p class="sec">Remixed from</p>
-        <ul class="remix" id="remix"></ul>
-        <div class="actions">
-          <button class="btn2" id="copy" type="button">Copy citation</button>
-          <span class="toast" id="toast" role="status"></span>
-        </div>
-        <p class="disclaimer">Fictional paper. Authors, journal and data are generated.</p>
-      </div>
+      <div class="body" id="body"></div>
     </article>
 
-    <aside class="side" aria-label="Corpus dissection">
+    <aside class="side" aria-label="Contents and corpus dissection">
+      <nav class="toc" aria-label="Sections"><h3>This paper</h3><ol id="toc"></ol></nav>
       <div>
         <h3>The corpus</h3>
         <p class="stat" id="corpusStat"></p>
@@ -203,14 +189,13 @@ footer a{color:inherit}
     </aside>
   </main>
 
-  <footer>Source titles from the <a href="https://sites.bu.edu/vision/publications/" target="_blank" rel="noopener">Ling Lab publications page</a>.</footer>
+  <footer>Source titles from the <a href="https://sites.bu.edu/vision/publications/" target="_blank" rel="noopener">Ling Lab publications page</a>. Every paper here is fictional; references are real.</footer>
 </div>
 
 <script>
 (function(){
 "use strict";
 
-/* ---------- Corpus: the real papers ---------- */
 const CORPUS = [
  [2026,["Park","Ling"],"Audiovisual interactions modulate visuocortical gain","Communications Biology"],
  [2026,["Vinke","Ling","Bloem"],"Model-based estimation of the population contrast response function in human visual cortex","Journal of Vision"],
@@ -277,6 +262,7 @@ function rng(seed){
     int: (lo, hi) => lo + Math.floor(next() * (hi - lo + 1)),
     num: (lo, hi) => lo + next() * (hi - lo),
     wpick: pairs => { const tot = pairs.reduce((s,p)=>s+p[1],0); let x = next()*tot; for (const p of pairs){ if((x-=p[1])<=0) return p[0]; } return pairs[pairs.length-1][0]; },
+    norm: (m, s) => m + s*Math.sqrt(-2*Math.log(1-next()))*Math.cos(2*Math.PI*next()),
     sample: (arr, k) => { const a = arr.slice(), out=[]; while(out.length<k && a.length){ out.push(a.splice(Math.floor(next()*a.length),1)[0]); } return out; }
   };
 }
@@ -284,21 +270,21 @@ const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
 
 /* ---------- Vocabulary, dissected from the titles ---------- */
 const M = {
-  spatial:{np:"spatial attention", adj:"attentional", conds:["Attended","Unattended"]},
-  feature:{np:"feature-based attention", adj:"attentional", conds:["Attended feature","Unattended feature"]},
-  temporal:{np:"temporal attention", adj:"attentional", conds:["Attended moment","Unattended moment"]},
-  transient:{np:"transient covert attention", adj:"attentional", conds:["Peripheral cue","Neutral cue"]},
-  sustained:{np:"sustained attention", adj:"attentional", conds:["Central cue","Neutral cue"]},
-  divided:{np:"divided attention", adj:"attentional", conds:["Focused","Divided"]},
-  pupil:{np:"pupil-linked arousal", adj:"arousal-related", conds:["Large pupil","Small pupil"]},
-  cognitive:{np:"cognitive arousal", adj:"arousal-related", conds:["High load","Low load"]},
-  emotional:{np:"emotional arousal", adj:"arousal-related", conds:["Threat cue","Neutral cue"]},
-  emotion:{np:"emotion", adj:"emotional", conds:["Fearful face","Neutral face"]},
-  reward:{np:"reward", adj:"reward-related", conds:["Rewarded","Unrewarded"]},
-  learning:{np:"perceptual learning", adj:"learning-related", conds:["Trained","Untrained"]},
-  expectation:{np:"expectation", adj:"predictive", conds:["Expected","Unexpected"]},
-  memory:{np:"visual working memory", adj:"mnemonic", conds:["Remembered","Viewed"]},
-  caffeine:{np:"caffeine", adj:"caffeinated", conds:["Double espresso","Decaf"]}
+  spatial:{k:"spatial", np:"spatial attention", adj:"attentional", conds:["Attended","Unattended"]},
+  feature:{k:"feature", np:"feature-based attention", adj:"attentional", conds:["Attended feature","Unattended feature"]},
+  temporal:{k:"temporal", np:"temporal attention", adj:"attentional", conds:["Attended moment","Unattended moment"]},
+  transient:{k:"transient", np:"transient covert attention", adj:"attentional", conds:["Peripheral cue","Neutral cue"]},
+  sustained:{k:"sustained", np:"sustained attention", adj:"attentional", conds:["Central cue","Neutral cue"]},
+  divided:{k:"divided", np:"divided attention", adj:"attentional", conds:["Focused","Divided"]},
+  pupil:{k:"pupil", np:"pupil-linked arousal", adj:"arousal-related", conds:["Large pupil","Small pupil"]},
+  cognitive:{k:"cognitive", np:"cognitive arousal", adj:"arousal-related", conds:["High load","Low load"]},
+  emotional:{k:"emotional", np:"emotional arousal", adj:"arousal-related", conds:["Threat cue","Neutral cue"]},
+  emotion:{k:"emotion", np:"emotion", adj:"emotional", conds:["Fearful face","Neutral face"]},
+  reward:{k:"reward", np:"reward", adj:"reward-related", conds:["Rewarded","Unrewarded"]},
+  learning:{k:"learning", np:"perceptual learning", adj:"learning-related", conds:["Trained","Untrained"]},
+  expectation:{k:"expectation", np:"expectation", adj:"predictive", conds:["Expected","Unexpected"]},
+  memory:{k:"memory", np:"visual working memory", adj:"mnemonic", conds:["Remembered","Viewed"]},
+  caffeine:{k:"caffeine", np:"caffeine", adj:"caffeinated", conds:["Double espresso","Decaf"]}
 };
 const MODS = {
   g:[["transient",3],["sustained",3],["spatial",2],["feature",2],["emotion",1]],
@@ -346,9 +332,9 @@ const T = [
  {src:10, eras:"i", fig:"crf", setup:c=>{c.mod=c.r.pick([M.cognitive,M.emotional,M.pupil])}, make:c=>`The effects of ${c.mod.np} on ${c.r.pick(["pupil size","the contrast response","visuocortical gain","contrast perception"])} depend on ${c.r.pick(V.factor)}`},
  {src:1, eras:"i", fig:"crf", make:c=>`Model-based estimation of ${c.r.pick(V.popThing)} in ${c.area}`},
  {src:8, eras:"i", fig:"tuning", make:c=>`Dynamic estimation of ${c.r.pick(V.popThing)} from visual cortical activity`},
- {src:3, eras:"i", fig:"crf", effects:["invert"], setup:c=>{c.sleep=c.r.pick(V.sleep); c.mod={np:"sleep", adj:"sleep-related", conds:[c.sleep,"Wake"]}}, make:c=>`Cortex-specific inversion of ${c.r.pick(V.resp)} during ${c.sleep}`},
- {src:26, eras:"i", fig:"crf", effects:["additive","responseGain"], setup:c=>{c.fac=c.r.pick(["Luminance","Caffeine","Eccentricity","Expectation","Sound"]); c.mod={np:c.fac.toLowerCase(), adj:"luminance-driven", conds:["High "+c.fac.toLowerCase(),"Low "+c.fac.toLowerCase()]}}, make:c=>`${c.fac} potentiates human visuocortical responses`},
- {src:0, eras:"i", fig:"crf", effects:["responseGain","contrastGain"], setup:c=>{c.ma=c.r.pick(V.modA); c.mod={np:c.ma.toLowerCase()+" stimulation", adj:"crossmodal", conds:[c.ma,"Visual only"]}}, make:c=>`${c.ma} interactions modulate visuocortical gain`},
+ {src:3, eras:"i", fig:"crf", effects:["invert"], setup:c=>{c.sleep=c.r.pick(V.sleep); c.mod={k:"sleep", np:"sleep", adj:"sleep-related", conds:[c.sleep,"Wake"]}}, make:c=>`Cortex-specific inversion of ${c.r.pick(V.resp)} during ${c.sleep}`},
+ {src:26, eras:"i", fig:"crf", effects:["additive","responseGain"], setup:c=>{c.fac=c.r.pick(["Luminance","Caffeine","Eccentricity","Expectation","Sound"]); c.mod={k:"factor", np:c.fac.toLowerCase(), adj:"luminance-driven", conds:["High "+c.fac.toLowerCase(),"Low "+c.fac.toLowerCase()]}}, make:c=>`${c.fac} potentiates human visuocortical responses`},
+ {src:0, eras:"i", fig:"crf", effects:["responseGain","contrastGain"], setup:c=>{c.ma=c.r.pick(V.modA); c.mod={k:"crossmodal", np:c.ma.toLowerCase()+" stimulation", adj:"crossmodal", conds:[c.ma,"Visual only"]}}, make:c=>`${c.ma} interactions modulate visuocortical gain`},
  {src:4, eras:"i", fig:"tuning", software:true, make:c=>`The population ${c.feature} toolbox`},
  {src:40, eras:"p", fig:"tuning", effects:["sharpen"], setup:c=>{c.mod=M.learning}, make:c=>`Perceptual learning selectively refines ${c.feature} representations in ${c.area}`},
  {src:37, eras:"p", fig:"tuning", setup:c=>{c.area=c.r.pick(["the human lateral geniculate nucleus","the human pulvinar","the human superior colliculus"])}, make:c=>`${cap(c.mod.np)} alters ${c.feature} processing in ${c.area}`},
@@ -359,8 +345,8 @@ const T = [
  {src:51, eras:"g", fig:"crf", effects:["contrastGain","responseGain"], setup:c=>{c.mod=M.transient}, make:c=>`Sustained and transient covert attention enhance the signal via different ${c.r.pick(["contrast response functions","normalization pools","tuning functions","noise-reduction mechanisms"])}`},
  {src:50, eras:"g", fig:"crf", effects:["contrastGain"], setup:c=>{c.mod=M.emotion}, make:c=>`Emotion facilitates perception and boosts the perceptual benefits of ${c.r.pick(["attention","transient attention","feature-based attention"])}`},
  {src:31, eras:"i", fig:"crf", make:c=>`${cap(c.mod.adj)} modulation interacts with ${c.r.pick(V.aniso)} in contrast perception`},
- {src:29, eras:"i", fig:"crf", effects:["additive","contrastGain","null"], setup:c=>{c.st=c.r.pick(["freezing","daydreaming","doomscrolling","grant-writing","faculty-meeting"]); c.mod={np:"a "+c.st+"-like state", adj:"state-dependent", conds:[cap(c.st),"Baseline"]}}, make:c=>`Visuocortical changes during a ${c.st}-like state in humans`},
- {src:12, eras:"i", fig:"crf", effects:["invert","additive"], setup:c=>{c.mod={np:"eye closure", adj:"state-dependent", conds:["Eyes shut","Eyes open"]}}, make:c=>`Differential cortical and subcortical visual processing with ${c.r.pick(["eyes shut","eyes half-open","one eye closed","sunglasses on"])}`},
+ {src:29, eras:"i", fig:"crf", effects:["additive","contrastGain","null"], setup:c=>{c.st=c.r.pick(["freezing","daydreaming","doomscrolling","grant-writing","faculty-meeting"]); c.mod={k:"state", np:"a "+c.st+"-like state", adj:"state-dependent", conds:[cap(c.st),"Baseline"]}}, make:c=>`Visuocortical changes during a ${c.st}-like state in humans`},
+ {src:12, eras:"i", fig:"crf", effects:["invert","additive"], setup:c=>{c.mod={k:"eyes", np:"eye closure", adj:"state-dependent", conds:["Eyes shut","Eyes open"]}}, make:c=>`Differential cortical and subcortical visual processing with ${c.r.pick(["eyes shut","eyes half-open","one eye closed","sunglasses on"])}`},
  {src:47, eras:"g", fig:"tuning", effects:["gainTuning","sharpen"], make:c=>`How ${c.mod.np} affects the gain and tuning of population responses`},
  {src:46, eras:"g", fig:"crf", make:c=>`A population-coding model of ${c.mod.np}'s influence on contrast response: estimating neural effects from psychophysical data`},
  {src:22, eras:"i", fig:"tuning", effects:["sharpen","gainTuning","shift"], make:c=>`${cap(c.mod.np)} selectively enhances target features`},
@@ -419,40 +405,6 @@ function volPages(j, y, r){
   return {v, p};
 }
 
-/* ---------- Abstract pieces ---------- */
-const METHODS = {
-  g:["measured contrast appearance and discrimination psychophysically","used a two-alternative forced-choice appearance paradigm"],
-  p:["combined fMRI with multivoxel pattern analysis","used binocular rivalry with psychophysical adaptation","used fMRI adaptation"],
-  i:["used 3T fMRI with model-based population tuning estimates","used high-resolution 7T fMRI","recorded simultaneous EEG-fMRI","combined pupillometry with fMRI"]
-};
-const TASKS = ["performed a demanding fixation task","attended to one of two peripheral gratings","judged the contrast of brief Gabor patches","detected rare targets in an RSVP stream","estimated the number of dots in brief arrays","lay quietly in the scanner"];
-
-function effectText(c){
-  const x = c.fx;
-  switch(c.effect){
-    case "contrastGain": return `shifted the contrast response function leftward, lowering the semi-saturation contrast by ${x.toFixed(2)} log units while leaving the maximum response unchanged, the signature of contrast gain`;
-    case "responseGain": return `scaled responses multiplicatively, raising the asymptotic response by ${Math.round(x)}% with no change in semi-saturation contrast, the signature of response gain`;
-    case "additive": return `added a contrast-independent offset of ${x.toFixed(2)}% signal change, an additive shift that neither gain model predicts`;
-    case "invert": return `inverted the sign of visual responses in ${c.area}, producing negative-going signals that nonetheless grew with contrast`;
-    case "null": return `left the contrast response function statistically unchanged (BF₀₁ = ${x.toFixed(1)}), contrary to prevailing accounts`;
-    case "sharpen": return `narrowed ${c.feature} tuning bandwidth by ${Math.round(x)}% while boosting the peak response`;
-    case "broaden": return `broadened ${c.feature} tuning bandwidth by ${Math.round(x)}% with no change in peak response`;
-    case "shift": return `shifted preferred ${c.feature} by ${c.axis.shiftLabel(x)} toward the attended value`;
-    case "gainTuning": return `scaled ${c.feature} tuning curves multiplicatively by ${Math.round(x)}%, leaving bandwidth untouched`;
-  }
-}
-const ANALOGY = {
-  contrastGain:["Think of a microphone's sensitivity knob: whispers become audible sooner, but the loudest shout still clips at the same ceiling.","Like reading glasses for faint signals: small print gets legible, but the headlines were already as clear as they get."],
-  responseGain:["Like a volume knob on the whole track: soft passages and loud ones rise by the same proportion.","Like zooming a photo: every feature gets bigger by the same factor, and the shape of the picture stays the same."],
-  additive:["Like raising the floor of a room instead of adding a story: everything sits a little higher no matter how tall it already was.","Like a constant hum under the music: it's there in the quiet parts and the loud parts alike."],
-  invert:["Like a photographic negative: the picture is all still there, with the sign flipped.","Like a sound wave played back with reversed polarity: same shape, opposite direction."],
-  null:["Like a thermostat that ignores you fiddling with it: the system was already holding its setpoint.","Like turning a dial that isn't connected to anything: a lot of effort, the same output."],
-  sharpen:["Like focusing a slide projector: the same image, but the edges stop bleeding into their neighbors.","Like a radio tuning in cleanly: the station gets louder and the static on either side drops away."],
-  broaden:["Like an old radio drifting off-station: neighboring channels start bleeding into the one you tuned.","Like a flashlight with the lens pulled back: the beam covers more ground but nothing gets brighter."],
-  shift:["Like a compass needle near a magnet: the preference itself swings toward what matters.","Like a spotlight operator nudging the beam toward the lead actor: the light stays the same, it just lands somewhere new."],
-  gainTuning:["Like turning up a choir without changing who's singing: every voice is louder and the harmony is intact.","Like brightening a stained-glass window: each color glows more, but the pattern is the same."]
-};
-
 /* ---------- Figure axes ---------- */
 function axisFor(feature){
   if (feature === "orientation") return {kind:"lin", lo:-90, hi:90, ticks:[-90,-45,0,45,90], fmt:v=>v+"°", label:"Orientation relative to preferred (°)", mu:0, sigma:24, shiftLabel:x=>`${x.toFixed(1)}°`, shiftScale:1};
@@ -461,12 +413,115 @@ function axisFor(feature){
   return {kind:"log2", lo:-2, hi:4, ticks:[-2,-1,0,1,2,3,4], fmt:v=>{const n=2**v; return n<1?String(n):String(n);}, label:"Spatial frequency (cycles/°)", mu:1, sigma:0.95, shiftLabel:x=>`${x.toFixed(2)} octaves`, shiftScale:1};
 }
 
+
+/* ---------- Stats ---------- */
+function lgamma(z){ const C=[0.99999999999980993,676.5203681218851,-1259.1392167224028,771.32342877765313,-176.61502916214059,12.507343278686905,-0.13857109526572012,9.9843695780195716e-6,1.5056327351493116e-7]; if(z<0.5) return Math.log(Math.PI/Math.sin(Math.PI*z))-lgamma(1-z); z-=1; let x=C[0]; for(let i=1;i<9;i++) x+=C[i]/(z+i); const t=z+7.5; return 0.5*Math.log(2*Math.PI)+(z+0.5)*Math.log(t)-t+Math.log(x); }
+function betacf(a,b,x){ const FP=1e-300; let qab=a+b,qap=a+1,qam=a-1,c=1,d=1-qab*x/qap; if(Math.abs(d)<FP)d=FP; d=1/d; let h=d; for(let m=1;m<=300;m++){ const m2=2*m; let aa=m*(b-m)*x/((qam+m2)*(a+m2)); d=1+aa*d; if(Math.abs(d)<FP)d=FP; c=1+aa/c; if(Math.abs(c)<FP)c=FP; d=1/d; h*=d*c; aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2)); d=1+aa*d; if(Math.abs(d)<FP)d=FP; c=1+aa/c; if(Math.abs(c)<FP)c=FP; d=1/d; const del=d*c; h*=del; if(Math.abs(del-1)<3e-14) break; } return h; }
+function ibeta(x,a,b){ if(x<=0) return 0; if(x>=1) return 1; const bt=Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+a*Math.log(x)+b*Math.log(1-x)); return x<(a+1)/(a+b+2) ? bt*betacf(a,b,x)/a : 1-bt*betacf(b,a,1-x)/b; }
+const mean = a => a.reduce((s,v)=>s+v,0)/a.length;
+const sd = a => { const m=mean(a); return Math.sqrt(a.reduce((s,v)=>s+(v-m)**2,0)/(a.length-1)); };
+const sem = a => sd(a)/Math.sqrt(a.length);
+function pairedT(A,B){
+  const d = A.map((v,i)=>v-B[i]), n=d.length, m=mean(d), s=sd(d)||1e-9, t=m/(s/Math.sqrt(n)), df=n-1;
+  const p = ibeta(df/(df+t*t), df/2, 0.5);
+  const bf01 = Math.sqrt(n)*Math.pow(1+t*t/df, -n/2);
+  return {t, df, p, dz:m/s, bf01, n};
+}
+function rmAnova(M){ // rows = subjects, cols = conditions
+  const n=M.length, k=M[0].length, gm=mean(M.flat());
+  const cm=[...Array(k)].map((_,j)=>mean(M.map(r=>r[j]))), rm=M.map(r=>mean(r));
+  const ssC=n*cm.reduce((s,v)=>s+(v-gm)**2,0), ssS=k*rm.reduce((s,v)=>s+(v-gm)**2,0), ssT=M.flat().reduce((s,v)=>s+(v-gm)**2,0);
+  const ssE=Math.max(ssT-ssC-ssS,1e-12), d1=k-1, d2=(k-1)*(n-1), F=(ssC/d1)/(ssE/d2);
+  return {F, d1, d2, p: ibeta(d2/(d2+d1*F), d2/2, d1/2), cm};
+}
+const fmtP = p => p < .001 ? "<i>p</i> < .001" : "<i>p</i> = " + p.toFixed(3).replace(/^0/,"");
+const fmtT = s => `<i>t</i>(${s.df}) = ${s.t.toFixed(2)}, ${fmtP(s.p)}, <i>d</i><sub>z</sub> = ${s.dz.toFixed(2)}`;
+const stars = p => p < .001 ? "***" : p < .01 ? "**" : p < .05 ? "*" : "";
+
+/* ---------- References (real) ---------- */
+const REFS = {
+ aghajari2020:[2020,"Aghajari et al., 2020","Aghajari, S., Vinke, L. N., & <b>Ling, S.</b> (2020). Population spatial frequency tuning in human early visual cortex. <i>Journal of Neurophysiology</i>."],
+ aston2005:[2005,"Aston-Jones & Cohen, 2005","Aston-Jones, G., & Cohen, J. D. (2005). An integrative theory of locus coeruleus-norepinephrine function: Adaptive gain and optimal performance. <i>Annual Review of Neuroscience, 28</i>, 403–450."],
+ benson2014:[2014,"Benson et al., 2014","Benson, N. C., Butt, O. H., Brainard, D. H., & Aguirre, G. K. (2014). Correction of distortion in flattened representations of the cortical surface allows prediction of V1–V3 functional organization from anatomy. <i>PLoS Computational Biology, 10</i>, e1003538."],
+ bloem2018:[2018,"Bloem et al., 2018","Bloem, I. M., Watanabe, Y., Kibbe, M., & <b>Ling, S.</b> (2018). Visual memories bypass normalization. <i>Psychological Science, 29</i>, 845–856."],
+ bloem2019:[2019,"Bloem & Ling, 2019","Bloem, I. M., & <b>Ling, S.</b> (2019). Normalization governs attentional modulation within human visual cortex. <i>Nature Communications, 10</i>, 5660."],
+ bloem2025:[2025,"Bloem et al., 2025","Bloem, I. M., Bakst, L., McGuire, J. T., & <b>Ling, S.</b> (2025). Dynamic estimation of the attentional field from visual cortical activity. <i>eLife</i>."],
+ boynton1996:[1996,"Boynton et al., 1996","Boynton, G. M., Engel, S. A., Glover, G. H., & Heeger, D. J. (1996). Linear systems analysis of functional magnetic resonance imaging in human V1. <i>Journal of Neuroscience, 16</i>, 4207–4221."],
+ brainard1997:[1997,"Brainard, 1997","Brainard, D. H. (1997). The Psychophysics Toolbox. <i>Spatial Vision, 10</i>, 433–436."],
+ burr2008:[2008,"Burr & Ross, 2008","Burr, D., & Ross, J. (2008). A visual sense of number. <i>Current Biology, 18</i>, 425–428."],
+ carandini2012:[2012,"Carandini & Heeger, 2012","Carandini, M., & Heeger, D. J. (2012). Normalization as a canonical neural computation. <i>Nature Reviews Neuroscience, 13</i>, 51–62."],
+ carrasco2004:[2004,"Carrasco et al., 2004","Carrasco, M., <b>Ling, S.</b>, & Read, S. (2004). Attention alters appearance. <i>Nature Neuroscience, 7</i>, 308–313."],
+ cicero2026:[2026,"Cicero et al., 2026","Cicero, N. G., Klímová, M., Vinke, L. N., <b>Ling, S.</b>, & Lewis, L. D. (2026). Cortex-specific inversion of visual responses during sleep. <i>Nature Communications</i>."],
+ cicero2024:[2024,"Cicero et al., 2024","Cicero, N. G., Klímová, M., Lewis, L. D., & <b>Ling, S.</b> (2024). Differential cortical and subcortical visual processing with eyes shut. <i>Journal of Neurophysiology</i>."],
+ dumoulin2008:[2008,"Dumoulin & Wandell, 2008","Dumoulin, S. O., & Wandell, B. A. (2008). Population receptive field estimates in human visual cortex. <i>NeuroImage, 39</i>, 647–660."],
+ fischl2012:[2012,"Fischl, 2012","Fischl, B. (2012). FreeSurfer. <i>NeuroImage, 62</i>, 774–781."],
+ foster2021:[2021,"Foster & Ling, 2021","Foster, J. J., & <b>Ling, S.</b> (2021). Normalizing population receptive fields. <i>Proceedings of the National Academy of Sciences, 118</i>, e2118367118."],
+ foster2022:[2022,"Foster & Ling, 2022","Foster, J. J., & <b>Ling, S.</b> (2022). Feature-based attention multiplicatively scales the fMRI-BOLD contrast-response function. <i>Journal of Neuroscience, 42</i>, 6894–6906."],
+ geurts2024:[2024,"Geurts et al., 2024","Geurts, L. S., <b>Ling, S.</b>, & Jehee, J. F. M. (2024). Pupil-linked arousal modulates precision of stimulus representation in cortex. <i>Journal of Neuroscience</i>."],
+ harvey2013:[2013,"Harvey et al., 2013","Harvey, B. M., Klein, B. P., Petridou, N., & Dumoulin, S. O. (2013). Topographic representation of numerosity in the human parietal cortex. <i>Science, 341</i>, 1123–1126."],
+ heeger1992:[1992,"Heeger, 1992","Heeger, D. J. (1992). Normalization of cell responses in cat striate cortex. <i>Visual Neuroscience, 9</i>, 181–197."],
+ jehee2012:[2012,"Jehee et al., 2012","Jehee, J. F. M., <b>Ling, S.</b>, Swisher, J. D., van Bergen, R. S., & Tong, F. (2012). Perceptual learning selectively refines orientation representations in early visual cortex. <i>Journal of Neuroscience, 32</i>, 16747–16753."],
+ kim2017:[2017,"Kim et al., 2017","Kim, D., Lokey, S., & <b>Ling, S.</b> (2017). Elevated arousal levels enhance contrast perception. <i>Journal of Vision, 17</i>(2), 14."],
+ klimova2021:[2021,"Klímová et al., 2021","Klímová, M., Bloem, I. M., & <b>Ling, S.</b> (2021). The specificity of orientation-tuned normalization within human early visual cortex. <i>Journal of Neurophysiology</i>."],
+ klimova2023:[2023,"Klímová et al., 2023","Klímová, M., Bloem, I. M., & <b>Ling, S.</b> (2023). Attention preserves the selectivity of feature-tuned normalization. <i>Journal of Neurophysiology</i>."],
+ ling2006a:[2006,"Ling & Carrasco, 2006a","<b>Ling, S.</b>, & Carrasco, M. (2006a). Sustained and transient covert attention enhance the signal via different contrast response functions. <i>Vision Research, 46</i>, 1210–1220."],
+ ling2006b:[2006,"Ling & Carrasco, 2006b","<b>Ling, S.</b>, & Carrasco, M. (2006b). When sustained attention impairs perception. <i>Nature Neuroscience, 9</i>, 1243–1245."],
+ lingblake2009:[2009,"Ling & Blake, 2009","<b>Ling, S.</b>, & Blake, R. (2009). Suppression during binocular rivalry broadens orientation tuning. <i>Psychological Science, 20</i>, 1348–1355."],
+ lingblake2012:[2012,"Ling & Blake, 2012","<b>Ling, S.</b>, & Blake, R. (2012). Normalization regulates competition for visual awareness. <i>Neuron, 75</i>, 533–542."],
+ lingliu2009:[2009,"Ling et al., 2009","<b>Ling, S.</b>, Liu, T., & Carrasco, M. (2009). How spatial and feature-based attention affect the gain and tuning of population responses. <i>Vision Research, 49</i>, 1194–1204."],
+ ling2015:[2015,"Ling et al., 2015","<b>Ling, S.</b>, Pratte, M. S., & Tong, F. (2015). Attention alters orientation processing in the human lateral geniculate nucleus. <i>Nature Neuroscience, 18</i>, 496–498."],
+ mcadams1999:[1999,"McAdams & Maunsell, 1999","McAdams, C. J., & Maunsell, J. H. R. (1999). Effects of attention on orientation-tuning functions of single neurons in macaque cortical area V4. <i>Journal of Neuroscience, 19</i>, 431–441."],
+ naka1966:[1966,"Naka & Rushton, 1966","Naka, K. I., & Rushton, W. A. H. (1966). S-potentials from colour units in the retina of fish (Cyprinidae). <i>Journal of Physiology, 185</i>, 536–555."],
+ pan2022:[2022,"Pan et al., 2022","Pan, J., Klímová, M., McGuire, J. T., & <b>Ling, S.</b> (2022). Arousal-based pupil modulation is dictated by luminance. <i>Scientific Reports</i>."],
+ pan2025:[2025,"Pan et al., 2025","Pan, J., Vinke, L. N., McGuire, J. T., & <b>Ling, S.</b> (2025). Heterogeneous effects of cognitive arousal on the contrast response in human visual cortex. <i>Journal of Neuroscience, 45</i>, e0798242025."],
+ park2026:[2026,"Park & Ling, 2026","Park, M., & <b>Ling, S.</b> (2026). Audiovisual interactions modulate visuocortical gain. <i>Communications Biology</i>."],
+ pestilli2009:[2009,"Pestilli et al., 2009","Pestilli, F., <b>Ling, S.</b>, & Carrasco, M. (2009). A population-coding model of attention's influence on contrast response: Estimating neural effects from psychophysical data. <i>Vision Research, 49</i>, 1144–1153."],
+ ramirez2025:[2025,"Ramirez et al., 2025","Ramirez, L. D., Wang, F., & <b>Ling, S.</b> (2025). Attention alters population spatial frequency tuning. <i>Journal of Neuroscience, 45</i>, e0251252025."],
+ reynolds2009:[2009,"Reynolds & Heeger, 2009","Reynolds, J. H., & Heeger, D. J. (2009). The normalization model of attention. <i>Neuron, 61</i>, 168–185."],
+ rouder2009:[2009,"Rouder et al., 2009","Rouder, J. N., Speckman, P. L., Sun, D., Morey, R. D., & Iverson, G. (2009). Bayesian t tests for accepting and rejecting the null hypothesis. <i>Psychonomic Bulletin & Review, 16</i>, 225–237."],
+ treue1999:[1999,"Treue & Martínez Trujillo, 1999","Treue, S., & Martínez Trujillo, J. C. (1999). Feature-based attention influences motion processing gain in macaque visual cortex. <i>Nature, 399</i>, 575–579."],
+ vinke2020:[2020,"Vinke & Ling, 2020","Vinke, L. N., & <b>Ling, S.</b> (2020). Luminance potentiates human visuocortical responses. <i>Journal of Neurophysiology</i>."],
+ vinke2022:[2022,"Vinke et al., 2022","Vinke, L. N., Bloem, I. M., & <b>Ling, S.</b> (2022). Saturating nonlinearities of contrast response in human visual cortex. <i>Journal of Neuroscience</i>."],
+ watson1983:[1983,"Watson & Pelli, 1983","Watson, A. B., & Pelli, D. G. (1983). QUEST: A Bayesian adaptive psychometric method. <i>Perception & Psychophysics, 33</i>, 113–120."],
+ wiecek2026:[2026,"Wiecek et al., 2026","Wiecek, E., Ramirez, L. D., Klímová, M., & <b>Ling, S.</b> (2026). Spatial frequency tuning follows scale invariance in the human visual cortex. <i>Journal of Neuroscience</i>."]
+};
+function cite(c, ...keys){
+  const ok = keys.filter(k => REFS[k] && REFS[k][0] < c.year);
+  if (!ok.length) return "";
+  ok.forEach(k => c.used.add(k));
+  return " (" + ok.map(k => REFS[k][1]).join("; ") + ")";
+}
+
+/* ---------- Kinds ---------- */
+const ATT = ["spatial","feature","temporal","transient","sustained","divided"];
+const ARO = ["pupil","cognitive","emotional","caffeine","emotion","state"];
+const kindOf = m => m.k || "spatial";
+
 /* ---------- Generator ---------- */
 const ERA_YEARS = {g:[2004,2009], p:[2009,2015], i:[2016,2027]};
+const AFF = {
+  g:"Department of Psychology, New York University, New York, NY",
+  p:"Department of Psychology, Vanderbilt University, Nashville, TN",
+  i:"Department of Psychological & Brain Sciences, Boston University, Boston, MA"
+};
+const AFF_BY = {
+  "Carrasco":"g","Pestilli":"g","Liu":"g","Fuller":"g","Read":"g","Phelps":"g",
+  "Blake":"p","Tong":"p","Pearson":"p","Pratte":"p","Swisher":"p","Hubert-Wallander":"p","Poltoratski":"p",
+  "Jehee":"Donders Institute for Brain, Cognition and Behaviour, Radboud University, Nijmegen, The Netherlands",
+  "van Bergen":"Donders Institute for Brain, Cognition and Behaviour, Radboud University, Nijmegen, The Netherlands",
+  "Geurts":"Donders Institute for Brain, Cognition and Behaviour, Radboud University, Nijmegen, The Netherlands",
+  "Watanabe":"Department of Cognitive, Linguistic & Psychological Sciences, Brown University, Providence, RI",
+  "Lewis":"Department of Biomedical Engineering, Boston University, Boston, MA",
+  "Brascamp":"Department of Psychology, Michigan State University, East Lansing, MI",
+  "Qian":"Department of Psychology, Michigan State University, East Lansing, MI",
+  "Chrastil":"Department of Neurobiology & Behavior, University of California, Irvine, CA"
+};
+const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
 function generate(seed, eraSel){
   const r = rng(seed);
   const era = eraSel === "a" ? r.wpick([["g",1],["p",1],["i",2.2]]) : eraSel;
-  const c = {r, era};
+  const c = {r, era, used:new Set()};
   c.year = r.int(...ERA_YEARS[era]);
   c.mod = M[r.wpick(MODS[era])];
   c.feature = r.wpick(V.features);
@@ -478,235 +533,695 @@ function generate(seed, eraSel){
   c.effect = r.pick(t.effects || (t.fig === "crf" ? CRF : TUN));
   c.axis = axisFor(c.feature);
   c.fx = ({
-    contrastGain:r.num(0.08,0.24), responseGain:r.num(15,60), additive:r.num(0.12,0.4), invert:0, null:r.num(3,11),
-    sharpen:r.num(12,35), broaden:r.num(18,55), gainTuning:r.num(15,50),
-    shift: c.axis.kind === "lin" ? r.num(6,18) * (c.axis.hi/90) : r.num(0.2,0.6)
+    contrastGain:r.num(0.1,0.24), responseGain:r.num(18,55), additive:r.num(0.15,0.4), invert:r.num(0.45,0.75), null:0,
+    sharpen:r.num(15,32), broaden:r.num(20,50), gainTuning:r.num(18,45),
+    shift: c.axis.kind === "lin" ? r.num(7,16) * (c.axis.hi/90) : r.num(0.25,0.6)
   })[c.effect];
   c.title = t.make(c);
+  c.k = kindOf(c.mod);
 
-  const authors = authorsFor(c);
-  const journal = t.software ? "Journal of Open Research Software" : t.review ? r.pick(["Brain Structure & Function","Trends in Cognitive Sciences","Annual Review of Vision Science"]) : r.wpick(JOURNALS[era]);
-  const vp = volPages(journal, c.year, r);
-  const n = era === "g" ? r.int(5,12) : r.int(8,28);
-  const method = r.pick(METHODS[era]);
-  const task = r.pick(TASKS);
-  const bg = c.fig === "crf"
-    ? r.pick([`${cap(c.mod.np)} is known to shape how ${c.area} encodes contrast, yet whether it acts by changing sensitivity or by scaling the response remains contested.`,
-              `How ${c.mod.np} alters the relationship between stimulus contrast and neural response has been debated for two decades.`])
-    : r.pick([`${cap(c.mod.np)} is thought to refine the ${c.feature} selectivity of neural populations, but how it reshapes population tuning in humans is unclear.`,
-              `Population ${c.feature} tuning in ${c.area} is often treated as fixed, but whether ${c.mod.np} reshapes it has rarely been tested directly.`]);
-  const locus = r.pick(["the excitatory drive","the suppressive pool","stimulus drive before normalization","the normalization pool"]);
-  const r2 = r.num(0.71, 0.96).toFixed(2);
-  const concl = r.pick([
-    `These results suggest that ${c.mech} is a canonical computation through which ${c.mod.np} shapes visual processing.`,
-    `Together, these findings help reconcile long-standing disagreements about how ${c.mod.np} changes what we see.`,
-    `More broadly, they suggest that ${c.area} is less a passive camera than an adjustable instrument.`,
-    `These results constrain models in which ${c.mod.np} and ${c.mech} are treated as separate stages.`
-  ]);
-  const abstract = `${bg} Here, we ${method} while ${n} observers ${task}. We found that ${c.mod.np} ${effectText(c)}. A ${c.mech} model in which ${c.mod.np} acts on ${locus} accounted for these effects (R² = ${r2}). ${concl}`;
+  const mm = r.pick(METHODS[era]); c.method = mm.t; c.mk = mm.k;
+  if (c.k === "sleep" || c.k === "eyes"){ c.method = "recorded simultaneous EEG-fMRI"; c.mk = "eegfmri"; }
+  else if (["pupil","cognitive","emotional","caffeine"].includes(c.k) && c.mk === "fmri" && r.f() < 0.5){ c.method = "combined pupillometry with fMRI"; c.mk = "pupil"; }
+  c.mri = c.mk !== "psych";
+  c.n = c.mri ? r.int(10, 24) : r.int(6, 12);
+  c.cA = c.mod.conds[0]; c.cB = c.mod.conds[1];
+  c.authors = authorsFor(c);
+  c.journal = t.software ? "Journal of Open Research Software" : t.review ? r.pick(["Brain Structure & Function","Annual Review of Vision Science"]) : r.wpick(JOURNALS[era]);
+  const vp = volPages(c.journal, c.year, r); c.vol = vp.v; c.pages = vp.p;
+  c.task = c.mri ? r.pick(["performed a demanding fixation task","detected rare targets in an RSVP stream at fixation","reported brief contrast decrements","lay still and fixated"]) : r.pick(["judged the contrast of brief Gabor patches","reported the orientation of a brief target","compared the apparent contrast of two Gabors"]);
+  c.locus = r.pick(["the excitatory drive","the suppressive pool","stimulus drive before normalization"]);
 
-  const kw = [c.mod.np, c.mech, c.fig === "crf" ? "contrast response function" : c.feature + " tuning", era === "g" ? "psychophysics" : method.match(/EEG-fMRI|7T|pupillometry|fMRI adaptation|pattern|fMRI|rivalry/)?.[0] || "fMRI", c.area.replace(/^the /,"")];
-
-  // Figure data
-  const figd = buildFigure(c, r, n);
-
-  // Provenance: the template's source + one related paper
+  simulate(c);
+  const p = {seed, eraSel, era, title:c.title, authors:c.authors, journal:c.journal, year:c.year, vol:c.vol, pages:c.pages, effect:c.effect, gaborOri:r.num(0, Math.PI)};
+  p.html = writePaper(c);
+  p.figs = c.figs;
+  p.toc = c.toc;
   const src = CORPUS[t.src];
   const key = (c.mod.np.match(/attention|arousal|learning|memory|reward|sleep|emotion/)||[c.feature])[0];
-  const related = CORPUS.filter((p,i) => i !== t.src && p[2].toLowerCase().includes(key.replace("memory","memor")));
-  const second = related.length ? r.pick(related) : r.pick(CORPUS.filter((p,i)=>i!==t.src));
-
-  return {
-    seed, eraSel, era, title:c.title, authors, journal, year:c.year, vol:vp.v, pages:vp.p,
-    abstract, figd, n, kw:[...new Set(kw)],
-    lay: r.pick(ANALOGY[c.effect]),
-    remix:[src, second], effect:c.effect, gaborOri: r.num(0, Math.PI)
-  };
+  const related = CORPUS.filter((q,i) => i !== t.src && q[2].toLowerCase().includes(key.replace("memory","memor")));
+  p.remix = [src, related.length ? r.pick(related) : r.pick(CORPUS.filter((q,i)=>i!==t.src))];
+  p.ctx = c;
+  p.cite = `${fmtAuthors(c.authors,false)} (${c.year}). ${c.title}. ${c.journal}, ${c.vol}, ${c.pages}.`;
+  return p;
 }
 
-function buildFigure(c, r, n){
-  const conds = c.mod.conds;
+/* ---------- Simulation ---------- */
+function simulate(c){
+  const r = c.r, n = c.n, a = c.axis;
+  const amp = c.mri ? r.num(1.4, 3.2) : 1;
+  c.unit = c.mri ? "% signal change" : "a.u.";
+  let defs, key, sec;
+  const f = c.fig === "crf"
+    ? (x,p) => p.Rmax*Math.pow(x,p.n)/(Math.pow(x,p.n)+Math.pow(p.c50,p.n)) + p.b
+    : (x,p) => p.amp*Math.exp(-((x-p.mu)**2)/(2*p.sigma**2)) + p.b;
   if (c.fig === "crf"){
-    const amp = c.era === "g" ? 1 : r.num(1.1, 1.8);
-    const base = {Rmax:1, c50:0.17, n:2, b:0.05};
-    const mod = {...base};
-    if (c.effect === "contrastGain") mod.c50 = base.c50 * Math.pow(10, -c.fx);
-    if (c.effect === "responseGain") mod.Rmax = 1 + c.fx/100;
-    if (c.effect === "additive") mod.b = base.b + c.fx / amp;
-    if (c.effect === "invert"){ mod.Rmax = -r.num(0.45, 0.75); mod.b = -0.02; }
-    const f = (x, p) => amp * (p.Rmax * Math.pow(x, p.n) / (Math.pow(x, p.n) + Math.pow(p.c50, p.n)) + p.b);
-    const xs = [0.015, 0.03, 0.06, 0.12, 0.25, 0.5, 1];
-    const pts = s => xs.map(x => ({x, y: f(x, s) + r.num(-0.035, 0.035)*amp, e: r.num(0.025, 0.07)*amp}));
-    return {
-      type:"crf", conds, curves:[{p:base, pts:pts(base), mod:false},{p:mod, pts:pts(mod), mod:true}], f,
-      ylabel: c.era === "g" ? "Normalized response" : "BOLD (% signal change)",
-      caption: `<b>Figure 1.</b> Contrast response functions for ${conds[0].toLowerCase()} and ${conds[1].toLowerCase()} conditions, fit with a Naka–Rushton function. ${({contrastGain:"The leftward shift with a shared asymptote indicates contrast gain.",responseGain:"The raised asymptote with a shared c₅₀ indicates response gain.",additive:"Curves are offset by a constant across contrasts.",invert:"Responses invert in sign but preserve contrast dependence.",null:"Fits are indistinguishable."})[c.effect]} Error bars, ±1 SEM across observers (n = ${n}).`
+    defs = {
+      c50:{name:"semi-saturation contrast", th:"C<sub>50</sub> (%)", ax:"C₅₀ (%)", sym:"C₅₀", get:p=>p.c50*100, dp:1, u:"%"},
+      Rmax:{name:"maximum response", th:`R<sub>max</sub> (${c.unit})`, ax:"Rₘₐₓ", sym:"Rₘₐₓ", get:p=>p.Rmax, dp:2, u:""},
+      n:{name:"exponent", th:"<i>n</i>", ax:"n", sym:"n", get:p=>p.n, dp:2, u:""},
+      b:{name:"baseline", th:`<i>b</i> (${c.unit})`, ax:"Baseline", sym:"b", get:p=>p.b, dp:2, u:""}
     };
-  }
-  const a = c.axis;
-  const base = {amp:1, mu:a.mu, sigma:a.sigma, b:0.12};
-  const mod = {...base};
-  if (c.effect === "sharpen"){ mod.sigma = base.sigma * (1 - c.fx/100); mod.amp = 1.18; }
-  if (c.effect === "broaden"){ mod.sigma = base.sigma * (1 + c.fx/100); }
-  if (c.effect === "shift"){ mod.mu = base.mu + c.fx; }
-  if (c.effect === "gainTuning"){ mod.amp = 1 + c.fx/100; }
-  const f = (x, p) => p.amp * Math.exp(-((x - p.mu)**2) / (2 * p.sigma**2)) + p.b;
-  const xs = Array.from({length:9}, (_, i) => a.lo + (a.hi - a.lo) * i / 8);
-  const pts = s => xs.map(x => ({x, y: f(x, s) + r.num(-0.05, 0.05), e: r.num(0.03, 0.08)}));
-  return {
-    type:"tuning", conds, axis:a, curves:[{p:base, pts:pts(base), mod:false},{p:mod, pts:pts(mod), mod:true}], f,
-    ylabel:"Normalized response",
-    caption: `<b>Figure 1.</b> Population ${c.feature} tuning for ${conds[0].toLowerCase()} and ${conds[1].toLowerCase()} conditions, fit with Gaussian${a.kind === "log2" ? "s in log₂ space" : "s"}. ${({sharpen:"Bandwidth narrows and the peak rises.",broaden:"Bandwidth widens with no change in peak.",shift:"The preferred value shifts toward the attended feature.",gainTuning:"Curves scale multiplicatively with bandwidth preserved."})[c.effect]} Error bars, ±1 SEM across observers (n = ${n}).`
-  };
-}
-
-/* ---------- Drawing ---------- */
-const css = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-const figCanvas = document.getElementById("fig");
-let current = null;
-
-function drawFigure(){
-  if (!current) return;
-  const d = current.figd;
-  const W = figCanvas.clientWidth;
-  const H = Math.max(220, Math.min(320, Math.round(W * 0.52)));
-  figCanvas.style.height = H + "px";
-  const dpr = window.devicePixelRatio || 1;
-  figCanvas.width = Math.round(W * dpr); figCanvas.height = Math.round(H * dpr);
-  const g = figCanvas.getContext("2d");
-  g.setTransform(dpr, 0, 0, dpr, 0, 0);
-  g.clearRect(0, 0, W, H);
-  const ink = css("--ink"), ink2 = css("--ink-2"), rule = css("--rule"), acc = css("--accent");
-  const mono = getComputedStyle(document.body).getPropertyValue("--f-mono") || "monospace";
-  const L = 58, R = 14, Tp = 14, B = 46;
-  const pw = W - L - R, ph = H - Tp - B;
-
-  let xlo, xhi, xt, xfmt, xl, xmap;
-  if (d.type === "crf"){
-    xlo = -2; xhi = 0; xt = [0.01, 0.03, 0.1, 0.3, 1]; xfmt = v => (v*100) + "%"; xl = "Stimulus contrast";
-    xmap = v => L + (Math.log10(v) - xlo) / (xhi - xlo) * pw;
+    key = {contrastGain:"c50", null:"c50", responseGain:"Rmax", invert:"Rmax", additive:"b"}[c.effect];
+    sec = {contrastGain:"Rmax", null:"Rmax", responseGain:"c50", invert:"n", additive:"Rmax"}[c.effect];
   } else {
-    const a = d.axis; xlo = a.lo; xhi = a.hi; xt = a.ticks; xfmt = a.fmt; xl = a.label;
-    xmap = v => L + (v - xlo) / (xhi - xlo) * pw;
+    const isLog = a.kind === "log2";
+    const pu = c.feature === "spatial frequency" ? " cpd" : c.feature === "numerosity" ? " dots" : "°";
+    defs = {
+      pref:{name:"preferred "+c.feature, th:`Preferred ${c.feature} (${pu.trim()})`, ax:`Preferred (${pu.trim()})`, sym:"μ", get:p=>isLog?Math.pow(2,p.mu):p.mu, dp:isLog?2:1, u:pu},
+      fwhm:{name:"tuning bandwidth", th:`Bandwidth, FWHM (${isLog?"octaves":"°"})`, ax:`FWHM (${isLog?"oct":"°"})`, sym:"σ", get:p=>2.355*p.sigma, dp:isLog?2:1, u:isLog?" octaves":"°"},
+      amp:{name:"amplitude", th:"Amplitude (a.u.)", ax:"Amplitude", sym:"A", get:p=>p.amp, dp:2, u:""},
+      b:{name:"baseline", th:"Baseline (a.u.)", ax:"Baseline", sym:"b", get:p=>p.b, dp:2, u:""}
+    };
+    key = {sharpen:"fwhm", broaden:"fwhm", shift:"pref", gainTuning:"amp"}[c.effect];
+    sec = {sharpen:"pref", broaden:"amp", shift:"fwhm", gainTuning:"fwhm"}[c.effect];
   }
-  // y range
-  let ys = [];
-  d.curves.forEach(c => c.pts.forEach(p => { ys.push(p.y + p.e, p.y - p.e); }));
-  const ymin = Math.min(...ys);
-  let ylo = Math.min(0, ymin), yhi = Math.max(...ys);
-  const span = yhi - ylo; if (ymin < 0) ylo -= span * 0.05; yhi += span * 0.08;
-  const step = niceStep((yhi - ylo) / 4);
-  ylo = Math.floor(ylo / step) * step; yhi = Math.ceil(yhi / step) * step;
-  const ymap = v => Tp + (1 - (v - ylo) / (yhi - ylo)) * ph;
-
-  g.font = `11px ${mono}`; g.textBaseline = "middle";
-  // grid + y ticks
-  g.strokeStyle = rule; g.lineWidth = 1; g.fillStyle = ink2; g.textAlign = "right";
-  for (let v = ylo; v <= yhi + 1e-9; v += step){
-    const y = Math.round(ymap(v)) + 0.5;
-    g.beginPath(); g.moveTo(L, y); g.lineTo(L + pw, y); g.stroke();
-    g.fillText(fmtNum(v, step), L - 8, y);
-  }
-  if (ylo < 0 && yhi > 0){ g.strokeStyle = ink2; g.beginPath(); g.moveTo(L, Math.round(ymap(0))+.5); g.lineTo(L+pw, Math.round(ymap(0))+.5); g.stroke(); }
-  // x axis
-  g.strokeStyle = ink2; g.beginPath(); g.moveTo(L, Tp + ph + .5); g.lineTo(L + pw, Tp + ph + .5); g.stroke();
-  g.textAlign = "center"; g.textBaseline = "top"; g.fillStyle = ink2;
-  xt.forEach(v => { const x = xmap(v); g.beginPath(); g.moveTo(x, Tp+ph); g.lineTo(x, Tp+ph+4); g.stroke(); g.fillText(xfmt(v), x, Tp + ph + 7); });
-  g.fillText(xl, L + pw/2, Tp + ph + 25);
-  g.save(); g.translate(13, Tp + ph/2); g.rotate(-Math.PI/2); g.textBaseline = "middle"; g.fillText(d.ylabel, 0, 0); g.restore();
-
-  // curves
-  d.curves.forEach(cv => {
-    const col = cv.mod ? acc : ink2;
-    g.strokeStyle = col; g.lineWidth = 2; g.beginPath();
-    for (let i = 0; i <= 160; i++){
-      const t = i / 160;
-      const xv = d.type === "crf" ? Math.pow(10, xlo + t*(xhi-xlo)) : xlo + t*(xhi-xlo);
-      const px = xmap(xv), py = ymap(d.f(xv, cv.p));
-      i ? g.lineTo(px, py) : g.moveTo(px, py);
+  let A, B, ks, ss, tries = 0;
+  do {
+    A = []; B = [];
+    for (let i = 0; i < n; i++){
+      let b, x;
+      if (c.fig === "crf"){
+        b = {c50:Math.pow(10, Math.log10(0.17)+r.norm(0,0.09)), Rmax:amp*r.norm(1,0.13), n:r.norm(2,0.22), b:amp*r.norm(0.04,0.02)};
+        x = {...b, n:b.n+r.norm(0,0.06)};
+        if (c.effect==="contrastGain") x.c50 = b.c50*Math.pow(10, -(c.fx + r.norm(0,0.05)));
+        if (c.effect==="responseGain") x.Rmax = b.Rmax*(1 + c.fx/100 + r.norm(0,0.07));
+        if (c.effect==="additive") x.b = b.b + amp*(c.fx + r.norm(0,0.05)) / 1.6;
+        if (c.effect==="invert"){ x.Rmax = -b.Rmax*(c.fx + r.norm(0,0.08)); x.b = amp*r.norm(-0.01,0.02); x.c50 = b.c50*Math.pow(10, r.norm(0,0.03)); }
+        if (c.effect==="null"){ x.c50 = b.c50*Math.pow(10, r.norm(0,0.03)); x.Rmax = b.Rmax*(1+r.norm(0,0.03)); }
+        if (c.effect!=="invert" && c.effect!=="additive") x.b = b.b + amp*r.norm(0,0.012);
+      } else {
+        b = {mu:a.mu + r.norm(0, a.sigma*0.06), sigma:a.sigma*r.norm(1,0.08), amp:r.norm(1,0.1), b:r.norm(0.12,0.03)};
+        x = {...b, b:b.b+r.norm(0,0.01)};
+        if (c.effect==="sharpen"){ x.sigma = b.sigma*(1 - c.fx/100 + r.norm(0,0.05)); x.amp = b.amp*(1.15+r.norm(0,0.05)); }
+        if (c.effect==="broaden") x.sigma = b.sigma*(1 + c.fx/100 + r.norm(0,0.06));
+        if (c.effect==="shift") x.mu = b.mu + c.fx + r.norm(0, c.fx*0.25);
+        if (c.effect==="gainTuning") x.amp = b.amp*(1 + c.fx/100 + r.norm(0,0.06));
+        if (c.effect!=="shift") x.mu = b.mu + r.norm(0, a.sigma*0.015);
+        if (c.effect!=="sharpen" && c.effect!=="broaden") x.sigma = b.sigma*(1+r.norm(0,0.025));
+        if (c.effect==="shift" || c.effect==="broaden") x.amp = b.amp*(1+r.norm(0,0.03));
+      }
+      A.push(x); B.push(b);
     }
-    g.stroke();
-    g.lineWidth = 1.25; g.fillStyle = col;
-    cv.pts.forEach(p => {
-      const px = xmap(p.x);
-      g.beginPath(); g.moveTo(px, ymap(p.y - p.e)); g.lineTo(px, ymap(p.y + p.e)); g.stroke();
-      g.beginPath(); g.arc(px, ymap(p.y), 3.6, 0, Math.PI*2); g.fill();
-    });
-  });
-  // legend
-  g.textAlign = "left"; g.textBaseline = "middle"; g.font = `12px ${mono}`;
-  [[d.conds[0], acc], [d.conds[1], ink2]].forEach(([lab, col], i) => {
-    const y = Tp + 10 + i * 18, x = L + 12;
-    g.fillStyle = col; g.fillRect(x, y - 1, 16, 2.5); g.beginPath(); g.arc(x + 8, y, 3.4, 0, Math.PI*2); g.fill();
-    g.fillStyle = ink; g.fillText(lab, x + 24, y);
-  });
-  figCanvas.setAttribute("aria-label", "Figure 1. " + d.caption.replace(/<[^>]+>/g, ""));
-}
-function niceStep(raw){ const p = Math.pow(10, Math.floor(Math.log10(raw))); const m = raw / p; return (m < 1.5 ? 1 : m < 3 ? 2 : m < 7 ? 5 : 10) * p; }
-function fmtNum(v, step){ const dp = Math.max(0, -Math.floor(Math.log10(step))); return (Math.abs(v) < 1e-9 ? 0 : v).toFixed(dp); }
+    ks = pairedT(A.map(defs[key].get), B.map(defs[key].get));
+    ss = pairedT(A.map(defs[sec].get), B.map(defs[sec].get));
+  } while (++tries < 60 && ((c.effect === "null" ? ks.p < .2 : ks.p > .005) || ss.p < .2));
 
+  // ROIs
+  let rois, roiAmp;
+  const sub = (c.area.match(/lateral geniculate|pulvinar|superior colliculus/)||[])[0];
+  if (!c.mri){ rois = ["2°","5°","8°","11°"]; roiAmp = [1,0.95,0.9,0.85]; c.roiWord = "eccentricity"; }
+  else if (sub || c.mk === "eegfmri"){ rois = [{"lateral geniculate":"LGN", pulvinar:"Pulvinar", "superior colliculus":"SC"}[sub] || "LGN","V1","V2","V3"]; roiAmp = [0.55,1,0.82,0.7]; c.roiWord = "region"; }
+  else { rois = ["V1","V2","V3","hV4"]; roiAmp = [1,0.82,0.7,0.6]; c.roiWord = "region"; }
+  const pattern = c.effect === "null" ? "flat" : r.pick(["increasing","decreasing","flat"]);
+  const mult = {increasing:[0.65,0.9,1.15,1.4], decreasing:[1.35,1.1,0.9,0.7], flat:[1,1,1,1]}[pattern].slice();
+  const subFirst = /LGN|Pulvinar|SC/.test(rois[0]);
+  if (c.effect === "invert" && subFirst) mult[0] = 0.06;
+  c.subFirst = subFirst;
+  const roiData = rois.map((name, j) => {
+    const Bs = [], As = [];
+    for (let i = 0; i < n; i++){
+      const b = B[i], x = A[i], m = mult[j] + r.norm(0, 0.12), s = roiAmp[j];
+      if (c.fig === "crf"){
+        const bb = {c50:b.c50, Rmax:b.Rmax*s, n:b.n, b:b.b*s};
+        Bs.push(bb);
+        As.push({c50:Math.exp(Math.log(b.c50) + (Math.log(x.c50)-Math.log(b.c50))*m), Rmax:bb.Rmax + (x.Rmax-b.Rmax)*s*m, n:x.n, b:bb.b + (x.b-b.b)*s*m});
+      } else {
+        const bb = {mu:b.mu, sigma:b.sigma, amp:b.amp*s, b:b.b*s};
+        Bs.push(bb);
+        As.push({mu:b.mu + (x.mu-b.mu)*m, sigma:b.sigma*Math.exp(Math.log(x.sigma/b.sigma)*m), amp:bb.amp + (x.amp-b.amp)*s*m, b:bb.b + (x.b-b.b)*s});
+      }
+    }
+    // measured points
+    const xs = c.fig === "crf" ? [0.015,0.03,0.06,0.12,0.25,0.5,1] : Array.from({length:9},(_,i)=>a.lo+(a.hi-a.lo)*i/8);
+    const noise = c.fig === "crf" ? 0.06*amp : 0.06;
+    const yA = As.map(p => xs.map(x => f(x,p) + r.norm(0, noise)));
+    const yB = Bs.map(p => xs.map(x => f(x,p) + r.norm(0, noise)));
+    const pt = Object.keys(defs).map(k => ({k, s:pairedT(As.map(defs[k].get), Bs.map(defs[k].get))}));
+    return {name, As, Bs, xs, yA, yB, pt};
+  });
+  const avgP = arr => { const o = {}; Object.keys(arr[0]).forEach(k => { o[k] = k === "c50" ? Math.exp(mean(arr.map(p=>Math.log(p[k])))) : mean(arr.map(p=>p[k])); }); return o; };
+  roiData.forEach(d => { d.pA = avgP(d.As); d.pB = avgP(d.Bs); });
+  const diffM = A.map((_, i) => roiData.map(d => defs[key].get(d.As[i]) - defs[key].get(d.Bs[i])));
+  const anova = rmAnova(diffM);
+
+  c.sim = {A, B, defs, key, sec, ks, ss, f, amp, rois, roiData, anova, pattern};
+  // observed effect sizes for the prose
+  const mA = mean(A.map(defs[key].get)), mB = mean(B.map(defs[key].get));
+  c.mA = mA; c.mB = mB;
+  c.fxObs = ({
+    contrastGain: Math.log10(mB/mA), responseGain:(mA/mB-1)*100, additive:mA-mB, invert:0, null:ks.bf01,
+    sharpen:(1-mA/mB)*100, broaden:(mA/mB-1)*100, gainTuning:(mA/mB-1)*100,
+    shift: a.kind === "lin" ? mA-mB : Math.log2(mA/mB)
+  })[c.effect];
+  // model comparison
+  c.models = c.fig === "crf" ? ["contrast-gain","response-gain","additive-offset","no-modulation"] : ["untuned-gain","tuned-suppression","untuned-suppression","feature-similarity gain"];
+  c.winner = ({contrastGain:"contrast-gain", responseGain:"response-gain", additive:"additive-offset", invert:"response-gain", null:"no-modulation", sharpen:"tuned-suppression", broaden:"untuned-suppression", shift:"feature-similarity gain", gainTuning:"untuned-gain"})[c.effect];
+  c.wins = Math.max(Math.ceil(n*0.6), n - r.int(0, Math.floor(n/4)));
+  c.dAIC = r.num(9, 46);
+}
+
+/* ---------- Writing ---------- */
+function effectText(c){
+  const x = c.fxObs, a = c.axis;
+  switch(c.effect){
+    case "contrastGain": return `shifted the contrast response function leftward, lowering the semi-saturation contrast by ${x.toFixed(2)} log units while leaving the maximum response unchanged, the signature of contrast gain`;
+    case "responseGain": return `scaled responses multiplicatively, raising the maximum response by ${Math.round(x)}% with no change in semi-saturation contrast, the signature of response gain`;
+    case "additive": return `added a contrast-independent offset of ${x.toFixed(2)} ${c.unit}, an additive shift that neither gain model predicts`;
+    case "invert": return `inverted the sign of visual responses, producing negative-going signals that nonetheless grew with contrast`;
+    case "null": return `left the contrast response function unchanged (BF<sub>01</sub> = ${x.toFixed(1)}), contrary to prevailing accounts`;
+    case "sharpen": return `narrowed ${c.feature} tuning bandwidth by ${Math.round(x)}% while boosting the peak response`;
+    case "broaden": return `broadened ${c.feature} tuning bandwidth by ${Math.round(x)}% with no change in peak response`;
+    case "shift": return `shifted preferred ${c.feature} by ${a.kind === "lin" ? x.toFixed(1)+"°" : x.toFixed(2)+" octaves"} toward the attended value`;
+    case "gainTuning": return `scaled ${c.feature} tuning curves multiplicatively by ${Math.round(x)}%, leaving bandwidth untouched`;
+  }
+}
+const HEADLINE = {contrastGain:"produces contrast gain", responseGain:"produces response gain", additive:"adds a contrast-independent offset", invert:"inverts visual responses", null:"leaves the contrast response unchanged", sharpen:"sharpens population tuning", broaden:"broadens population tuning", shift:"shifts population tuning toward the target", gainTuning:"scales population tuning without changing selectivity"};
+const ANALOGY = {
+  contrastGain:["Think of a microphone's sensitivity knob: whispers become audible sooner, but the loudest shout still clips at the same ceiling.","Like reading glasses for faint signals: small print gets legible, but the headlines were already as clear as they get."],
+  responseGain:["Like a volume knob on the whole track: soft passages and loud ones rise by the same proportion.","Like zooming a photo: every feature gets bigger by the same factor, and the shape of the picture stays the same."],
+  additive:["Like raising the floor of a room instead of adding a story: everything sits a little higher no matter how tall it already was.","Like a constant hum under the music: it's there in the quiet parts and the loud parts alike."],
+  invert:["Like a photographic negative: the picture is all still there, with the sign flipped.","Like a sound wave played back with reversed polarity: same shape, opposite direction."],
+  null:["Like a thermostat that ignores you fiddling with it: the system was already holding its setpoint.","Like turning a dial that isn't connected to anything: a lot of effort, the same output."],
+  sharpen:["Like focusing a slide projector: the same image, but the edges stop bleeding into their neighbors.","Like a radio tuning in cleanly: the station gets louder and the static on either side drops away."],
+  broaden:["Like an old radio drifting off-station: neighboring channels start bleeding into the one you tuned.","Like a flashlight with the lens pulled back: the beam covers more ground but nothing gets brighter."],
+  shift:["Like a compass needle near a magnet: the preference itself swings toward what matters.","Like a spotlight operator nudging the beam toward the lead actor: the light stays the same, it just lands somewhere new."],
+  gainTuning:["Like turning up a choir without changing who's singing: every voice is louder and the harmony is intact.","Like brightening a stained-glass window: each color glows more, but the pattern is the same."]
+};
+const METHODS = {
+  g:[{t:"measured contrast appearance and discrimination psychophysically", k:"psych"},{t:"used a two-alternative forced-choice appearance paradigm", k:"psych"}],
+  p:[{t:"combined fMRI with multivoxel pattern analysis", k:"fmri"},{t:"used fMRI adaptation", k:"fmri"},{t:"combined binocular rivalry with psychophysical adaptation", k:"psych"}],
+  i:[{t:"used 3T fMRI with model-based population estimates", k:"fmri"},{t:"used high-resolution 7T fMRI", k:"fmri"},{t:"recorded simultaneous EEG-fMRI", k:"eegfmri"},{t:"combined pupillometry with fMRI", k:"pupil"}]
+};
+
+function procedureText(c){
+  const k = c.k, A = c.cA.toLowerCase(), B = c.cB.toLowerCase();
+  const T = {
+    spatial:`At the start of each block, a central arrow instructed observers to attend covertly to the left or right stimulus and report brief contrast decrements there, while maintaining fixation. In the ${A} condition the probed stimulus fell in the attended hemifield; in the ${B} condition it fell in the opposite hemifield.`,
+    feature:`Two gratings were superimposed in each aperture. A cue at fixation told observers which of the two to attend and monitor for small speed changes, so that spatial position was held constant and only the attended feature varied.`,
+    temporal:`A tone at the start of each trial indicated which of two sequential stimuli would be probed, directing attention to one moment in time without changing where observers looked.`,
+    transient:`On cued trials a small dot appeared for 60 ms adjacent to the upcoming target location, 100 ms before stimulus onset; on neutral trials dots appeared at both locations. The short cue-to-target interval ensured that attention was deployed reflexively.`,
+    sustained:`A central arrow appeared 300 ms before the stimulus and pointed to the target location (cued) or to both locations (neutral), giving observers time to deploy attention voluntarily.`,
+    divided:`Observers either monitored a single location (focused) or both locations simultaneously (divided) for an infrequent target.`,
+    pupil:`Arousal was not manipulated; instead, we exploited spontaneous fluctuations. Trials were sorted by baseline pupil diameter, and the top and bottom terciles formed the ${A} and ${B} conditions.`,
+    cognitive:`To manipulate arousal, observers solved serial-subtraction problems during stimulus blocks. In the ${A} condition the problems were difficult (subtract 7s from a three-digit number); in the ${B} condition they were trivial (subtract 1s).`,
+    emotional:`Each block began with either an aversive sound (${A}) or a neutral tone (${B}), a manipulation that reliably raises arousal for several seconds.`,
+    emotion:`A face with a fearful or neutral expression was flashed at fixation before each trial, followed by the target Gabor.`,
+    caffeine:`In a double-blind crossover design, observers drank either a double espresso or decaffeinated coffee 45 min before testing. Sessions were separated by at least a week, and order was counterbalanced.`,
+    reward:`Correct responses on one side of fixation earned 10¢; correct responses on the other side earned nothing. The rewarded side alternated across runs.`,
+    learning:`Observers trained for five days on fine orientation discrimination at one reference orientation (${A}). The orthogonal orientation served as the ${B} control.`,
+    expectation:`A central cue predicted the orientation of the upcoming grating with 75% validity. ${cap(A)} trials matched the cue; ${B} trials did not.`,
+    memory:`On ${A} trials observers held a grating in memory over a 10-s delay; on ${B} trials the same grating was shown continuously.`,
+    sleep:`Observers slept in the scanner overnight. Flickering checkerboards were presented intermittently during wakefulness and sleep, and sleep stages were scored offline from the simultaneously recorded EEG.`,
+    eyes:`Observers alternated between blocks with eyes open and eyes closed while bright flicker was presented through the eyelids or directly to the open eyes.`,
+    state:`Observers completed a validated induction protocol for a ${c.mod.np.replace(/^a /,"")} before each run, alternating with baseline runs.`,
+    crossmodal:`On half of the blocks a co-occurring ${c.cA.toLowerCase()} stimulus accompanied each visual presentation; the other half were visual only.`,
+    factor:`Blocks alternated between high and low ${c.mod.np}, with all other stimulus properties held constant.`
+  };
+  return T[k] || T.spatial;
+}
+
+function stimulusText(c){
+  const a = c.axis;
+  if (c.fig === "crf") return c.mri
+    ? `Stimuli were full-field sinusoidal gratings (2 cycles/°) presented in an annulus spanning 1.5° to 9° of eccentricity, counterphase-flickering at 4 Hz. Seven contrasts were log-spaced between 1.5% and 100%.`
+    : `Stimuli were Gabor patches (2 cycles/°, σ = 0.8°) presented at 5° eccentricity on a uniform gray background. Seven pedestal contrasts were log-spaced between 1.5% and 100%.`;
+  if (c.feature === "numerosity") return `Stimuli were arrays of 1 to 64 black and white dots, presented in log₂ steps and matched for total surface area and convex hull so that numerosity could not be inferred from low-level cues${cite(c,"burr2008")}.`;
+  if (c.feature === "spatial frequency") return `Stimuli were band-pass filtered noise patterns with peak spatial frequencies spanning 0.25 to 16 cycles/° in half-octave steps, presented within an annulus from 1.5° to 9° of eccentricity.`;
+  if (c.feature === "motion direction") return `Stimuli were random-dot kinematograms (100% coherence, 6°/s) moving in one of eight directions spaced 45° apart.`;
+  return `Stimuli were sinusoidal gratings (2 cycles/°, 50% contrast) at one of eight orientations spaced 22.5° apart.`;
+}
+
+function introText(c){
+  const k = c.k, m = c.mod.np;
+  let p1;
+  if (ATT.includes(k)) p1 = `${cap(m)} changes what we see. It can alter the apparent contrast of a stimulus${cite(c,"carrasco2004")}, improve or even impair discrimination${cite(c,"ling2006b")}, and reshape responses as early as the thalamus and primary visual cortex${cite(c,"ling2015","bloem2019")}. Yet the computations through which these changes arise remain debated.`;
+  else if (ARO.includes(k)) p1 = `Moment-to-moment fluctuations in arousal, often indexed by pupil size, are thought to adjust neural gain throughout cortex${cite(c,"aston2005")}. Elevated arousal enhances perceived contrast${cite(c,"kim2017")}, its pupillary signature depends on luminance${cite(c,"pan2022")}, and its effects appear to reach early visual cortex${cite(c,"geurts2024","pan2025")}. How ${m} shapes visual responses, however, is far from settled.`;
+  else if (k === "learning" || k === "reward") p1 = `Experience changes perception. Practice and reward can produce lasting improvements in fine discrimination, and perceptual learning refines orientation representations in early visual cortex${cite(c,"jehee2012")}. Whether these improvements reflect changes in response gain or in selectivity is still unclear.`;
+  else if (k === "memory" || k === "expectation") p1 = `Not all visual signals arrive from the retina. Information held in memory or predicted from context also evokes responses in visual cortex, but whether such internally generated signals obey the same computations as sensory input is debated${cite(c,"bloem2018")}.`;
+  else if (k === "sleep" || k === "eyes") p1 = `Visual cortex does not go quiet when the eyes close or when we fall asleep${cite(c,"cicero2024","cicero2026")}. How the brain's state changes the transformation from stimulus to cortical response remains poorly understood in humans.`;
+  else p1 = `Visual responses are shaped by factors beyond the stimulus itself, including ambient luminance${cite(c,"vinke2020")} and input from the other senses${cite(c,"park2026")}. How such factors interact with the contrast-dependent machinery of early vision is not well understood.`;
+
+  let p2;
+  if (c.fig === "crf") p2 = `A useful way to characterize these influences is the contrast response function (CRF), which relates stimulus contrast to response and is well described by a Naka–Rushton function${cite(c,"naka1966")}. A modulation can shift the CRF leftward (contrast gain), scale it multiplicatively (response gain), or add a constant offset, and each form points to a different mechanism${cite(c,"ling2006a","pestilli2009","foster2022")}. The normalization model of attention unifies the first two, predicting that the form depends on the relative sizes of the stimulus and the attention field${cite(c,"reynolds2009")}, and normalization more generally is thought to be a canonical neural computation${cite(c,"heeger1992","carandini2012")}. Measuring BOLD CRFs is not trivial, because they often fail to saturate${cite(c,"vinke2022")}.`;
+  else {
+    const fs = {"spatial frequency":`In human visual cortex, population spatial frequency tuning can now be estimated directly from fMRI${cite(c,"aghajari2020","ramirez2025","wiecek2026")}.`,
+      orientation:`Orientation-tuned normalization in human early visual cortex is highly specific${cite(c,"klimova2021","klimova2023")}, making orientation a natural feature in which to look for changes in selectivity.`,
+      numerosity:`Numerosity is perceived directly, much like contrast or color${cite(c,"burr2008")}, and is represented by tuned neural populations in human cortex${cite(c,"harvey2013")}.`,
+      "motion direction":`Direction-selective populations offer a clean test, because feature-based attention is known to modulate motion responses in a feature-specific manner${cite(c,"treue1999")}.`}[c.feature];
+    p2 = `Beyond response magnitude, ${m} might change what a population is tuned to. Single-unit studies typically find multiplicative scaling of tuning curves with no change in bandwidth${cite(c,"mcadams1999","treue1999")}, whereas psychophysical and neuroimaging work suggests that tuning itself can sharpen, broaden or shift${cite(c,"lingliu2009","lingblake2009","jehee2012")}. ${fs}`;
+  }
+  const what = c.fig === "crf" ? "the contrast response function" : `population ${c.feature} tuning`;
+  const p3 = `Here, we ${c.method} while ${c.n} observers ${c.task}, and asked how ${m} changes ${what} in ${c.area}. We found that ${m} ${effectText(c)}. A normalization model in which ${m} acts on ${c.locus} accounted for the pattern across observers and ${c.roiWord === "region" ? "visual areas" : "eccentricities"}.`;
+  return [p1, p2, p3];
+}
+
+function initialsOf(a){ const [sur, ini] = a.split(", "); return (ini||"") + sur.replace(/^van /,"v").charAt(0) + "."; }
+function affList(c){
+  const affs = [], idx = a => {
+    const sur = a.split(",")[0];
+    let k = AFF_BY[sur] || c.era; let label = AFF[k] || k;
+    if (sur === "Ling") label = AFF[c.era];
+    let i = affs.indexOf(label); if (i < 0){ affs.push(label); i = affs.length-1; } return i+1;
+  };
+  const sups = c.authors.map(idx);
+  return {affs, sups};
+}
+
+function writePaper(c){
+  const r = c.r, S = c.sim, d = S.defs, n = c.n, kd = d[S.key], sd2 = d[S.sec];
+  const A = c.cA, B = c.cB, a = A.toLowerCase(), b = B.toLowerCase();
+  c.figs = []; c.toc = [];
+  const fig = (type, caption) => { const id = c.figs.length; c.figs.push({type}); return `<figure class="fig"><canvas data-fig="${id}" role="img" aria-label="${caption.replace(/<[^>]+>/g,"").replace(/"/g,"'")}"></canvas><figcaption>${caption}</figcaption></figure>`; };
+  const sec = (id, h) => { c.toc.push([id,h]); return `<h3 id="s-${id}">${h}</h3>`; };
+  const fmt = (v, dd) => v.toFixed(dd.dp);
+
+  // header
+  const {affs, sups} = affList(c);
+  const parts = c.authors.map((au,i) => `${au === ME ? `<span class="me">${au}</span>` : au}<sup>${sups[i]}</sup>`);
+  const authorsHtml = parts.length > 1 ? parts.slice(0,-1).join(", ") + " & " + parts[parts.length-1] : parts[0];
+  const pubM = r.int(0,11), recDelta = r.int(5,11);
+  const recY = pubM - recDelta < 0 ? c.year-1 : c.year, recM = (pubM - recDelta + 12) % 12;
+  const accM = (pubM + 11) % 12, accY = pubM === 0 ? c.year-1 : c.year;
+  const date = (m,y) => `${MONTHS[m]} ${r.int(1,28)}, ${y}`;
+
+  const abstract = `${c.fig === "crf"
+    ? `${cap(c.mod.np)} is known to shape how ${c.area} encodes contrast, yet whether it acts by changing sensitivity or by scaling the response remains contested.`
+    : `${cap(c.mod.np)} is thought to refine the ${c.feature} selectivity of neural populations, but how it reshapes population tuning in humans is unclear.`} Here, we ${c.method} while ${n} observers ${c.task}. We found that ${c.mod.np} ${effectText(c)}. A ${c.mech} model in which ${c.mod.np} acts on ${c.locus} accounted for these effects in ${c.wins} of ${n} observers. ${r.pick([
+    `These results suggest that ${c.mech} is a canonical computation through which ${c.mod.np} shapes visual processing.`,
+    `More broadly, they suggest that ${c.area} is less a passive camera than an adjustable instrument.`,
+    `These results constrain models in which ${c.mod.np} and ${c.mech} are treated as separate stages.`])}`;
+
+  const sig = /Neuroscience|PNAS/.test(c.journal) ? `<div class="sig"><p class="sec">Significance statement</p><p>${cap(c.mod.np)} is one of the strongest influences on what we see, yet the neural computation it engages is still debated. Using ${c.mri ? "fMRI" : "psychophysics"} and model-based analyses, we show that ${c.mod.np} ${HEADLINE[c.effect]} in ${c.area}. The result places ${c.mod.np} within the framework of ${c.mech}, linking it to a computation found throughout the brain.</p></div>` : "";
+
+  const kw = [...new Set([c.mod.np, c.mech, c.fig === "crf" ? "contrast response function" : c.feature + " tuning", c.mri ? (c.mk === "eegfmri" ? "EEG-fMRI" : c.mk === "pupil" ? "pupillometry" : "fMRI") : "psychophysics", c.area.replace(/^the /,"")])];
+
+  let h = `<div class="cite-line"><b>${c.journal}</b><span>${c.year}</span><span>${c.vol}: ${c.pages}</span></div>
+<h2>${c.title}</h2>
+<p class="authors">${authorsHtml}</p>
+<ol class="affs">${affs.map((x,i)=>`<li><sup>${i+1}</sup> ${x}</li>`).join("")}</ol>
+<div class="dates"><span>Received ${date(recM, recY)}</span><span>Accepted ${date(accM, accY)}</span></div>
+<p class="sec">Abstract</p><p class="abstract">${abstract}</p>${sig}
+<div class="lay"><p class="sec">Lay summary</p><p>${r.pick(ANALOGY[c.effect])}</p></div>
+<p class="sec">Keywords</p><ul class="kw">${kw.map(k=>`<li>${k}</li>`).join("")}</ul>
+<div class="article">`;
+
+  // Introduction
+  h += sec("intro","Introduction") + introText(c).map(p=>`<p>${p}</p>`).join("");
+
+  // Methods
+  const fem = r.int(Math.floor(n*0.35), Math.ceil(n*0.65)), ageLo = r.int(18,22), ageHi = r.int(29,39);
+  const irb = {g:"New York University", p:"Vanderbilt University", i:"Boston University"}[c.era];
+  h += sec("methods","Materials and methods");
+  h += `<h4>Participants</h4><p>${n} observers (${fem} female; aged ${ageLo}–${ageHi} years) with normal or corrected-to-normal vision took part. ${c.mri ? "All were screened for MRI safety." : (r.f()<0.5 ? "One observer was an author (S.L.); the rest were naive to the purpose of the study." : "All were naive to the purpose of the study.")} Procedures were approved by the ${irb} Institutional Review Board, and all observers gave written informed consent.</p>`;
+  h += `<h4>Apparatus and stimuli</h4><p>Stimuli were generated in MATLAB with Psychtoolbox${cite(c,"brainard1997")} and ${c.mri ? "back-projected onto a screen at the rear of the bore (1920 × 1080, 120 Hz), viewed through a mirror mounted on the head coil" : "presented on a gamma-corrected CRT monitor (1024 × 768, 100 Hz) at a viewing distance of 57 cm, with head position stabilized by a chin rest"}. ${stimulusText(c)} The background was held at mean luminance (${r.int(38,60)} cd/m²) throughout.</p>`;
+  h += `<h4>Design and procedure</h4><p>${procedureText(c)} ${c.mri ? `Each run lasted ${r.int(5,7)} min and contained ${r.int(14,28)} stimulus blocks of 12 s separated by jittered 10–14 s blank intervals. Observers completed ${r.int(8,14)} runs across two sessions.` : `Contrast discrimination thresholds were estimated with interleaved QUEST staircases${cite(c,"watson1983")}, ${r.int(4,8)} staircases per condition per session.`} The trial sequence is shown in Figure 1.</p>`;
+  h += fig("design", `<b>Figure 1.</b> Experimental design. ${c.mri ? "Schematic of one stimulus block. Durations are given below each frame." : "Schematic of a single trial. Durations are given below each frame."} The gray background was held at mean luminance throughout.`);
+  if (c.mri){
+    const seven = /7T/.test(c.method);
+    h += `<h4>MRI acquisition</h4><p>Data were acquired on a ${seven ? "Siemens 7T scanner with a 32-channel head coil" : "Siemens Prisma 3T scanner with a 64-channel head coil"} (TR = ${seven ? "1.5" : "2"} s, TE = ${seven ? r.int(20,25) : r.int(28,32)} ms, ${seven ? "1.2" : "2"}-mm isotropic voxels, multiband factor ${r.pick([2,3,4])}). A T1-weighted MPRAGE (1-mm isotropic) was collected for cortical surface reconstruction in FreeSurfer${cite(c,"fischl2012")}. ${c.mk === "eegfmri" ? "EEG was recorded simultaneously from a 64-channel MR-compatible cap, and each 30-s epoch was scored for sleep stage according to AASM criteria. " : ""}${c.mk === "pupil" ? "Pupil diameter was recorded at 1 kHz with an MR-compatible EyeLink 1000 Plus. " : ""}Eye position was monitored throughout.</p>`;
+    h += `<h4>Regions of interest</h4><p>${S.rois.filter(x=>/^V|hV/.test(x)).join(", ")} were defined from a separate retinotopic mapping session using population receptive field (pRF) modeling${cite(c,"dumoulin2008")}, cross-checked against an anatomical template${cite(c,"benson2014")}. ${/LGN|Pulvinar|SC/.test(S.rois[0]) ? `The ${S.rois[0]} was localized with a separate flickering-checkerboard localizer. ` : ""}Voxels were restricted to those whose pRFs fell within the stimulus aperture.</p>`;
+  }
+  h += `<h4>Analysis and modeling</h4><p>${c.mri ? `Each voxel's time series was modeled with a general linear model using a canonical hemodynamic response${cite(c,"boynton1996")}, and response amplitudes were averaged within each region of interest.` : `Thresholds were converted to contrast response functions with a population-coding linking model${cite(c,"pestilli2009")}.`} ${c.fig === "crf" ? "Contrast response functions were fit with a Naka–Rushton function:" : `Population tuning was fit with a Gaussian${c.axis.kind === "log2" ? " in log₂ units" : ""}:`}</p>`;
+  h += c.fig === "crf"
+    ? `<div class="eq"><span class="m">R(c) = R<sub>max</sub> · c<sup>n</sup> / (c<sup>n</sup> + C<sub>50</sub><sup>n</sup>) + b</span><span class="no">(1)</span></div>`
+    : `<div class="eq"><span class="m">R(x) = A · exp(−(x − μ)² / 2σ²) + b</span><span class="no">(1)</span></div>`;
+  h += `<p>where ${c.fig === "crf" ? "R<sub>max</sub> is the maximum response, C<sub>50</sub> the semi-saturation contrast, <i>n</i> the exponent and <i>b</i> the baseline" : "<i>A</i> is the amplitude, μ the preferred value, σ the width and <i>b</i> the baseline; bandwidth is reported as the full width at half maximum (FWHM = 2.355σ)"}. To ask which computation best explained the data, we fit ${c.models.length} variants of the normalization model of attention${cite(c,"reynolds2009")}:</p>`;
+  h += `<div class="eq"><span class="m">R(x, θ) = A(x, θ) · E(x, θ) / (σ + S[A · E](x, θ))</span><span class="no">(2)</span></div>`;
+  h += `<p>in which ${c.mod.np} acted on the attention field <i>A</i> through different routes (${c.models.join(", ")}). Models were compared with the Akaike information criterion. Parameters were compared between conditions with paired <i>t</i> tests, and evidence for the null was quantified with Bayes factors${cite(c,"rouder2009")}. Differences across ${c.roiWord === "region" ? "regions" : "eccentricities"} were tested with a one-way repeated-measures ANOVA.</p>`;
+
+  // Results
+  h += sec("results","Results");
+  // manipulation check
+  const mcT = r.num(3.4, 8.5), mcDf = n-1, mcP = ibeta(mcDf/(mcDf+mcT*mcT), mcDf/2, 0.5);
+  const mcStat = `<i>t</i>(${mcDf}) = ${mcT.toFixed(2)}, ${fmtP(mcP)}`;
+  const accA = r.num(82,93), accB = accA - r.num(6,14);
+  const pupA = r.num(4.2,5.4), pupB = pupA - r.num(0.25,0.7);
+  const mcText = {
+    att:`Observers followed the task instructions. Accuracy was higher for ${a} than ${b} targets (${accA.toFixed(1)}% vs. ${accB.toFixed(1)}%; ${mcStat}), confirming that attention was deployed as intended.`,
+    aro:`Pupil diameter, an index of arousal, was larger in the ${a} than the ${b} condition (${pupA.toFixed(2)} vs. ${pupB.toFixed(2)} mm; ${mcStat}), confirming that the manipulation was effective.`,
+    learning:`Training was effective: discrimination thresholds at the trained orientation fell from ${r.num(3.5,5).toFixed(1)}° to ${r.num(1.6,2.6).toFixed(1)}° over five days (${mcStat}), with little transfer to the untrained orientation.`,
+    sleep:`Observers reached stable N2 sleep in ${r.int(55,80)}% of runs. We retained ${r.int(140,320)} artifact-free stimulus epochs per observer in each state.`,
+    gen:`The manipulation was effective: performance on the concurrent task differed between the ${a} and ${b} conditions (${mcStat}).`
+  };
+  const mcKey = ATT.includes(c.k) || c.k === "reward" || c.k === "expectation" ? "att" : ARO.includes(c.k) ? "aro" : c.k === "learning" ? "learning" : (c.k === "sleep" || c.k === "eyes") ? "sleep" : "gen";
+  h += `<h4>${mcKey === "sleep" ? "Sleep staging" : "Manipulation check"}</h4><p>${mcText[mcKey]}</p>`;
+
+  // main effect
+  const pool = c.mri ? `Pooled across ${S.rois.slice(0,3).join(", ").replace(/, ([^,]*)$/," and $1")}` : "Averaged across eccentricities";
+  const verb = {contrastGain:"rose most steeply at intermediate contrasts", responseGain:"were scaled up across contrasts, with the largest absolute difference at high contrast", additive:"were shifted upward by a roughly constant amount at every contrast", invert:"were negative-going yet still grew in magnitude with contrast", null:`were nearly indistinguishable from those in the ${b} condition`,
+    sharpen:"peaked higher and fell off more steeply on either side of the preferred value", broaden:"spread further on either side of the preferred value without peaking higher", shift:"peaked closer to the attended value", gainTuning:"were scaled up at every point along the tuning curve"}[c.effect];
+  const dirWord = c.mA < c.mB ? "fell" : "rose";
+  const keyLine = c.effect === "null"
+    ? `showed no reliable change in ${kd.name} (${fmt(c.mB,kd)}${kd.u} vs. ${fmt(c.mA,kd)}${kd.u}; ${fmtT(S.ks)}; BF<sub>01</sub> = ${S.ks.bf01.toFixed(1)})`
+    : `showed that the ${kd.name} ${dirWord} from ${fmt(c.mB,kd)}${kd.u} to ${fmt(c.mA,kd)}${kd.u} (${fmtT(S.ks)})`;
+  const secLine = `whereas the ${sd2.name} did not change reliably (${fmtT(S.ss)})`;
+  const sigLine = {contrastGain:"A leftward shift with an unchanged asymptote is the signature of contrast gain.", responseGain:"A multiplicative increase with an unchanged semi-saturation contrast is the signature of response gain.", additive:"Because the offset was constant across contrast, it cannot be explained by either gain mechanism.", invert: c.subFirst ? `The inversion was confined to cortex: the ${S.rois[0] === "SC" ? "collicular" : "thalamic"} response kept its positive sign.` : "The inversion was present in every cortical area we examined.", null:"The Bayes factor indicates moderate evidence that the contrast response was unaffected.", sharpen:"The narrower bandwidth, together with a higher peak, indicates a genuine change in selectivity rather than a change in gain alone.", broaden:"The wider bandwidth without a change in peak indicates a loss of selectivity.", shift:"The preferred value itself moved, which pure gain changes cannot produce.", gainTuning:"Bandwidth was preserved, so selectivity was unchanged."}[c.effect];
+  const fitWord = c.fig === "crf" ? "Naka–Rushton fits" : "Gaussian fits";
+  h += `<h4>${cap(c.mod.np)} ${HEADLINE[c.effect]}</h4><p>${pool}, responses in the ${a} condition ${verb} (Fig. 2a). ${fitWord} to each observer's data (Eq. 1; Table 1) ${keyLine}, ${secLine}. ${sigLine} The difference between conditions was consistent in sign for most observers (Fig. 2b).</p>`;
+  const roiNames = S.rois.slice(0,3).join(", ").replace(/, ([^,]*)$/," and $1");
+  h += fig("main", `<b>Figure 2.</b> ${c.fig === "crf" ? "Contrast response functions" : `Population ${c.feature} tuning`} in ${roiNames}. <b>a</b>, Group-average responses in the ${a} (blue) and ${b} (red) conditions, with ${c.fig === "crf" ? "Naka–Rushton" : "Gaussian"} fits. Asterisks mark parameters that differed between conditions (*<i>p</i> < .05, **<i>p</i> < .01, ***<i>p</i> < .001). Error bars represent ±1 SEM across observers. <b>b</b>, Difference between conditions (${A} − ${B}) for each observer (gray) and the group mean (black). The dashed line indicates no difference.`);
+  // table
+  const rows = Object.keys(d).map(k => { const da = S.A.map(d[k].get), db = S.B.map(d[k].get), st = pairedT(da, db);
+    return `<tr><td>${d[k].th}</td><td>${mean(da).toFixed(d[k].dp)} ± ${sem(da).toFixed(d[k].dp)}</td><td>${mean(db).toFixed(d[k].dp)} ± ${sem(db).toFixed(d[k].dp)}</td><td>${st.t.toFixed(2)}</td><td>${st.p < .001 ? "<.001" : st.p.toFixed(3).replace(/^0/,"")}${stars(st.p)}</td></tr>`; }).join("");
+  h += `<div class="tblwrap"><table class="tbl"><caption><b>Table 1.</b> ${fitWord.replace(" fits","")} parameters (mean ± SEM across observers, <i>N</i> = ${n})</caption><thead><tr><th>Parameter</th><th>${A}</th><th>${B}</th><th><i>t</i>(${n-1})</th><th><i>p</i></th></tr></thead><tbody>${rows}</tbody></table></div>`;
+
+  // model comparison
+  h += `<h4>Individual observers and model comparison</h4><p>The effect on the ${kd.name} was visible at the level of individual observers (Fig. 3): ${S.A.filter((x,i)=> (kd.get(x)-kd.get(S.B[i])) * (c.mA - c.mB) > 0).length} of ${n} fell on the expected side of the unity line. In model comparison, the ${c.winner} variant of the normalization model was preferred for ${c.wins} of ${n} observers, with a summed ΔAIC of ${c.dAIC.toFixed(1)} over the next-best model.</p>`;
+  h += fig("scatter", `<b>Figure 3.</b> ${cap(kd.name)} for each observer in the ${b} (horizontal) and ${a} (vertical) conditions. The dashed line marks equality. Points ${c.mA < c.mB ? "below" : "above"} the line indicate ${c.mA < c.mB ? "a decrease" : "an increase"} with ${c.mod.np}.`);
+
+  // ROI
+  const an = S.anova, cm = an.cm;
+  const roiStat = `<i>F</i>(${an.d1}, ${an.d2}) = ${an.F.toFixed(2)}, ${fmtP(an.p)}`;
+  const big = S.rois[cm.indexOf(Math.max(...cm.map(Math.abs)) === Math.abs(Math.max(...cm)) ? Math.max(...cm) : Math.min(...cm))];
+  const roiText = c.effect === "null"
+    ? `No ${c.roiWord === "region" ? "visual area" : "eccentricity"} showed a reliable effect, and the size of the (absent) effect did not differ across them (${roiStat}; Fig. 4).`
+    : an.p < .05
+      ? `The effect was present in every ${c.roiWord === "region" ? "area" : "eccentricity"} we examined, but its magnitude differed across them (${roiStat}; Fig. 4), being largest in ${big}${S.pattern === "increasing" ? (c.mri ? " and growing along the visual hierarchy" : " and growing with eccentricity") : S.pattern === "decreasing" ? (c.mri ? " and diminishing along the visual hierarchy" : " and diminishing with eccentricity") : ""}.`
+      : `The effect was of similar magnitude in every ${c.roiWord === "region" ? "area" : "eccentricity"} we examined (${roiStat}; Fig. 4).`;
+  h += `<h4>The effect across ${c.roiWord === "region" ? "visual areas" : "eccentricity"}</h4><p>${roiText}</p>`;
+  h += fig("bars", `<b>Figure 4.</b> ${cap(kd.name)} in the ${a} (dark) and ${b} (light) conditions for each ${c.roiWord === "region" ? "region of interest" : "eccentricity"}. Error bars represent ±1 SEM across observers. *<i>p</i> < .05, **<i>p</i> < .01, ***<i>p</i> < .001, paired <i>t</i> test.`);
+
+  const fixA = r.num(0.18,0.42), fixD = r.num(-0.03,0.03), fixT = r.num(0.1,1.4), fixP = ibeta((n-1)/((n-1)+fixT*fixT),(n-1)/2,0.5);
+  h += `<h4>Eye movements</h4><p>Fixation was stable and did not differ between conditions (mean deviation ${fixA.toFixed(2)}° vs. ${(fixA+fixD).toFixed(2)}°; <i>t</i>(${n-1}) = ${fixT.toFixed(2)}, ${fmtP(fixP)}), so the effects above cannot be attributed to differences in where observers looked.</p>`;
+
+  // Discussion
+  h += sec("discussion","Discussion");
+  h += `<p>We asked how ${c.mod.np} changes ${c.fig === "crf" ? "the contrast response" : `population ${c.feature} tuning`} in ${c.area}. ${cap(c.mod.np)} ${effectText(c)}, an effect seen in most individual observers and best captured by a ${c.winner} variant of the normalization model.</p>`;
+  const rel = {
+    contrastGain:`This pattern parallels the contrast gain we observed psychophysically with transient attention${cite(c,"ling2006a")}, and is what the normalization model of attention predicts when the attention field is large relative to the stimulus${cite(c,"reynolds2009")}. It differs from the multiplicative scaling found for feature-based attention with BOLD${cite(c,"foster2022")}, suggesting that the form of the modulation depends on what is being selected.`,
+    responseGain:`Response gain is what the normalization model of attention predicts when the attention field is small relative to the stimulus${cite(c,"reynolds2009")}, and it matches the multiplicative scaling of BOLD CRFs we reported for feature-based attention${cite(c,"foster2022")}. Because BOLD CRFs often fail to saturate${cite(c,"vinke2022")}, we took care to sample contrasts up to 100%, which is what allowed us to tell the two forms apart.`,
+    additive:`Additive shifts are common in BOLD measurements and are often dismissed as nonspecific, but their consistency here argues for a real, contrast-independent input. Arousal-related signals are a plausible source${cite(c,"aston2005","pan2025")}.`,
+    invert:`Inverted responses fit with recent evidence that cortical, but not subcortical, visual responses change sign during sleep${cite(c,"cicero2026")}, and with differences between cortical and subcortical processing when the eyes are shut${cite(c,"cicero2024")}.`,
+    null:`A null result is informative here. Our Bayes factors favor the absence of an effect, consistent with the idea that some internally generated or state-dependent signals bypass normalization altogether${cite(c,"bloem2018")}.`,
+    sharpen:`Sharpening agrees with reports that perceptual learning refines orientation representations${cite(c,"jehee2012")}, and with our earlier psychophysical dissociation between gain and tuning effects of attention${cite(c,"lingliu2009")}. It contrasts with the pure gain often reported in single neurons${cite(c,"mcadams1999")}, a discrepancy that population measurements may help resolve.`,
+    broaden:`Broadening echoes our finding that suppression during binocular rivalry broadens orientation tuning${cite(c,"lingblake2009")}, and suggests that ${c.mod.np} can draw a wider pool of neurons into the population response.`,
+    shift:`A shift toward the attended value is predicted by feature-similarity gain${cite(c,"treue1999")}: when gain is applied unevenly across neurons with different preferences, the population's peak moves. Related shifts have been reported for spatial frequency${cite(c,"ramirez2025")}.`,
+    gainTuning:`Multiplicative scaling with preserved bandwidth mirrors classic single-unit results${cite(c,"mcadams1999")} and our observation that attention preserves the selectivity of feature-tuned normalization${cite(c,"klimova2023")}.`
+  }[c.effect];
+  h += `<p>${rel}</p>`;
+  h += `<p>Within the normalization framework${cite(c,"carandini2012")}, our results suggest that ${c.mod.np} acts on ${c.locus}. ${c.locus === "the suppressive pool" ? "Changing the pool rather than the drive predicts that the effect should depend on stimulus size and surround, which can be tested directly." : "Acting on the drive predicts that the effect should be largely independent of the surround, which can be tested by varying stimulus size."} ${c.fig === "crf" ? "Such tests would also clarify whether the same computation operates across visual areas." : `Such tests would also clarify whether the same computation shapes tuning for features other than ${c.feature}.`}</p>`;
+  h += `<p>Several limitations deserve mention. ${c.mri ? "BOLD signals pool across large populations with heterogeneous tuning, so a change in the population response can arise from different changes at the level of single neurons." : "Inferring neural response functions from behavior relies on a linking model, and other linking assumptions could yield different parameter estimates."} Our sample of ${n} observers was adequate to detect the main effect but limits our ability to characterize individual differences, which can be substantial${cite(c,"pan2025")}. ${ARO.includes(c.k) ? "Finally, arousal manipulations inevitably affect attention as well, and our design cannot fully separate the two." : ATT.includes(c.k) ? "Finally, attention may also raise arousal, and our design cannot fully separate the two." : "Finally, we tested a single stimulus configuration, and the effect may differ for other stimuli."}</p>`;
+  h += `<p>In summary, ${c.mod.np} ${HEADLINE[c.effect]} in ${c.area}, consistent with a ${c.mech} account. ${c.caffeine ? "" : ""}</p>`;
+
+  // Backmatter
+  const ini = c.authors.map(initialsOf), fa = ini[0];
+  h += sec("back","Acknowledgments and references");
+  h += `<div class="backmatter"><p><b>Acknowledgments.</b> ${c.era === "i" ? "This work was supported by National Institutes of Health grant R01 EY035640 (S.L.)." : "This work was supported by the National Eye Institute."}${c.k === "caffeine" ? " We thank the department espresso machine for its uncompensated contributions." : ""}</p>
+<p><b>Author contributions.</b> ${fa} and S.L. designed the research; ${fa} performed the research and analyzed the data; ${ini.join(", ").replace(/, ([^,]*)$/, " and $1")} wrote the paper.</p>
+<p><b>Data availability.</b> Data and analysis code are available at github.com/samuelling/LargeLingModel.</p>
+<p><b>Competing interests.</b> The authors declare no competing financial interests.</p></div>`;
+  const refList = [...c.used].map(k => REFS[k][2]).sort((x,y)=>x.replace(/<[^>]+>/g,"").localeCompare(y.replace(/<[^>]+>/g,"")));
+  h += `<p class="sec" style="margin-top:20px">References</p><ol class="refs">${refList.map(x=>`<li>${x}</li>`).join("")}</ol>`;
+  h += `</div>`;
+  return h;
+}
+
+/* ---------- Ling Lab figure style ---------- */
+// Read off Pan et al. 2025, Foster & Ling 2022 and Ramirez et al. 2025:
+// blue vs red conditions with colored italic legend labels, open offset axes with outward ticks,
+// italic axis labels and panel titles in Helvetica, bold lowercase panel letters,
+// V1–V3 small multiples, gray per-observer lines under a black group mean, significance asterisks
+// beside parameter names, and dark/light bar pairs with ±1 SEM.
+const LS = {
+  blue:"#2a68c4", red:"#d8302b", blueLight:"#9cc0ec", redLight:"#f0a7a3",
+  ink:"#111111", ink2:"#4a4a4a", gray:"#bdbdbd", shade:"#ececec", mid:"#808080", plate:"#ffffff",
+  font:'"Helvetica Neue", Helvetica, Arial, sans-serif'
+};
+function plateSetup(cv, H){
+  const W = cv.clientWidth; cv.style.height = H + "px";
+  const dpr = window.devicePixelRatio || 1;
+  cv.width = Math.round(W*dpr); cv.height = Math.round(H*dpr);
+  const g = cv.getContext("2d"); g.setTransform(dpr,0,0,dpr,0,0);
+  g.fillStyle = LS.plate; g.fillRect(0,0,W,H);
+  return {g, W, H};
+}
+const F = (size, it, wt) => `${it ? "italic " : ""}${wt || 400} ${size}px ${LS.font}`;
+function niceStep(raw){ const p = Math.pow(10, Math.floor(Math.log10(raw))); const m = raw/p; return (m < 1.5 ? 1 : m < 3 ? 2 : m < 7 ? 5 : 10) * p; }
+function fmtTick(v, step){ const dp = Math.max(0, -Math.floor(Math.log10(step) + 1e-9)); const s = (Math.abs(v) < 1e-9 ? 0 : v).toFixed(dp); return s; }
+function niceRange(lo, hi, nt){ const st = niceStep((hi-lo)/(nt||4)); return {lo:Math.floor(lo/st)*st, hi:Math.ceil(hi/st)*st, st}; }
+
+// Offset L-axes with outward ticks; returns mapping functions
+function axes(g, box, xs, ys, o){
+  const off = 7, tk = 4;
+  g.strokeStyle = LS.ink; g.fillStyle = LS.ink; g.lineWidth = 1;
+  const X = v => box.x + (xs.map(v) ) * box.w, Y = v => box.y + (1 - ys.map(v)) * box.h;
+  // y spine
+  const yT = ys.ticks;
+  g.beginPath(); g.moveTo(box.x - off + .5, Y(yT[0])); g.lineTo(box.x - off + .5, Y(yT[yT.length-1])); g.stroke();
+  g.font = F(10); g.textAlign = "right"; g.textBaseline = "middle";
+  yT.forEach(v => { const y = Math.round(Y(v)) + .5; g.beginPath(); g.moveTo(box.x - off, y); g.lineTo(box.x - off - tk, y); g.stroke(); g.fillText(ys.fmt(v), box.x - off - tk - 3, y); });
+  // x spine
+  const xT = xs.ticks;
+  g.beginPath(); g.moveTo(X(xT[0]), box.y + box.h + off + .5); g.lineTo(X(xT[xT.length-1]), box.y + box.h + off + .5); g.stroke();
+  g.textAlign = "center"; g.textBaseline = "top";
+  xT.forEach(v => { const x = Math.round(X(v)) + .5; g.beginPath(); g.moveTo(x, box.y + box.h + off); g.lineTo(x, box.y + box.h + off + tk); g.stroke(); g.fillText(xs.fmt(v), x, box.y + box.h + off + tk + 2); });
+  (xs.minor||[]).forEach(v => { const x = Math.round(X(v)) + .5; g.beginPath(); g.moveTo(x, box.y + box.h + off); g.lineTo(x, box.y + box.h + off + 2.5); g.stroke(); });
+  if (o.xlabel){ g.font = F(11, true); g.fillText(o.xlabel, box.x + box.w/2, box.y + box.h + off + tk + 16); }
+  if (o.ylabel){ g.save(); g.translate(box.x - off - (o.ylw || 34), box.y + box.h/2); g.rotate(-Math.PI/2); g.font = F(11, true); g.textAlign = "center"; g.textBaseline = "bottom"; g.fillText(o.ylabel, 0, 0); g.restore(); }
+  if (o.title){ g.font = F(13, true); g.textAlign = "center"; g.textBaseline = "bottom"; g.fillText(o.title, box.x + box.w/2, box.y - 8); }
+  return {X, Y};
+}
+const linScale = (lo, hi, ticks, fmt) => ({map:v => (v-lo)/(hi-lo), ticks, fmt});
+function panelLetter(g, L, x, y){ g.font = F(19, false, 700); g.fillStyle = LS.ink; g.textAlign = "left"; g.textBaseline = "top"; g.fillText(L, x, y); }
+
+function xScaleFor(c){
+  if (c.fig === "crf") return {lo:-2, hi:0, val:x=>Math.log10(x), axis:{map:v=>(Math.log10(v)+2)/2, ticks:[0.01,0.1,1], fmt:v=>String(Math.round(v*100)), minor:[0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9]}, label:"Contrast (%)", curveX:t=>Math.pow(10, -2 + 2*t)};
+  const a = c.axis;
+  return {lo:a.lo, hi:a.hi, val:x=>x, axis:{map:v=>(v-a.lo)/(a.hi-a.lo), ticks:a.ticks, fmt:a.fmt}, label:a.label.replace(" relative to preferred",""), curveX:t=>a.lo+(a.hi-a.lo)*t};
+}
+
+function drawMain(cv, c){
+  const S = c.sim, W0 = cv.clientWidth, narrow = W0 < 560;
+  const cols = narrow ? 1 : 3, rowsPer = narrow ? 3 : 1;
+  const padL = 62, padR = 14, gapX = 46;
+  const pw = (W0 - padL - padR - gapX*(cols-1)) / cols, ph = Math.min(170, Math.max(120, pw*0.78));
+  const blockH = ph + 74;
+  const H = 30 + rowsPer*blockH + 26 + rowsPer*(ph*0.72 + 70);
+  const {g, W} = plateSetup(cv, H);
+  const xsF = xScaleFor(c);
+  const rois = S.roiData.slice(0,3);
+  // y ranges shared within row
+  const allY = []; rois.forEach(d => { [d.yA, d.yB].forEach(Y => d.xs.forEach((_,j) => { const col = Y.map(r=>r[j]); allY.push(mean(col)+sem(col), mean(col)-sem(col)); })); });
+  const yr = niceRange(Math.min(0, ...allY), Math.max(...allY), 4);
+  const yTicks = []; for (let v = yr.lo; v <= yr.hi + 1e-9; v += yr.st) yTicks.push(+v.toFixed(6));
+  const allD = []; rois.forEach(d => d.yA.forEach((row,i) => row.forEach((v,j) => allD.push(v - d.yB[i][j]))));
+  const dr = niceRange(Math.min(...allD), Math.max(...allD), 4);
+  const dTicks = []; for (let v = dr.lo; v <= dr.hi + 1e-9; v += dr.st) dTicks.push(+v.toFixed(6));
+  const ylab = c.fig === "crf" ? (c.mri ? "BOLD response (%)" : "Response (a.u.)") : "Response (a.u.)";
+
+  panelLetter(g, "a", 6, 4);
+  rois.forEach((d, i) => {
+    const col = i % cols, row = Math.floor(i / cols);
+    const box = {x: padL + col*(pw+gapX), y: 34 + row*blockH + 18, w: pw, h: ph};
+    // analysis window shade (Ling style) only for tuning around preferred? use light band at the middle third for crf high contrasts? skip; shade baseline
+    const ax = axes(g, box, xsF.axis, linScale(yr.lo, yr.hi, yTicks, v=>fmtTick(v, yr.st)), {title: d.name, xlabel: (row === rowsPer-1 || narrow) ? xsF.label : "", ylabel: col === 0 ? ylab : "", ylw: 34});
+    if (yr.lo < 0){ g.setLineDash([3,3]); g.strokeStyle = LS.gray; g.beginPath(); g.moveTo(box.x, ax.Y(0)); g.lineTo(box.x+box.w, ax.Y(0)); g.stroke(); g.setLineDash([]); }
+    [[d.yB, d.pB, LS.red],[d.yA, d.pA, LS.blue]].forEach(([Y, P, colr]) => {
+      g.strokeStyle = colr; g.lineWidth = 2.4; g.beginPath();
+      for (let t = 0; t <= 120; t++){ const xv = xsF.curveX(t/120); const px = ax.X(xv), py = ax.Y(S.f(xv, P)); t ? g.lineTo(px,py) : g.moveTo(px,py); }
+      g.stroke();
+      g.lineWidth = 1.2; g.fillStyle = colr;
+      d.xs.forEach((x, j) => { const colv = Y.map(r=>r[j]), m = mean(colv), e = sem(colv), px = ax.X(x);
+        g.beginPath(); g.moveTo(px, ax.Y(m-e)); g.lineTo(px, ax.Y(m+e)); g.stroke();
+        g.beginPath(); g.arc(px, ax.Y(m), 2.8, 0, Math.PI*2); g.fill(); });
+    });
+    // significance annotations, Foster & Ling style
+    const sigs = d.pt.filter(q => q.s.p < .05).map(q => S.defs[q.k].sym + stars(q.s.p));
+    if (sigs.length){
+      // pick the emptiest corner (bottom-right preferred, as in Foster & Ling 2022)
+      const occ = (fx0, fx1, fy0, fy1) => { let n = 0; [d.pA, d.pB].forEach(P => { for (let t = 0; t <= 40; t++){ const xv = xsF.curveX(t/40), px = (ax.X(xv) - box.x)/box.w, py = (ax.Y(S.f(xv,P)) - box.y)/box.h; if (px >= fx0 && px <= fx1 && py >= fy0 && py <= fy1) n++; } }); return n; };
+      const hh = Math.min(0.42, (sigs.length*13 + 8)/box.h);
+      const cands = [["br", occ(0.55,1,1-hh,1)], ["tr", occ(0.55,1,0,hh)], ["bl", occ(0,0.45,1-hh,1)]];
+      if (i > 0) cands.push(["tl", occ(0,0.45,0,hh)]);
+      const best = cands.sort((p,q)=>p[1]-q[1])[0][0];
+      g.font = F(10.5, true); g.fillStyle = LS.ink; g.textAlign = best[1] === "r" ? "right" : "left"; g.textBaseline = "top";
+      const bx = best[1] === "r" ? box.x + box.w - 2 : box.x + 4, by = best[0] === "b" ? box.y + box.h - sigs.length*13 - 2 : box.y + 2;
+      sigs.forEach((s, k2) => g.fillText(s, bx, by + k2*13)); }
+    if (i === 0){ // colored italic legend
+      g.font = F(11, true); g.textAlign = "left"; g.textBaseline = "top";
+      [[c.cA, LS.blue],[c.cB, LS.red]].forEach(([lab, colr], k2) => { const y = box.y + 2 + k2*15;
+        g.strokeStyle = colr; g.lineWidth = 2.4; g.beginPath(); g.moveTo(box.x + 4, y + 6); g.lineTo(box.x + 20, y + 6); g.stroke();
+        g.fillStyle = colr; g.fillText(lab, box.x + 25, y); });
+    }
+  });
+  // b: individual differences
+  const top2 = 34 + rowsPer*blockH + 10;
+  panelLetter(g, "b", 6, top2 - 4);
+  const ph2 = ph*0.72;
+  rois.forEach((d, i) => {
+    const col = i % cols, row = Math.floor(i / cols);
+    const box = {x: padL + col*(pw+gapX), y: top2 + 22 + row*(ph2+70), w: pw, h: ph2};
+    const ax = axes(g, box, xsF.axis, linScale(dr.lo, dr.hi, dTicks, v=>fmtTick(v, dr.st)), {xlabel: xsF.label, ylabel: col === 0 ? ((c.cA + c.cB).length > 16 ? "Difference" : `${c.cA}−${c.cB}`) : "", ylw: 34});
+    g.setLineDash([3,3]); g.strokeStyle = LS.ink2; g.lineWidth = 1; g.beginPath(); g.moveTo(box.x, ax.Y(0)); g.lineTo(box.x+box.w, ax.Y(0)); g.stroke(); g.setLineDash([]);
+    g.strokeStyle = LS.gray; g.fillStyle = LS.gray; g.lineWidth = 1;
+    d.yA.forEach((row2, s) => { g.beginPath(); d.xs.forEach((x,j) => { const px = ax.X(x), py = ax.Y(row2[j]-d.yB[s][j]); j ? g.lineTo(px,py) : g.moveTo(px,py); }); g.stroke();
+      d.xs.forEach((x,j) => { g.beginPath(); g.arc(ax.X(x), ax.Y(row2[j]-d.yB[s][j]), 1.7, 0, Math.PI*2); g.fill(); }); });
+    const md = d.xs.map((_,j) => d.yA.map((row2,s)=>row2[j]-d.yB[s][j]));
+    g.strokeStyle = LS.ink; g.fillStyle = LS.ink; g.lineWidth = 2.2; g.beginPath();
+    d.xs.forEach((x,j) => { const px = ax.X(x), py = ax.Y(mean(md[j])); j ? g.lineTo(px,py) : g.moveTo(px,py); }); g.stroke();
+    g.lineWidth = 1.3; d.xs.forEach((x,j) => { const px = ax.X(x), m = mean(md[j]), e = sem(md[j]); g.beginPath(); g.moveTo(px, ax.Y(m-e)); g.lineTo(px, ax.Y(m+e)); g.stroke(); g.beginPath(); g.arc(px, ax.Y(m), 2.6, 0, Math.PI*2); g.fill(); });
+    if (i === rois.length-1){ g.font = F(11, true); g.textAlign = "right"; g.textBaseline = "bottom"; g.fillText(`N=${c.n}`, box.x + box.w, box.y + box.h - 2); }
+  });
+}
+
+function drawScatter(cv, c){
+  const S = c.sim, kd = S.defs[S.key];
+  const xv = S.B.map(kd.get), yv = S.A.map(kd.get);
+  const W0 = cv.clientWidth, side = Math.min(270, W0 - 90);
+  const H = side + 84;
+  const {g} = plateSetup(cv, H);
+  const lo = Math.min(...xv, ...yv), hi = Math.max(...xv, ...yv), pad = (hi-lo)*0.12 || 1;
+  const rr = niceRange(lo - pad, hi + pad, 4);
+  const ticks = []; for (let v = rr.lo; v <= rr.hi + 1e-9; v += rr.st) ticks.push(+v.toFixed(6));
+  const sc = linScale(rr.lo, rr.hi, ticks, v=>fmtTick(v, rr.st));
+  const box = {x: (W0 - side)/2 + 20, y: 30, w: side, h: side};
+  const ax = axes(g, box, sc, sc, {xlabel:`${c.cB}: ${kd.ax}`, ylabel:`${c.cA}: ${kd.ax}`, ylw: 38, title: ""});
+  g.setLineDash([4,4]); g.strokeStyle = LS.ink2; g.lineWidth = 1; g.beginPath(); g.moveTo(ax.X(rr.lo), ax.Y(rr.lo)); g.lineTo(ax.X(rr.hi), ax.Y(rr.hi)); g.stroke(); g.setLineDash([]);
+  xv.forEach((x,i) => { g.beginPath(); g.arc(ax.X(x), ax.Y(yv[i]), 4.6, 0, Math.PI*2); g.fillStyle = LS.blue; g.globalAlpha = 0.85; g.fill(); g.globalAlpha = 1; g.strokeStyle = LS.ink; g.lineWidth = 0.9; g.stroke(); });
+  // group mean, Ramirez-style large dark-edged marker
+  g.beginPath(); g.arc(ax.X(mean(xv)), ax.Y(mean(yv)), 7, 0, Math.PI*2); g.fillStyle = "#0d2f66"; g.fill(); g.strokeStyle = LS.plate; g.lineWidth = 1.5; g.stroke();
+  g.font = F(10.5, true); g.fillStyle = LS.ink; g.textAlign = "left"; g.textBaseline = "top";
+  const st = S.ks, below = c.mA < c.mB;
+  const tx = below ? box.x + 6 : box.x + box.w*0.62, ty = below ? box.y + 4 : box.y + box.h*0.74;
+  g.fillText(`t(${st.df}) = ${st.t.toFixed(2)}`, tx, ty);
+  g.fillText(st.p < .001 ? "p < 0.001" : `p = ${st.p.toFixed(3)}`, tx, ty + 13);
+  g.fillText(`N=${c.n}`, tx, ty + 26);
+}
+
+function drawBars(cv, c){
+  const S = c.sim, kd = S.defs[S.key];
+  const W0 = cv.clientWidth, H = 250;
+  const {g} = plateSetup(cv, H);
+  const data = S.roiData.map(d => { const a = d.As.map(kd.get), b = d.Bs.map(kd.get); return {name:d.name, a:[mean(a), sem(a)], b:[mean(b), sem(b)], p:pairedT(a,b).p}; });
+  const vals = data.flatMap(d => [d.a[0]+d.a[1], d.b[0]+d.b[1], d.a[0]-d.a[1], d.b[0]-d.b[1]]);
+  const rr = niceRange(Math.min(0, ...vals), Math.max(0, ...vals)*1.12, 4);
+  const ticks = []; for (let v = rr.lo; v <= rr.hi + 1e-9; v += rr.st) ticks.push(+v.toFixed(6));
+  const bwid = Math.min(W0 - 92, 460); const box = {x: Math.max(72, (W0 - bwid)/2 + 24), y: 34, w: bwid, h: H - 84};
+  const k = data.length, slot = box.w / k, bw = Math.min(26, slot*0.3);
+  const xs = {map:v => (v + 0.5)/k, ticks:data.map((_,i)=>i), fmt:i => data[i].name};
+  const ax = axes(g, box, xs, linScale(rr.lo, rr.hi, ticks, v=>fmtTick(v, rr.st)), {ylabel: kd.ax, xlabel: c.roiWord === "region" ? "" : "Eccentricity", ylw: 40});
+  // legend, Foster & Ling style
+  g.font = F(11, true); g.textBaseline = "middle"; g.textAlign = "left";
+  g.font = F(11, true); const lw0 = g.measureText(c.cA).width + 48;
+  [[c.cA, "#1f3f8f"],[c.cB, LS.blueLight]].forEach(([lab, col], i) => { const x = box.x + i*lw0; g.fillStyle = col; g.fillRect(x, 10, 16, 10); g.fillStyle = LS.ink; g.fillText(lab, x + 22, 15); });
+  data.forEach((d, i) => {
+    const cx = ax.X(i);
+    [[d.a, "#1f3f8f", -1],[d.b, LS.blueLight, 1]].forEach(([v, col, s]) => {
+      const x0 = cx + (s < 0 ? -bw - 2 : 2), y0 = ax.Y(0), y1 = ax.Y(v[0]);
+      g.fillStyle = col; g.fillRect(x0, Math.min(y0,y1), bw, Math.abs(y1-y0));
+      g.strokeStyle = LS.ink; g.lineWidth = 1.3; const mx = x0 + bw/2; g.beginPath(); g.moveTo(mx, ax.Y(v[0]-v[1])); g.lineTo(mx, ax.Y(v[0]+v[1])); g.stroke();
+    });
+    const st = stars(d.p);
+    if (st){ const top = Math.max(d.a[0]+d.a[1], d.b[0]+d.b[1]); g.fillStyle = LS.ink; g.font = F(12); g.textAlign = "center"; g.textBaseline = "bottom"; g.fillText(st, cx, ax.Y(Math.max(top, 0)) - 3); }
+  });
+  if (rr.lo < 0){ g.strokeStyle = LS.ink2; g.lineWidth = 1; g.beginPath(); g.moveTo(box.x, ax.Y(0)+.5); g.lineTo(box.x+box.w, ax.Y(0)+.5); g.stroke(); }
+}
+
+function gaborInto(g, cx, cy, rad, ori, contrast, cycles){
+  const S = Math.max(4, Math.round(rad*2)), off = document.createElement("canvas"); off.width = S; off.height = S;
+  const og = off.getContext("2d"), img = og.createImageData(S, S), sig = S*0.24, fr = cycles/S*Math.PI*2, co = Math.cos(ori), si = Math.sin(ori);
+  for (let y = 0; y < S; y++) for (let x = 0; x < S; x++){ const dx = x - S/2, dy = y - S/2, env = Math.exp(-(dx*dx+dy*dy)/(2*sig*sig)), v = Math.sin((dx*co+dy*si)*fr)*env*contrast, i = (y*S+x)*4, L = 128 + 127*v; img.data[i]=img.data[i+1]=img.data[i+2]=L; img.data[i+3]=255; }
+  og.putImageData(img, 0, 0);
+  g.save(); g.beginPath(); g.arc(cx, cy, rad, 0, Math.PI*2); g.clip(); g.drawImage(off, cx - rad, cy - rad, rad*2, rad*2); g.restore();
+}
+function drawDesign(cv, c){
+  const W0 = cv.clientWidth;
+  const s = Math.max(70, Math.min(150, (W0 - 40) / 2.95)), dx = s*0.62, dy = s*0.40;
+  const H = s + 3*dy + 74;
+  const {g} = plateSetup(cv, H);
+  const x0 = (W0 - (s + 3*dx))/2, y0 = 14;
+  const k = c.k, two = ["spatial","transient","sustained","divided","reward"].includes(k);
+  const dots = c.feature === "numerosity" && c.fig === "tuning";
+  const durs = c.mri
+    ? (c.mk === "eegfmri" ? [["Rest","10–14 s"],["State", k === "sleep" ? "EEG-scored" : "eyes shut/open"],["Flicker","12 s"],["Rest","10–14 s"]] : [["Fixation","2 s"],["Cue","1 s"],["Stimulus","12 s block"],["Blank","10–14 s"]])
+    : [["Fixation","500 ms"],["Cue", k === "transient" ? "60 ms" : "300 ms"],["Stimulus","100 ms"],["Response","until response"]];
+  for (let i = 0; i < 4; i++){
+    const x = x0 + i*dx, y = y0 + i*dy;
+    g.fillStyle = LS.mid; g.fillRect(x, y, s, s); g.strokeStyle = LS.ink; g.lineWidth = 1; g.strokeRect(x + .5, y + .5, s - 1, s - 1);
+    const cx = x + s/2, cy = y + s/2;
+    // fixation dot in every frame
+    const fix = () => { g.fillStyle = "#000"; g.beginPath(); g.arc(cx, cy, Math.max(1.6, s*0.018), 0, Math.PI*2); g.fill(); };
+    if (i === 0) fix();
+    if (i === 1){
+      fix(); g.fillStyle = "#fff"; g.strokeStyle = "#fff"; g.lineWidth = 1.6; g.font = F(Math.max(9, s*0.1), true); g.textAlign = "center"; g.textBaseline = "middle";
+      const txt = {temporal:"♪", cognitive:"823 − 7?", emotional:"!", emotion:"fearful face", caffeine:"espresso", learning:"day 1–5", expectation:"75% valid", memory:"remember", sleep:"zzz", eyes:"eyes shut", crossmodal:"+ " + (c.cA||"").toLowerCase(), factor:"high / low", pupil:"", state:"induction"}[k];
+      if (k === "transient"){ g.beginPath(); g.arc(cx + s*0.27, cy - s*0.2, s*0.025, 0, Math.PI*2); g.fill(); }
+      else if (k === "sustained" || k === "spatial" || k === "reward"){ g.beginPath(); g.moveTo(cx - s*0.08, cy - s*0.08); g.lineTo(cx + s*0.08, cy - s*0.08); g.lineTo(cx + s*0.04, cy - s*0.12); g.moveTo(cx + s*0.08, cy - s*0.08); g.lineTo(cx + s*0.04, cy - s*0.04); g.stroke(); }
+      else if (k === "divided"){ g.beginPath(); g.moveTo(cx - s*0.1, cy - s*0.08); g.lineTo(cx + s*0.1, cy - s*0.08); g.stroke(); }
+      else if (k === "feature"){ g.strokeStyle = LS.blueLight; g.lineWidth = 2.2; g.beginPath(); g.moveTo(cx - s*0.07, cy + s*0.05 - s*0.12); g.lineTo(cx + s*0.07, cy - s*0.05 - s*0.12); g.stroke(); }
+      else if (txt) g.fillText(txt, cx, cy - s*0.16);
+    }
+    if (i === 2){
+      if (dots){ g.fillStyle = "#000"; for (let j = 0; j < 12; j++){ const ang = j*2.399, rad = s*0.08*Math.sqrt(j+1); g.fillStyle = j%2 ? "#000" : "#fff"; g.beginPath(); g.arc(cx + Math.cos(ang)*rad, cy + Math.sin(ang)*rad, s*0.022, 0, Math.PI*2); g.fill(); } }
+      else if (two){ gaborInto(g, cx - s*0.27, cy, s*0.17, 0.5, 0.9, 4); gaborInto(g, cx + s*0.27, cy, s*0.17, 1.1, 0.9, 4); fix(); }
+      else { gaborInto(g, cx, cy, s*0.3, 0.6, 0.9, 6); fix(); }
+    }
+    if (i === 3){ fix(); if (!c.mri){ g.fillStyle = "#fff"; g.font = F(Math.max(10, s*0.11)); g.textAlign = "center"; g.textBaseline = "middle"; g.fillText("?", cx, cy - s*0.14); } }
+    // label beneath frame's lower-left (not covered by the next frame)
+    g.fillStyle = LS.ink; g.font = F(10.5, true); g.textAlign = "left"; g.textBaseline = "top";
+    g.fillText(durs[i][0], x, y + s + 4);
+    g.fillStyle = LS.ink2; g.font = F(10); g.fillText(durs[i][1], x, y + s + 17);
+  }
+  // time arrow, horizontal beneath the stack
+  const ty = y0 + 3*dy + s + 40, tx0 = x0, tx1 = x0 + 3*dx + s;
+  g.strokeStyle = LS.ink; g.fillStyle = LS.ink; g.lineWidth = 1;
+  g.beginPath(); g.moveTo(tx0, ty); g.lineTo(tx1, ty); g.stroke();
+  g.beginPath(); g.moveTo(tx1, ty); g.lineTo(tx1 - 8, ty - 4); g.lineTo(tx1 - 8, ty + 4); g.closePath(); g.fill();
+  g.font = F(11, true); g.textAlign = "right"; g.textBaseline = "top"; g.fillText("Time", tx1, ty + 5);
+}
+
+/* ---------- Header Gabor (page chrome) ---------- */
+const css = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 function hexRGB(h){ h = h.replace("#",""); if (h.length === 3) h = h.split("").map(x=>x+x).join(""); const n = parseInt(h,16); return [n>>16&255, n>>8&255, n&255]; }
 const gab = document.getElementById("gabor");
-let gaborPhase = 0;
+let gaborPhase = 0, current = null, currentC = null;
 function drawGabor(){
-  const g = gab.getContext("2d"), S = gab.width;
-  const mid = hexRGB(css("--screen") || "#a5a8ad");
-  const ori = current ? current.gaborOri : 0.6;
-  const img = g.createImageData(S, S), c = S/2, sig = S*0.2, freq = 4.2 / S * Math.PI * 2;
-  const co = Math.cos(ori), si = Math.sin(ori);
-  for (let y = 0; y < S; y++) for (let x = 0; x < S; x++){
-    const dx = x - c, dy = y - c;
-    const env = Math.exp(-(dx*dx + dy*dy) / (2*sig*sig));
-    const v = Math.sin((dx*co + dy*si) * freq + gaborPhase) * env * 0.9;
-    const i = (y*S + x) * 4;
-    for (let k = 0; k < 3; k++) img.data[i+k] = v > 0 ? mid[k] + (255 - mid[k]) * v : mid[k] + mid[k] * v;
-    img.data[i+3] = 255;
-  }
+  const g = gab.getContext("2d"), S = gab.width, mid = hexRGB(css("--screen") || "#a5a8ad");
+  const ori = current ? current.gaborOri : 0.6, img = g.createImageData(S, S), c0 = S/2, sig = S*0.2, freq = 4.2/S*Math.PI*2, co = Math.cos(ori), si = Math.sin(ori);
+  for (let y = 0; y < S; y++) for (let x = 0; x < S; x++){ const dx = x-c0, dy = y-c0, env = Math.exp(-(dx*dx+dy*dy)/(2*sig*sig)), v = Math.sin((dx*co+dy*si)*freq + gaborPhase)*env*0.9, i = (y*S+x)*4;
+    for (let k = 0; k < 3; k++) img.data[i+k] = v > 0 ? mid[k] + (255-mid[k])*v : mid[k] + mid[k]*v; img.data[i+3] = 255; }
   g.putImageData(img, 0, 0);
 }
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-function driftGabor(){
-  if (reduceMotion.matches){ drawGabor(); return; }
-  const t0 = performance.now();
-  const tick = now => { const t = (now - t0) / 380; gaborPhase = t * Math.PI * 2; drawGabor(); if (t < 1) requestAnimationFrame(tick); };
-  requestAnimationFrame(tick);
-}
+function driftGabor(){ if (reduceMotion.matches){ drawGabor(); return; } const t0 = performance.now(); const tick = now => { const t = (now-t0)/380; gaborPhase = t*Math.PI*2; drawGabor(); if (t < 1) requestAnimationFrame(tick); }; requestAnimationFrame(tick); }
 
 /* ---------- Render ---------- */
 const $ = id => document.getElementById(id);
+const DRAW = {design:drawDesign, main:drawMain, scatter:drawScatter, bars:drawBars};
+function drawFigs(){
+  if (!current) return;
+  document.querySelectorAll("#body canvas[data-fig]").forEach(cv => { const f = current.figs[+cv.dataset.fig]; try { DRAW[f.type](cv, current.ctx); } catch(e){ console.error(e); } });
+}
 let history = [];
 function render(p, animate){
   current = p;
-  $("citeLine").innerHTML = `<b>${p.journal}</b><span>${p.year}</span><span>${p.vol}: ${p.pages}</span>`;
-  $("title").textContent = p.title;
-  $("authors").innerHTML = fmtAuthors(p.authors, true);
-  $("abstract").textContent = p.abstract;
-  $("caption").innerHTML = p.figd.caption;
-  $("lay").textContent = p.lay;
-  $("kw").innerHTML = p.kw.map(k => `<li>${k}</li>`).join("");
-  $("remix").innerHTML = p.remix.map(s => `<li><span>${shortCite(s[1], s[0])} · <i>${s[2]}</i>, ${s[3]}</span></li>`).join("");
-  $("toast").textContent = "";
-  drawFigure();
-  if (animate){
-    const el = $("paper"); el.classList.remove("flash"); void el.offsetWidth; el.classList.add("flash");
-    driftGabor();
-  } else drawGabor();
+  $("body").innerHTML = p.html + `
+    <p class="sec" style="margin-top:28px">Remixed from</p>
+    <ul class="remix">${p.remix.map(s => `<li><span>${shortCite(s[1], s[0])} · <i>${s[2]}</i>, ${s[3]}</span></li>`).join("")}</ul>
+    <div class="actions"><button class="btn2" id="copy" type="button">Copy citation</button><button class="btn2" id="copyAll" type="button">Copy full text</button><span class="toast" id="toast" role="status"></span></div>
+    <p class="disclaimer">Fictional paper. Authors, journal, data and statistics are generated; the reference list cites real papers.</p>`;
+  $("toc").innerHTML = [["top","Title and abstract"], ...p.toc].map(([id,h]) => `<li><button type="button" data-go="${id}">${h}</button></li>`).join("");
+  drawFigs();
+  if (animate){ const el = $("paper"); el.classList.remove("flash"); void el.offsetWidth; el.classList.add("flash"); driftGabor(); } else drawGabor();
 }
+$("toc").addEventListener("click", e => {
+  const b = e.target.closest("button[data-go]"); if (!b) return;
+  const el = b.dataset.go === "top" ? $("paper") : document.getElementById("s-" + b.dataset.go);
+  if (el) el.scrollIntoView({behavior: reduceMotion.matches ? "auto" : "smooth", block:"start"});
+});
 function addHistory(p){
   history = [p, ...history.filter(h => h.seed !== p.seed)].slice(0, 6);
-  const ul = $("hist");
-  ul.innerHTML = history.slice(1).map((h, i) => `<li><button type="button" data-i="${i+1}"><span class="y">${h.year} · ${h.journal}</span><br>${h.title}</button></li>`).join("") || `<li><p class="empty">Earlier papers appear here.</p></li>`;
+  $("hist").innerHTML = history.slice(1).map((h, i) => `<li><button type="button" data-i="${i+1}"><span class="y">${h.year} · ${h.journal}</span><br>${h.title}</button></li>`).join("") || `<li><p class="empty">Earlier papers appear here.</p></li>`;
 }
-$("hist").addEventListener("click", e => {
-  const b = e.target.closest("button[data-i]"); if (!b) return;
-  const h = history[+b.dataset.i]; render(h, true); addHistory(h);
-});
+$("hist").addEventListener("click", e => { const b = e.target.closest("button[data-i]"); if (!b) return; const h = history[+b.dataset.i]; render(h, true); addHistory(h); window.scrollTo({top:0}); });
 
+function build(seed, era){ const p = generate(seed, era); return p; }
+const REAL = new Set(CORPUS.map(q => q[2].toLowerCase()));
 function eraValue(){ return document.querySelector('input[name="era"]:checked').value; }
-const REAL = new Set(CORPUS.map(c => c[2].toLowerCase()));
 function fresh(){
   let p, tries = 0;
-  do { p = generate((Math.random() * 2**31) >>> 0, eraValue()); } while (REAL.has(p.title.toLowerCase()) && ++tries < 20);
+  do { p = build((Math.random() * 2**31) >>> 0, eraValue()); } while (REAL.has(p.title.toLowerCase()) && ++tries < 20);
   render(p, true); addHistory(p);
 }
 $("go").addEventListener("click", fresh);
@@ -716,19 +1231,11 @@ document.addEventListener("keydown", e => {
   const t = e.target; if (t && (t.tagName === "BUTTON" || t.tagName === "INPUT" || t.isContentEditable)) return;
   e.preventDefault(); fresh();
 });
-
-$("copy").addEventListener("click", () => {
-  const p = current; if (!p) return;
-  const text = `${fmtAuthors(p.authors, false)} (${p.year}). ${p.title}. ${p.journal}, ${p.vol}, ${p.pages}.`;
-  const done = msg => { $("toast").textContent = msg; };
-  try {
-    navigator.clipboard.writeText(text).then(() => done("Copied"), () => fallback());
-  } catch (err) { fallback(); }
-  function fallback(){
-    const sel = window.getSelection(), range = document.createRange();
-    range.selectNodeContents($("title")); sel.removeAllRanges(); sel.addRange(range);
-    done("Clipboard blocked. Title selected instead.");
-  }
+$("body").addEventListener("click", e => {
+  const id = e.target.id; if (id !== "copy" && id !== "copyAll") return;
+  const text = id === "copy" ? current.cite : Array.from($("body").querySelectorAll(".cite-line, h2, .authors, .affs, .abstract, .sig, .article > *:not(figure):not(.tblwrap)")).map(el => el.innerText).join("\n\n");
+  const done = m => { const t = $("toast"); if (t) t.textContent = m; };
+  try { navigator.clipboard.writeText(text).then(() => done("Copied"), () => done("Clipboard blocked by this viewer.")); } catch(err){ done("Clipboard blocked by this viewer."); }
 });
 
 /* ---------- Dissection panel ---------- */
@@ -736,35 +1243,23 @@ $("copy").addEventListener("click", () => {
   const years = CORPUS.map(p => p[0]);
   $("corpusStat").innerHTML = `${CORPUS.length} papers<span>${Math.min(...years)}–${Math.max(...years)} · ${new Set(CORPUS.map(p=>p[3])).size} journals</span>`;
   const STOP = new Set("a an the of in on and to for by with from via during within across does do how when is are that this be as at it its human visual cortex early processing evidence reply neither nor not use".split(" "));
-  const norm = w => ({attentional:"attention", normalizing:"normalization", responses:"response", representations:"representation", tuned:"tuning", visuocortical:"visuocortical"}[w] || w);
+  const norm = w => ({attentional:"attention", normalizing:"normalization", responses:"response", representations:"representation", tuned:"tuning"}[w] || w);
   const wc = {};
-  CORPUS.forEach(p => {
-    const seen = new Set();
-    p[2].toLowerCase().replace(/[^a-z\- ]/g, " ").split(/\s+/).forEach(w => { w = norm(w); if (w.length > 2 && !STOP.has(w) && !seen.has(w)){ seen.add(w); wc[w] = (wc[w]||0) + 1; } });
-  });
-  const ca = {};
-  CORPUS.forEach(p => p[1].forEach(a => { if (a !== "Ling") ca[a] = (ca[a]||0) + 1; }));
-  const jc = {};
-  CORPUS.forEach(p => { jc[p[3]] = (jc[p[3]]||0) + 1; });
-  const bars = (obj, k) => {
-    const rows = Object.entries(obj).sort((a,b) => b[1]-a[1] || a[0].localeCompare(b[0])).slice(0, k);
-    const max = rows[0][1];
-    return rows.map(([l,n]) => `<li><span class="lbl" style="--w:${(n/max*100).toFixed(1)}%"><span>${l}</span></span><span class="n">${n}</span></li>`).join("");
-  };
-  $("words").innerHTML = bars(wc, 8);
-  $("coauth").innerHTML = bars(ca, 8);
-  $("journals").innerHTML = bars(jc, 6);
+  CORPUS.forEach(p => { const seen = new Set(); p[2].toLowerCase().replace(/[^a-z\- ]/g, " ").split(/\s+/).forEach(w => { w = norm(w); if (w.length > 2 && !STOP.has(w) && !seen.has(w)){ seen.add(w); wc[w] = (wc[w]||0) + 1; } }); });
+  const ca = {}; CORPUS.forEach(p => p[1].forEach(a => { if (a !== "Ling") ca[a] = (ca[a]||0) + 1; }));
+  const jc = {}; CORPUS.forEach(p => { jc[p[3]] = (jc[p[3]]||0) + 1; });
+  const bars = (obj, k) => { const rows = Object.entries(obj).sort((a,b) => b[1]-a[1] || a[0].localeCompare(b[0])).slice(0, k), max = rows[0][1];
+    return rows.map(([l,n]) => `<li><span class="lbl" style="--w:${(n/max*100).toFixed(1)}%"><span>${l}</span></span><span class="n">${n}</span></li>`).join(""); };
+  $("words").innerHTML = bars(wc, 8); $("coauth").innerHTML = bars(ca, 8); $("journals").innerHTML = bars(jc, 6);
 })();
 
-/* ---------- Theme / resize ---------- */
-new ResizeObserver(() => drawFigure()).observe(figCanvas.parentElement);
-const redrawAll = () => { drawFigure(); drawGabor(); };
-window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", redrawAll);
-new MutationObserver(redrawAll).observe(document.documentElement, {attributes:true, attributeFilter:["data-theme"]});
-if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawFigure);
+/* ---------- Resize / theme ---------- */
+let rzT; new ResizeObserver(() => { clearTimeout(rzT); rzT = setTimeout(drawFigs, 60); }).observe($("body"));
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", drawGabor);
+new MutationObserver(drawGabor).observe(document.documentElement, {attributes:true, attributeFilter:["data-theme"]});
 
 /* ---------- First paper ---------- */
-const first = generate(20041984, "a");
+const first = build(20041984, "i");
 render(first, false); addHistory(first);
 })();
 </script>
