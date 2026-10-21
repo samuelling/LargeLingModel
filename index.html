@@ -56,7 +56,15 @@ body{
 .top{display:grid; grid-template-columns:auto 1fr; gap:18px 20px; align-items:center}
 #gabor{width:72px; height:72px; border-radius:50%; display:block}
 .top h1{font-family:var(--f-display); font-weight:560; font-size:clamp(1.9rem, 4.2vw, 2.8rem); line-height:1.05; margin:0; letter-spacing:-0.01em; text-wrap:balance}
-.top p{margin:6px 0 0; color:var(--screen-muted); max-width:64ch; font-size:.95rem}
+.whatbtn{margin-top:10px; display:inline-flex; align-items:center; gap:8px; font:500 .8rem/1 var(--f-mono); padding:7px 12px 7px 7px; border-radius:999px; border:1px solid color-mix(in srgb, var(--screen-ink) 25%, transparent); background:transparent; color:var(--screen-ink); cursor:pointer}
+.whatbtn span{display:grid; place-items:center; width:18px; height:18px; border-radius:50%; background:var(--screen-ink); color:var(--screen); font-weight:700; font-size:.72rem}
+.whatbtn:hover{background:color-mix(in srgb, var(--screen-ink) 8%, transparent)}
+.whatbtn:focus-visible, .whatclose:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+.what{max-width:min(460px, calc(100vw - 32px)); border:0; border-radius:8px; padding:22px 24px 20px; background:var(--paper); color:var(--ink); box-shadow:0 20px 50px -12px color-mix(in srgb, #000 55%, transparent)}
+.what::backdrop{background:color-mix(in srgb, #000 35%, transparent)}
+.what h2{font-family:var(--f-display); font-weight:560; font-size:1.4rem; margin:0 0 10px}
+.what p{margin:0 0 18px; line-height:1.55}
+.whatclose{font:700 .9rem/1 var(--f-body); padding:10px 18px; border-radius:999px; border:0; background:var(--btn); color:#fff; cursor:pointer}
 .top{margin-bottom:4px}
 .top h1 .h1sub{font-weight:400; font-style:italic; color:var(--screen-muted)}
 .era{display:flex; flex-wrap:wrap; gap:4px; border:0; margin:0; padding:3px; background:color-mix(in srgb, var(--screen-ink) 9%, transparent); border-radius:999px}
@@ -198,8 +206,13 @@ footer a{color:inherit}
     <canvas id="gabor" width="144" height="144" aria-hidden="true"></canvas>
     <div>
       <h1>LLM <span class="h1sub">(Large Ling Model)</span></h1>
-      <p>Built from a dissection of 53 real Ling Lab papers (2004–2026). Each draw writes a complete paper: title, abstract, introduction, methods, results with simulated observers and real statistics, four figures, a parameter table, discussion and references.</p>
+      <button class="whatbtn" id="whatBtn" type="button" aria-haspopup="dialog"><span aria-hidden="true">?</span>What's happening?</button>
     </div>
+    <dialog class="what" id="what" aria-labelledby="whatTitle">
+      <h2 id="whatTitle">What's happening?</h2>
+      <p>Built from a dissection of 53 real Ling Lab papers (2004–2026). Each draw writes a complete paper: title, abstract, introduction, methods, results with simulated observers and real statistics, four figures, a parameter table, discussion and references.</p>
+      <button class="whatclose" id="whatClose" type="button">Got it</button>
+    </dialog>
     <section class="machine" id="machine" aria-label="Paper generator">
       <span class="bolt tl" aria-hidden="true"></span><span class="bolt tr" aria-hidden="true"></span><span class="bolt bl" aria-hidden="true"></span><span class="bolt br" aria-hidden="true"></span>
       <div class="bigwrap">
@@ -1326,6 +1339,10 @@ function fresh(){
   requestAnimationFrame(step);
 }
 $("go").addEventListener("click", fresh);
+const whatDlg = $("what");
+$("whatBtn").addEventListener("click", () => { try { whatDlg.showModal(); } catch(e){ whatDlg.setAttribute("open", ""); } });
+$("whatClose").addEventListener("click", () => whatDlg.close());
+whatDlg.addEventListener("click", e => { if (e.target === whatDlg) whatDlg.close(); });
 $("era").addEventListener("change", fresh);
 document.addEventListener("keydown", e => {
   if (e.code !== "Space" || e.metaKey || e.ctrlKey || e.altKey) return;
