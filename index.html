@@ -91,9 +91,6 @@ body{
 @keyframes glint{0%{transform:translateX(-130%)} 11%{transform:translateX(130%)} 100%{transform:translateX(130%)}}
 @keyframes nuttwist{0%{transform:rotate(0)} 4%{transform:rotate(0)} 12%{transform:rotate(60deg)} 100%{transform:rotate(60deg)}}
 .nutsbtn[aria-expanded="true"]::after{animation:none; opacity:0}
-.bigwrap .nutsbtn{margin-bottom:6px; background:color-mix(in srgb, var(--screen) 85%, #fff); z-index:2}
-.machine.open .bigwrap .nutsbtn{margin-bottom:20px}
-.pipes .casing.main{stroke-width:14} .pipes .bore.main{stroke-width:8} .pipes .fluid.main{stroke-width:3.5}
 .nutsbtn:not([aria-expanded="true"]){animation:jiggle 4.8s ease-in-out 1.2s infinite; transform-origin:50% 60%}
 @keyframes jiggle{0%, 84%, 100%{transform:rotate(0)} 86%{transform:rotate(-3deg)} 88%{transform:rotate(2.6deg)} 90%{transform:rotate(-2deg)} 92%{transform:rotate(1.4deg)} 94%{transform:rotate(-.8deg)} 96%{transform:rotate(0)}}
 @media (prefers-reduced-motion: reduce){ .nutsbtn::after, .nutsbtn svg, .nutsbtn{animation:none !important} }
@@ -342,6 +339,7 @@ footer a{color:inherit}
     </div>
     <div class="pills">
       <button class="whatbtn" id="whatBtn" type="button" aria-haspopup="dialog"><span aria-hidden="true">?</span>What's happening?</button>
+      <button class="whatbtn nutsbtn" id="nutsBtn" type="button" aria-expanded="false" aria-controls="works"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5 20.2 7.25v9.5L12 21.5 3.8 16.75v-9.5Z" fill="currentColor"/><circle cx="12" cy="12" r="3.6" fill="var(--screen)"/></svg>Nuts and bolts</button>
     </div>
     <dialog class="what" id="what" aria-labelledby="whatTitle">
       <h2 id="whatTitle">What's happening?</h2>
@@ -363,7 +361,6 @@ footer a{color:inherit}
       </div>
       <span class="bolt tl" aria-hidden="true"></span><span class="bolt tr" aria-hidden="true"></span><span class="bolt bl" aria-hidden="true"></span><span class="bolt br" aria-hidden="true"></span>
       <div class="bigwrap">
-  <button class="whatbtn nutsbtn" id="nutsBtn" type="button" aria-expanded="false" aria-controls="works"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5 20.2 7.25v9.5L12 21.5 3.8 16.75v-9.5Z" fill="currentColor"/><circle cx="12" cy="12" r="3.6" fill="var(--screen)"/></svg>Nuts and bolts</button>
         <div class="guard"><div class="ring"><button class="big" id="go" type="button" aria-label="Generate paper">Generate<br>paper</button></div></div>
         <div class="biglbl">Derivative output<span>or press space</span></div>
       </div>
@@ -1677,9 +1674,8 @@ function updateStations(p){
 function drawPipes(){
   const svg = $("pipes");
   if (!worksOpen){ svg.innerHTML = ""; return; }
-  const mr = $("machine").getBoundingClientRect(), gr = document.querySelector(".guard").getBoundingClientRect(), nr = $("nutsBtn").getBoundingClientRect();
-  const bx = nr.left + nr.width/2 - mr.left, by = nr.top - mr.top + 3;
-  const mainD = `M${bx.toFixed(1)} ${(nr.bottom - mr.top - 3).toFixed(1)} L${bx.toFixed(1)} ${(gr.top - mr.top + 6).toFixed(1)}`;
+  const mr = $("machine").getBoundingClientRect(), gr = document.querySelector(".guard").getBoundingClientRect();
+  const bx = gr.left + gr.width/2 - mr.left, by = gr.top - mr.top + 4;
   svg.setAttribute("viewBox", `0 0 ${mr.width} ${mr.height}`);
   const sts = [...document.querySelectorAll(".station")], N = sts.length;
   let casing = "", bore = "", fluid = "";
@@ -1690,8 +1686,7 @@ function drawPipes(){
     casing += `<path class="casing" d="${d}"/>`; bore += `<path class="bore" d="${d}"/>`;
     fluid += `<path class="fluid" id="pf-${el.id.slice(3)}" d="${d}" style="animation-delay:${(-i*0.05).toFixed(2)}s"/>`;
   });
-  casing += `<path class="casing main" d="${mainD}"/>`; bore += `<path class="bore main" d="${mainD}"/>`; fluid += `<path class="fluid main" d="${mainD}"/>`;
-  svg.innerHTML = casing + bore + fluid + `<rect class="collar" x="${(bx-24).toFixed(1)}" y="${(by-6).toFixed(1)}" width="48" height="10" rx="3"/>` + `<rect class="collar" x="${(bx-20).toFixed(1)}" y="${(gr.top - mr.top - 1).toFixed(1)}" width="40" height="9" rx="3"/>`;
+  svg.innerHTML = casing + bore + fluid + `<rect class="collar" x="${(bx-24).toFixed(1)}" y="${(by-6).toFixed(1)}" width="48" height="10" rx="3"/>`;
 }
 function setWorks(open){
   worksOpen = open;
