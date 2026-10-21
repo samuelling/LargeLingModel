@@ -21,6 +21,9 @@
   --chip:#eceef1;
   --accent:#1c5bc4;
   --fix:#d0372a;
+  --btn:#e3261b; --btn-hi:#ff7a6b; --btn-lo:#8c110b;
+  --haz-y:#f2c12e; --haz-k:#1c1c1c;
+  --lcd-bg:#18231a; --lcd-fg:#a6f7a0; --lcd-dim:#4f7a4c;
   --f-display:"Newsreader", "Iowan Old Style", Georgia, serif;
   --f-body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
   --f-mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
@@ -54,18 +57,56 @@ body{
 #gabor{width:72px; height:72px; border-radius:50%; display:block}
 .top h1{font-family:var(--f-display); font-weight:560; font-size:clamp(1.9rem, 4.2vw, 2.8rem); line-height:1.05; margin:0; letter-spacing:-0.01em; text-wrap:balance}
 .top p{margin:6px 0 0; color:var(--screen-muted); max-width:64ch; font-size:.95rem}
-.controls{grid-column:1 / -1; display:flex; flex-wrap:wrap; gap:12px; align-items:center}
+.top{margin-bottom:4px}
 .era{display:flex; flex-wrap:wrap; gap:4px; border:0; margin:0; padding:3px; background:color-mix(in srgb, var(--screen-ink) 9%, transparent); border-radius:999px}
 .era legend{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0)}
 .era input{position:absolute; opacity:0; pointer-events:none}
 .era label{font-family:var(--f-mono); font-size:.78rem; padding:6px 12px; border-radius:999px; cursor:pointer; color:var(--screen-muted); white-space:nowrap}
 .era input:checked + label{background:var(--paper); color:var(--ink)}
 .era input:focus-visible + label{outline:2px solid var(--accent); outline-offset:1px}
-.go{display:inline-flex; align-items:center; gap:10px; font:700 1rem/1 var(--f-body); padding:12px 20px; border-radius:999px; border:0; background:var(--screen-ink); color:var(--screen); cursor:pointer}
-.go:hover{filter:brightness(1.15)}
-.go:focus-visible{outline:2px solid var(--accent); outline-offset:3px}
-.go .dot{width:9px; height:9px; border-radius:50%; background:var(--fix)}
-.hint{font-family:var(--f-mono); font-size:.75rem; color:var(--screen-muted)}
+/* The machine */
+.machine{grid-column:1 / -1; position:relative; display:grid; grid-template-columns:auto minmax(0,1fr); gap:20px 30px; align-items:center;
+  padding:22px 26px; border-radius:10px; background:color-mix(in srgb, var(--screen-ink) 11%, var(--screen));
+  box-shadow:inset 0 1px 0 color-mix(in srgb, #fff 22%, transparent), inset 0 -2px 0 color-mix(in srgb, #000 16%, transparent), 0 10px 24px -16px color-mix(in srgb, #000 60%, transparent)}
+.bolt{position:absolute; width:9px; height:9px; border-radius:50%; background:radial-gradient(circle at 35% 35%, color-mix(in srgb, #fff 55%, var(--screen)), color-mix(in srgb, #000 35%, var(--screen))); box-shadow:inset 0 0 0 1px color-mix(in srgb, #000 25%, transparent)}
+.bolt::after{content:""; position:absolute; left:2px; right:2px; top:4px; height:1px; background:color-mix(in srgb, #000 45%, transparent); transform:rotate(35deg)}
+.bolt.tl{top:9px; left:9px} .bolt.tr{top:9px; right:9px} .bolt.bl{bottom:9px; left:9px} .bolt.br{bottom:9px; right:9px}
+.machine.shaking{animation:shake .09s linear infinite}
+@keyframes shake{0%{transform:translate(0,0)}25%{transform:translate(1.2px,-.6px)}50%{transform:translate(-1px,.8px)}75%{transform:translate(.8px,.6px)}100%{transform:translate(0,0)}}
+.bigwrap{display:flex; flex-direction:column; align-items:center; gap:10px}
+.guard{width:156px; height:156px; border-radius:50%; display:grid; place-items:center;
+  background:repeating-conic-gradient(var(--haz-y) 0 15deg, var(--haz-k) 15deg 30deg);
+  box-shadow:0 4px 10px color-mix(in srgb, #000 35%, transparent)}
+.ring{width:130px; height:130px; border-radius:50%; background:var(--haz-k); display:grid; place-items:center; box-shadow:inset 0 4px 8px color-mix(in srgb, #000 70%, transparent)}
+.big{width:108px; height:108px; border-radius:50%; border:0; cursor:pointer; color:#fff;
+  font:700 .74rem/1.15 var(--f-mono); letter-spacing:.1em; text-transform:uppercase; text-shadow:0 1px 0 color-mix(in srgb, #000 40%, transparent);
+  background:radial-gradient(circle at 35% 28%, var(--btn-hi), var(--btn) 46%, var(--btn-lo) 100%);
+  box-shadow:0 9px 0 var(--btn-lo), 0 13px 16px color-mix(in srgb, #000 50%, transparent), inset 0 -6px 10px color-mix(in srgb, #000 22%, transparent);
+  transform:translateY(-7px); transition:transform .07s ease-out, box-shadow .07s ease-out, filter .2s}
+.big:hover{filter:brightness(1.07)}
+.big:active, .big.pressed{transform:translateY(0); box-shadow:0 2px 0 var(--btn-lo), 0 3px 5px color-mix(in srgb, #000 45%, transparent), inset 0 -3px 8px color-mix(in srgb, #000 30%, transparent)}
+.big:focus-visible{outline:3px solid var(--accent); outline-offset:10px}
+.big[aria-busy="true"]{cursor:progress}
+.biglbl{font-family:var(--f-mono); font-size:.72rem; letter-spacing:.12em; text-transform:uppercase; color:var(--screen-ink); text-align:center}
+.biglbl span{display:block; letter-spacing:.04em; text-transform:none; color:var(--screen-muted)}
+.console{display:flex; flex-direction:column; gap:12px; min-width:0}
+.plate{display:flex; flex-wrap:wrap; gap:4px 14px; align-items:baseline; font-family:var(--f-mono); font-size:.72rem; letter-spacing:.12em; text-transform:uppercase; color:var(--screen-muted)}
+.plate b{font-weight:500; color:var(--screen-ink); letter-spacing:.14em}
+.lcd{display:grid; grid-template-columns:auto minmax(0,1fr); gap:6px 10px; align-items:center; background:var(--lcd-bg); color:var(--lcd-fg);
+  border-radius:5px; padding:11px 14px; font-family:var(--f-mono); font-size:.82rem; box-shadow:inset 0 2px 6px color-mix(in srgb, #000 60%, transparent)}
+.lamp{width:10px; height:10px; border-radius:50%; background:var(--lcd-dim); box-shadow:0 0 0 2px color-mix(in srgb, #000 40%, transparent)}
+.lamp.on{background:var(--btn-hi); box-shadow:0 0 8px var(--btn-hi), 0 0 0 2px color-mix(in srgb, #000 40%, transparent); animation:blink .22s steps(2) infinite}
+.lamp.done{background:var(--lcd-fg); box-shadow:0 0 8px var(--lcd-fg), 0 0 0 2px color-mix(in srgb, #000 40%, transparent)}
+@keyframes blink{50%{opacity:.35}}
+.lcdmsg{white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-shadow:0 0 6px color-mix(in srgb, var(--lcd-fg) 45%, transparent)}
+.meter{grid-column:2; height:6px; border-radius:3px; background:color-mix(in srgb, var(--lcd-fg) 14%, transparent); overflow:hidden}
+.meter i{display:block; height:100%; width:0; background:var(--lcd-fg); box-shadow:0 0 6px var(--lcd-fg)}
+.knobs{display:flex; flex-wrap:wrap; gap:10px 14px; align-items:center}
+.knobs .lbl{font-family:var(--f-mono); font-size:.7rem; letter-spacing:.12em; text-transform:uppercase; color:var(--screen-muted)}
+.snd{font:500 .74rem/1 var(--f-mono); padding:7px 11px; border-radius:999px; border:1px solid color-mix(in srgb, var(--screen-ink) 25%, transparent); background:transparent; color:var(--screen-ink); cursor:pointer}
+.snd:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+@media (max-width:620px){ .machine{grid-template-columns:minmax(0,1fr); justify-items:stretch; padding:22px 18px} .bigwrap{justify-self:center} .lcdmsg{white-space:normal} .era{border-radius:14px} }
+@media (prefers-reduced-motion: reduce){ .machine.shaking{animation:none} .lamp.on{animation:none} .big{transition:none} }
 
 /* Main grid */
 .grid{display:grid; grid-template-columns:minmax(0, 1fr) 280px; gap:24px; align-items:start}
@@ -158,17 +199,27 @@ footer a{color:inherit}
       <h1>Large Ling Model</h1>
       <p>Built from a dissection of 53 real Ling Lab papers (2004–2026). Each draw writes a complete paper: title, abstract, introduction, methods, results with simulated observers and real statistics, four figures, a parameter table, discussion and references.</p>
     </div>
-    <div class="controls">
-      <fieldset class="era" id="era">
-        <legend>Career era</legend>
-        <input type="radio" name="era" id="era-a" value="a" checked><label for="era-a">Any era</label>
-        <input type="radio" name="era" id="era-g" value="g"><label for="era-g">Grad school · 2004–09</label>
-        <input type="radio" name="era" id="era-p" value="p"><label for="era-p">Postdoc · 2009–15</label>
-        <input type="radio" name="era" id="era-i" value="i"><label for="era-i">Own lab · 2016–</label>
-      </fieldset>
-      <button class="go" id="go" type="button"><span class="dot" aria-hidden="true"></span>Generate paper</button>
-      <span class="hint">or press space</span>
-    </div>
+    <section class="machine" id="machine" aria-label="Paper generator">
+      <span class="bolt tl" aria-hidden="true"></span><span class="bolt tr" aria-hidden="true"></span><span class="bolt bl" aria-hidden="true"></span><span class="bolt br" aria-hidden="true"></span>
+      <div class="bigwrap">
+        <div class="guard"><div class="ring"><button class="big" id="go" type="button" aria-label="Generate paper">Generate<br>paper</button></div></div>
+        <div class="biglbl">Derivative output<span>or press space</span></div>
+      </div>
+      <div class="console">
+        <div class="plate"><b>Large Ling Model</b><span>Derivative paper engine · Model LLM-1</span><span>Hopper: 53 papers</span></div>
+        <div class="lcd" role="status" aria-live="polite"><span class="lamp" id="lamp" aria-hidden="true"></span><span class="lcdmsg" id="lcd">READY. 53 PAPERS IN HOPPER.</span><span class="meter" aria-hidden="true"><i id="meter"></i></span></div>
+        <div class="knobs">
+          <fieldset class="era" id="era">
+            <legend>Career era</legend>
+            <input type="radio" name="era" id="era-a" value="a" checked><label for="era-a">Any era</label>
+            <input type="radio" name="era" id="era-g" value="g"><label for="era-g">Grad school · 2004–09</label>
+            <input type="radio" name="era" id="era-p" value="p"><label for="era-p">Postdoc · 2009–15</label>
+            <input type="radio" name="era" id="era-i" value="i"><label for="era-i">Own lab · 2016–</label>
+          </fieldset>
+          <button class="snd" id="snd" type="button" aria-pressed="true">Sound on</button>
+        </div>
+      </div>
+    </section>
   </header>
 
   <main class="grid">
@@ -1219,10 +1270,59 @@ $("hist").addEventListener("click", e => { const b = e.target.closest("button[da
 function build(seed, era){ const p = generate(seed, era); return p; }
 const REAL = new Set(CORPUS.map(q => q[2].toLowerCase()));
 function eraValue(){ return document.querySelector('input[name="era"]:checked').value; }
+const MSGS = ["SWAPPING 'ATTENTION' FOR 'AROUSAL'…","RECYCLING 2009 STIMULI…","FITTING NAKA–RUSHTON TO EVERYTHING…","NORMALIZING THE NORMALIZATION…","ADDING A V3 PANEL NOBODY ASKED FOR…","CITING LING ET AL.…","INFLATING ASTERISKS…","RECRUITING AN 'ADEQUATE' N…","PRE-EMPTING REVIEWER 2…","REBRANDING OLD FINDING AS NOVEL…","COLORING ATTENDED BLUE, UNATTENDED RED…","DRAFTING 'FUTURE WORK SHOULD…'…","OFFSETTING THE AXES…","REUSING THE INTRO FROM LAST TIME…"];
+let busy = false, soundOn = true;
+try { soundOn = localStorage.getItem("llm-sound") !== "off"; } catch(e){}
+const sndBtn = $("snd");
+const syncSnd = () => { sndBtn.textContent = soundOn ? "Sound on" : "Sound off"; sndBtn.setAttribute("aria-pressed", String(soundOn)); };
+syncSnd();
+sndBtn.addEventListener("click", () => { soundOn = !soundOn; syncSnd(); try { localStorage.setItem("llm-sound", soundOn ? "on" : "off"); } catch(e){} });
+let AC = null;
+function machineSound(dur){
+  if (!soundOn) return null;
+  try {
+    AC = AC || new (window.AudioContext || window.webkitAudioContext)();
+    const t = AC.currentTime, out = AC.createGain(); out.gain.value = 0.5; out.connect(AC.destination);
+    // clunk
+    const o = AC.createOscillator(), g = AC.createGain(); o.type = "sine"; o.frequency.setValueAtTime(110, t); o.frequency.exponentialRampToValueAtTime(38, t+0.18);
+    g.gain.setValueAtTime(0.5, t); g.gain.exponentialRampToValueAtTime(0.001, t+0.22); o.connect(g).connect(out); o.start(t); o.stop(t+0.25);
+    // motor whirr
+    const m = AC.createOscillator(), mf = AC.createBiquadFilter(), mg = AC.createGain(); m.type = "sawtooth"; mf.type = "lowpass"; mf.frequency.value = 420;
+    m.frequency.setValueAtTime(45, t+0.05); m.frequency.linearRampToValueAtTime(120, t+dur*0.6); m.frequency.linearRampToValueAtTime(70, t+dur);
+    mg.gain.setValueAtTime(0.0001, t); mg.gain.linearRampToValueAtTime(0.09, t+0.15); mg.gain.setValueAtTime(0.09, t+dur-0.1); mg.gain.linearRampToValueAtTime(0.0001, t+dur);
+    m.connect(mf).connect(mg).connect(out); m.start(t); m.stop(t+dur+0.05);
+    return {tick(){ const tt = AC.currentTime, k = AC.createOscillator(), kg = AC.createGain(); k.type = "square"; k.frequency.value = 1500; kg.gain.setValueAtTime(0.06, tt); kg.gain.exponentialRampToValueAtTime(0.001, tt+0.03); k.connect(kg).connect(out); k.start(tt); k.stop(tt+0.04); },
+      ding(){ const tt = AC.currentTime; [880, 1320].forEach((f, i) => { const d = AC.createOscillator(), dg = AC.createGain(); d.type = "sine"; d.frequency.value = f; dg.gain.setValueAtTime(0.0001, tt+i*0.09); dg.gain.linearRampToValueAtTime(0.18, tt+i*0.09+0.01); dg.gain.exponentialRampToValueAtTime(0.001, tt+i*0.09+0.5); d.connect(dg).connect(out); d.start(tt+i*0.09); d.stop(tt+i*0.09+0.55); }); }};
+  } catch(e){ return null; }
+}
 function fresh(){
+  if (busy) return;
+  busy = true;
+  const big = $("go"), mach = $("machine"), lamp = $("lamp"), lcd = $("lcd"), meter = $("meter");
+  const quick = reduceMotion.matches, dur = quick ? 0.35 : 1.35;
   let p, tries = 0;
   do { p = build((Math.random() * 2**31) >>> 0, eraValue()); } while (REAL.has(p.title.toLowerCase()) && ++tries < 20);
-  render(p, true); addHistory(p);
+  const msgs = ["LOADING 53 PRIOR PAPERS…", ...MSGS.slice().sort(() => Math.random() - 0.5).slice(0, quick ? 1 : 3)];
+  big.classList.add("pressed"); big.setAttribute("aria-busy", "true");
+  setTimeout(() => big.classList.remove("pressed"), 160);
+  lamp.className = "lamp on"; if (!quick) mach.classList.add("shaking");
+  const snd = machineSound(dur);
+  const t0 = performance.now(); let shown = -1;
+  const step = now => {
+    const f = Math.min(1, (now - t0) / (dur * 1000));
+    meter.style.width = (f * 100).toFixed(1) + "%";
+    const idx = Math.min(msgs.length - 1, Math.floor(f * msgs.length));
+    if (idx !== shown){ shown = idx; lcd.textContent = msgs[idx]; if (snd && idx > 0) snd.tick(); }
+    if (f < 1) requestAnimationFrame(step);
+    else {
+      mach.classList.remove("shaking"); lamp.className = "lamp done";
+      lcd.textContent = `OUTPUT: ${p.journal.toUpperCase()}, ${p.year}. ANOTHER ONE.`;
+      if (snd) snd.ding();
+      render(p, true); addHistory(p);
+      big.removeAttribute("aria-busy"); busy = false;
+    }
+  };
+  requestAnimationFrame(step);
 }
 $("go").addEventListener("click", fresh);
 $("era").addEventListener("change", fresh);
