@@ -20,6 +20,7 @@
   --fix:#d0372a;
   --btn:#e3261b; --btn-hi:#ff7a6b; --btn-lo:#8c110b;
   --haz-y:#f2c12e; --haz-k:#1c1c1c;
+  --metal-hi:#fbfbfb; --metal:#b8bcc3; --metal-lo:#5f646c;
   --lcd-bg:#18231a; --lcd-fg:#a6f7a0; --lcd-dim:#4f7a4c;
   --f-display:"Helvetica Neue", Helvetica, Arial, sans-serif;
   --f-body:"Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -93,7 +94,7 @@ body{
   -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent}
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .mm span{--a:var(--a-d); --b:var(--b-d)} }
 :root[data-theme="dark"] .mm span{--a:var(--a-d); --b:var(--b-d)}
-.mm:hover, .mm.reveal{--w:9px}
+.mm:hover, .mm.reveal, .mm.pulse{--w:9px}
 @media (prefers-reduced-motion: reduce){ .mm{transition:none} }
 /* The machine */
 .machine{grid-column:1 / -1; position:relative; display:grid; grid-template-columns:auto minmax(0,1fr); gap:20px 30px; align-items:center;
@@ -181,6 +182,48 @@ body{
 .st-range{display:flex; flex-direction:column; gap:2px; font-size:.76rem; color:var(--screen-muted)}
 .st-range span{display:flex; justify-content:space-between}
 .st-range input{width:100%; accent-color:var(--btn)}
+.ctl-row{display:flex; flex-wrap:wrap; align-items:flex-start; gap:12px 16px; padding-top:4px}
+.knobbox{display:flex; flex-direction:column; align-items:center; gap:4px; min-width:0}
+.knob{position:relative; width:64px; height:64px; flex:none; cursor:grab; touch-action:none; border-radius:50%; color:var(--screen-ink)}
+.knob.sm{width:52px; height:52px}
+.knob:active{cursor:grabbing}
+.knob:focus-visible{outline:2px solid var(--accent); outline-offset:3px}
+.knob svg{position:absolute; inset:0; width:100%; height:100%; overflow:visible}
+.knob .tick{stroke:currentColor; stroke-width:1.6; opacity:.55}
+.knob .tick.on{stroke:var(--btn); opacity:1; stroke-width:2.4}
+.kcap{position:absolute; inset:17%; border-radius:50%; transform:rotate(var(--ang, -135deg)); transition:transform .18s cubic-bezier(.3,1.4,.5,1);
+  background:radial-gradient(circle at 34% 28%, var(--metal-hi), var(--metal) 52%, var(--metal-lo) 100%);
+  box-shadow:0 4px 7px color-mix(in srgb, #000 50%, transparent), inset 0 -2px 3px color-mix(in srgb, #000 30%, transparent), inset 0 1px 1px color-mix(in srgb, #fff 70%, transparent)}
+.knob.dragging .kcap{transition:none}
+.kcap::before{content:""; position:absolute; inset:0; border-radius:50%;
+  background:repeating-conic-gradient(color-mix(in srgb, #000 22%, transparent) 0 3deg, transparent 3deg 10deg);
+  -webkit-mask:radial-gradient(circle, transparent 66%, #000 68%); mask:radial-gradient(circle, transparent 66%, #000 68%)}
+.kcap::after{content:""; position:absolute; left:50%; top:7%; width:3px; height:30%; margin-left:-1.5px; border-radius:2px; background:var(--btn); box-shadow:0 0 3px color-mix(in srgb, var(--btn) 60%, transparent)}
+.kname{font-size:.62rem; letter-spacing:.12em; text-transform:uppercase; color:var(--screen-muted); text-align:center; max-width:110px; line-height:1.25}
+.kname b{display:block; font-weight:500; color:var(--screen-ink); letter-spacing:.04em; text-transform:none; font-size:.72rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:110px}
+.tsw{display:flex; flex-direction:column; align-items:center; gap:3px; background:none; border:0; padding:0; cursor:pointer; color:var(--screen-muted)}
+.tsw:focus-visible{outline:2px solid var(--accent); outline-offset:3px; border-radius:6px}
+.tlbl{font-size:.58rem; letter-spacing:.12em; text-transform:uppercase; line-height:1}
+.tsw[aria-checked="true"] .tlbl:first-child, .tsw[aria-checked="false"] .tlbl:last-child{color:var(--screen-ink); font-weight:500}
+.tsw .plate{position:relative; width:28px; height:40px; border-radius:6px; background:color-mix(in srgb, var(--screen-ink) 55%, var(--screen));
+  box-shadow:inset 0 2px 4px color-mix(in srgb, #000 55%, transparent), 0 1px 0 color-mix(in srgb, #fff 25%, transparent)}
+.tsw .nut{position:absolute; left:50%; top:50%; width:16px; height:16px; margin:-8px 0 0 -8px; border-radius:50%;
+  background:radial-gradient(circle at 35% 30%, var(--metal-hi), var(--metal) 55%, var(--metal-lo))}
+.tsw .lever{position:absolute; left:50%; top:50%; width:6px; height:19px; margin-left:-3px; transform-origin:50% 0; transform:rotate(180deg);
+  border-radius:3px; background:linear-gradient(90deg, var(--metal-lo), var(--metal-hi) 45%, var(--metal) 70%, var(--metal-lo)); transition:transform .14s cubic-bezier(.3,1.6,.5,1)}
+.tsw .lever::after{content:""; position:absolute; left:50%; bottom:-4px; width:10px; height:10px; margin-left:-5px; border-radius:50%;
+  background:radial-gradient(circle at 35% 30%, var(--metal-hi), var(--metal) 55%, var(--metal-lo)); box-shadow:0 2px 3px color-mix(in srgb, #000 45%, transparent)}
+.tsw[aria-checked="true"] .lever{transform:rotate(180deg)}
+.tsw[aria-checked="false"] .lever{transform:rotate(0deg)}
+.tcap{font-size:.66rem; letter-spacing:.1em; text-transform:uppercase; line-height:1.3; color:var(--screen-muted)}
+.momentary{display:flex; flex-direction:column; align-items:center; gap:4px; background:none; border:0; padding:0; cursor:pointer; margin-left:8px}
+.momentary .cap{width:34px; height:34px; border-radius:50%; background:radial-gradient(circle at 35% 28%, var(--btn-hi), var(--btn) 50%, var(--btn-lo));
+  box-shadow:0 4px 0 var(--btn-lo), 0 6px 8px color-mix(in srgb, #000 40%, transparent); transform:translateY(-3px); transition:transform .06s, box-shadow .06s}
+.momentary:active .cap{transform:translateY(0); box-shadow:0 1px 0 var(--btn-lo), 0 2px 3px color-mix(in srgb, #000 40%, transparent)}
+.momentary:focus-visible{outline:2px solid var(--accent); outline-offset:3px; border-radius:6px}
+.mlbl{font-size:.6rem; letter-spacing:.12em; text-transform:uppercase; color:var(--screen-muted)}
+.wtools{gap:10px 12px; align-items:center}
+@media (prefers-reduced-motion: reduce){ .kcap, .tsw .lever{transition:none} }
 @media (prefers-reduced-motion: reduce){ .works.unveil, .works.unveil .station{animation:none} .machine.running .gear{animation:none} .machine.running .pipes .fluid, .pipes .fluid.pulse{animation:none} }
 @media (max-width:620px){ .machine{grid-template-columns:minmax(0,1fr); justify-items:stretch; padding:22px 18px} .bigwrap{justify-self:center} .lcdmsg{white-space:normal} .era{border-radius:14px} }
 @media (prefers-reduced-motion: reduce){ .machine.shaking{animation:none} .lamp.on{animation:none} .big{transition:none} }
@@ -293,7 +336,11 @@ footer a{color:inherit}
       <div class="works" id="works" hidden>
         <div class="works-head">
           <div><h2>The publication machine</h2><p>Every part feeds the button. Lock a part to hold it fixed, or change it and watch the same draw re-synthesize into a different paper.</p></div>
-          <div class="wtools"><label><input type="checkbox" id="holdSeed" checked> Hold this draw</label><button class="snd" id="unlockAll" type="button">Unlock all parts</button></div>
+          <div class="wtools">
+            <button class="tsw" id="holdSw" type="button" role="switch" aria-checked="true" aria-label="Hold this draw"><span class="tlbl">Hold</span><span class="plate"><span class="nut"></span><span class="lever"></span></span><span class="tlbl">Free</span></button>
+            <span class="tcap">Hold<br>this draw</span>
+            <button class="momentary" id="unlockAll" type="button"><span class="cap"></span><span class="mlbl">All auto</span></button>
+          </div>
         </div>
         <div class="stations" id="stations"></div>
       </div>
@@ -1441,7 +1488,7 @@ function fresh(){
   const msgs = ["LOADING 53 PRIOR PAPERS…", ...MSGS.slice().sort(() => Math.random() - 0.5).slice(0, quick ? 1 : 3)];
   big.classList.add("pressed"); big.setAttribute("aria-busy", "true");
   setTimeout(() => big.classList.remove("pressed"), 160);
-  lamp.className = "lamp on"; if (!quick) mach.classList.add("shaking"); mach.classList.add("running");
+  lamp.className = "lamp on"; if (!quick) mach.classList.add("shaking"); mach.classList.add("running"); pulseTitle(dur*1000 + 350);
   const snd = machineSound(dur);
   const t0 = performance.now(); let shown = -1;
   const step = now => {
@@ -1473,53 +1520,138 @@ const esc = x => String(x).replace(/[&<>"]/g, ch => ({"&":"&amp;","<":"&lt;",">"
 const trunc = (x, n) => x.length > n ? x.slice(0, n-1) + "…" : x;
 const STATIONS = [
   {id:"hopper", name:"Corpus hopper", read:p => `53 papers in. Feeding from <i>${esc(shortCite(p.source[1], p.source[0]))}</i>: ${esc(p.source[2])}`},
-  {id:"tpl", name:"Title press", key:"tpl", opts:() => T.map((t,i) => [String(i), `${i+1}. ${trunc(patternFor(t).replace(/[{}]/g,""), 64)}`]),
+  {id:"tpl", name:"Title press", key:"tpl", knob:"Template", opts:() => T.map((t,i) => [String(i), `${i+1}. ${trunc(patternFor(t).replace(/[{}]/g,""), 64)}`]),
     read:p => esc(p.pattern).replace(/\{([^}]+)\}/g, '<span class="slot">[$1]</span>')},
-  {id:"mod", name:"Modulator valve", key:"mod", opts:() => Object.keys(M).map(k => [k, cap(M[k].np)]), read:p => `${esc(cap(p.ctx.mod.np))}<br><i>${esc(p.ctx.cA)} vs. ${esc(p.ctx.cB)}</i>`},
-  {id:"feature", name:"Feature tuner", key:"feature", opts:() => V.features.map(f => [f[0], cap(f[0])]), read:p => esc(cap(p.ctx.feature))},
-  {id:"area", name:"Region selector", key:"area", opts:() => uniq(Object.values(V.areas).flat()).map(a => [a, cap(a)]), read:p => esc(cap(p.ctx.area)) + `<br><i>ROIs: ${esc(p.ctx.sim.rois.join(", "))}</i>`},
-  {id:"mech", name:"Mechanism gearbox", key:"mech", opts:() => V.mechs.map(m => [m, cap(m)]), read:p => esc(cap(p.ctx.mech)) + `<br><i>acting on ${esc(p.ctx.locus)}</i>`},
-  {id:"effect", name:"Effect dial", key:"effect", opts:() => Object.keys(EFFECT_LABEL).map(k => [k, EFFECT_LABEL[k]]), range:{key:"size", label:"Effect size", min:0, max:3, step:0.05, fmt:v => "×" + (+v).toFixed(2)},
+  {id:"mod", name:"Modulator valve", key:"mod", knob:"Modulator", opts:() => Object.keys(M).map(k => [k, cap(M[k].np)]), read:p => `${esc(cap(p.ctx.mod.np))}<br><i>${esc(p.ctx.cA)} vs. ${esc(p.ctx.cB)}</i>`},
+  {id:"feature", name:"Feature tuner", key:"feature", knob:"Feature", opts:() => V.features.map(f => [f[0], cap(f[0])]), read:p => esc(cap(p.ctx.feature))},
+  {id:"area", name:"Region selector", key:"area", knob:"Region", opts:() => uniq(Object.values(V.areas).flat()).map(a => [a, cap(a)]), read:p => esc(cap(p.ctx.area)) + `<br><i>ROIs: ${esc(p.ctx.sim.rois.join(", "))}</i>`},
+  {id:"mech", name:"Mechanism gearbox", key:"mech", knob:"Mechanism", opts:() => V.mechs.map(m => [m, cap(m)]), read:p => esc(cap(p.ctx.mech)) + `<br><i>acting on ${esc(p.ctx.locus)}</i>`},
+  {id:"effect", name:"Effect dial", key:"effect", knob:"Effect", opts:() => Object.keys(EFFECT_LABEL).map(k => [k, EFFECT_LABEL[k]]), range:{key:"size", label:"Effect size", min:0, max:3, step:0.05, fmt:v => "×" + (+v).toFixed(2)},
     read:p => `${EFFECT_LABEL[p.ctx.effect]}<br><i>${p.ctx.fig === "crf" ? "Naka–Rushton CRF" : "Gaussian tuning"} · size ${p.ctx.effect === "null" ? "0" : p.ctx.fx.toFixed(2)}</i>`},
-  {id:"obs", name:"Observer vat", key:"n", opts:() => [4,6,8,10,12,16,20,24,32,48,96].map(n => [String(n), n + " observers"]), range:{key:"noise", label:"Noise", min:0.25, max:4, step:0.05, fmt:v => "×" + (+v).toFixed(2)},
+  {id:"obs", name:"Observer vat", key:"n", knob:"Observers", opts:() => [4,6,8,10,12,16,20,24,32,48,96].map(n => [String(n), n + " observers"]), range:{key:"noise", label:"Noise", min:0.25, max:4, step:0.05, fmt:v => "×" + (+v).toFixed(2)},
     read:p => { const k = p.ctx.sim.ks; return `N = ${p.ctx.n} simulated<br><i>t(${k.df}) = ${k.t.toFixed(2)}, ${k.p < .001 ? "p < .001" : "p = " + k.p.toFixed(3)}</i>`; }},
-  {id:"method", name:"Method rig", key:"method", opts:() => uniq(allMethods().map(m => m.t)).map(t => [t, cap(t)]), read:p => esc(cap(p.ctx.method))},
-  {id:"journal", name:"Journal chute", key:"journal", opts:() => uniq([...Object.values(JOURNALS).flat().map(j => j[0]), "Journal of Open Research Software"]).sort().map(j => [j, j]), read:p => `${esc(p.journal)}, ${p.year}<br><i>${esc(String(p.vol))}: ${esc(String(p.pages))}</i>`}
+  {id:"method", name:"Method rig", key:"method", knob:"Method", opts:() => uniq(allMethods().map(m => m.t)).map(t => [t, cap(t)]), read:p => esc(cap(p.ctx.method))},
+  {id:"journal", name:"Journal chute", key:"journal", knob:"Journal", opts:() => uniq([...Object.values(JOURNALS).flat().map(j => j[0]), "Journal of Open Research Software"]).sort().map(j => [j, j]), read:p => `${esc(p.journal)}, ${p.year}<br><i>${esc(String(p.vol))}: ${esc(String(p.pages))}</i>`}
 ];
 let worksBuilt = false, worksOpen = false;
+const KNOBS = {};
+function knobTick(){
+  if (!soundOn) return;
+  try { AC = AC || new (window.AudioContext || window.webkitAudioContext)(); const t = AC.currentTime, o = AC.createOscillator(), g = AC.createGain();
+    o.type = "square"; o.frequency.value = 2200; g.gain.setValueAtTime(0.025, t); g.gain.exponentialRampToValueAtTime(0.0005, t+0.018); o.connect(g).connect(AC.destination); o.start(t); o.stop(t+0.02); } catch(e){}
+}
+// A rotary control: discrete (labels) or continuous (range). 270° sweep, drag up/right to turn, tap to step, arrows/wheel when focused.
+function makeKnob(cfg){
+  const el = document.createElement("div");
+  el.className = "knob" + (cfg.small ? " sm" : ""); el.tabIndex = 0; el.setAttribute("role", "slider"); el.setAttribute("aria-label", cfg.aria);
+  const disc = !!cfg.labels, n = disc ? cfg.labels.length : 0;
+  const lo = disc ? 0 : cfg.min, hi = disc ? n - 1 : cfg.max, step = disc ? 1 : cfg.step;
+  let val = cfg.value;
+  const frac = v => hi === lo ? 0.5 : (v - lo) / (hi - lo);
+  const nt = disc ? Math.min(n, 25) : 11, ticks = [];
+  let svg = `<svg viewBox="0 0 100 100" aria-hidden="true">`;
+  for (let i = 0; i < nt; i++){ const f = nt === 1 ? 0.5 : i/(nt-1), a = (-135 + 270*f - 90) * Math.PI/180, r0 = 44, r1 = (i === 0 || i === nt-1) ? 52 : 49;
+    svg += `<line class="tick" data-f="${f.toFixed(4)}" x1="${(50+r0*Math.cos(a)).toFixed(2)}" y1="${(50+r0*Math.sin(a)).toFixed(2)}" x2="${(50+r1*Math.cos(a)).toFixed(2)}" y2="${(50+r1*Math.sin(a)).toFixed(2)}"/>`; }
+  svg += `</svg><div class="kcap"></div>`;
+  el.innerHTML = svg;
+  const tickEls = [...el.querySelectorAll(".tick")];
+  const text = v => disc ? cfg.labels[v] : cfg.fmt(v);
+  const paint = () => {
+    const f = frac(val); el.style.setProperty("--ang", (-135 + 270*f) + "deg");
+    let best = 0, bd = 9; tickEls.forEach((t, i) => { const d = Math.abs(+t.dataset.f - f); if (d < bd){ bd = d; best = i; } t.classList.remove("on"); }); tickEls[best].classList.add("on");
+    el.setAttribute("aria-valuemin", lo); el.setAttribute("aria-valuemax", hi); el.setAttribute("aria-valuenow", val); el.setAttribute("aria-valuetext", text(val));
+    if (cfg.onPaint) cfg.onPaint(text(val));
+  };
+  const clamp = v => Math.min(hi, Math.max(lo, disc ? Math.round(v) : Math.round(v/step)*step));
+  const setLive = (v, commit) => { v = clamp(v); if (v !== val){ val = v; paint(); knobTick(); if (cfg.onInput) cfg.onInput(val); } if (commit && cfg.onCommit) cfg.onCommit(val); };
+  let drag = null, cTimer = null;
+  const commitSoon = () => { clearTimeout(cTimer); cTimer = setTimeout(() => cfg.onCommit && cfg.onCommit(val), 260); };
+  el.addEventListener("pointerdown", e => { e.preventDefault(); el.focus(); el.setPointerCapture(e.pointerId); drag = {x:e.clientX, y:e.clientY, v:val, moved:false}; el.classList.add("dragging"); });
+  el.addEventListener("pointermove", e => { if (!drag) return; const d = (drag.y - e.clientY) + (e.clientX - drag.x)*0.6;
+    if (Math.abs(d) > 3) drag.moved = true;
+    if (drag.moved) setLive(drag.v + (disc ? d/11 : d/170*(hi-lo)), false); });
+  const end = () => { if (!drag) return; el.classList.remove("dragging");
+    if (!drag.moved){ setLive(disc ? (val >= hi ? lo : val + 1) : (val + step*5 > hi ? lo : val + step*5), false); }
+    if (val !== drag.v || !drag.moved) cfg.onCommit && cfg.onCommit(val); drag = null; };
+  el.addEventListener("pointerup", end); el.addEventListener("pointercancel", end);
+  el.addEventListener("keydown", e => { const k = e.key; let d = 0;
+    if (k === "ArrowUp" || k === "ArrowRight") d = 1; else if (k === "ArrowDown" || k === "ArrowLeft") d = -1; else if (k === "PageUp") d = 5; else if (k === "PageDown") d = -5;
+    else if (k === "Home"){ e.preventDefault(); setLive(lo, false); commitSoon(); return; } else if (k === "End"){ e.preventDefault(); setLive(hi, false); commitSoon(); return; } else return;
+    e.preventDefault(); e.stopPropagation(); setLive(val + d*step, false); commitSoon(); });
+  el.addEventListener("wheel", e => { if (document.activeElement !== el) return; e.preventDefault(); setLive(val + (e.deltaY < 0 ? 1 : -1)*step, false); commitSoon(); }, {passive:false});
+  el.addEventListener("dblclick", () => { if (!disc && cfg.reset !== undefined){ setLive(cfg.reset, true); } });
+  paint();
+  return {el, get:() => val, set:(v) => { v = clamp(v); if (v !== val){ val = v; paint(); } }};
+}
+function makeSwitch(id, aria, onToggle){
+  const b = document.createElement("button"); b.type = "button"; b.className = "tsw"; b.id = id; b.setAttribute("role", "switch"); b.setAttribute("aria-checked", "false"); b.setAttribute("aria-label", aria);
+  b.innerHTML = `<span class="tlbl">Man</span><span class="plate"><span class="nut"></span><span class="lever"></span></span><span class="tlbl">Auto</span>`;
+  b.addEventListener("click", () => { const on = b.getAttribute("aria-checked") !== "true"; b.setAttribute("aria-checked", String(on)); knobTick(); onToggle(on); });
+  return b;
+}
 function buildWorks(){
   if (worksBuilt) return; worksBuilt = true;
   $("stations").innerHTML = STATIONS.map((st, i) => `
     <section class="station" id="st-${st.id}" style="--i:${i}" aria-label="${st.name}">
-      <div class="st-head">${gearSVG()}<span class="st-name">${st.name}</span><span class="st-lock">Locked</span><span class="led" aria-hidden="true"></span></div>
+      <div class="st-head">${gearSVG()}<span class="st-name">${st.name}</span><span class="st-lock">Manual</span><span class="led" aria-hidden="true"></span></div>
       <div class="st-read" id="rd-${st.id}"></div>
-      ${st.key ? `<select id="ctl-${st.id}" aria-label="${st.name}"><option value="">Random</option>${st.opts().map(([v,l]) => `<option value="${esc(v)}">${esc(l)}</option>`).join("")}</select>` : ""}
-      ${st.range ? `<label class="st-range"><span>${st.range.label}<b id="rv-${st.id}">${st.range.fmt(OVR[st.range.key])}</b></span><input type="range" id="rg-${st.id}" min="${st.range.min}" max="${st.range.max}" step="${st.range.step}" value="${OVR[st.range.key]}"></label>` : ""}
+      ${st.key || st.range ? `<div class="ctl-row" id="cr-${st.id}"></div>` : ""}
     </section>`).join("");
   STATIONS.forEach(st => {
-    const sel = document.getElementById("ctl-" + st.id);
-    if (sel) sel.addEventListener("change", () => {
-      const v = sel.value;
-      OVR[st.key] = v === "" ? null : (st.key === "tpl" || st.key === "n") ? +v : v;
-      resynth(st.id);
-    });
-    const rg = document.getElementById("rg-" + st.id);
-    if (rg){
-      rg.addEventListener("input", () => { document.getElementById("rv-" + st.id).textContent = st.range.fmt(rg.value); });
-      rg.addEventListener("change", () => { OVR[st.range.key] = +rg.value; resynth(st.id); });
+    const row = document.getElementById("cr-" + st.id); if (!row) return;
+    const k = KNOBS[st.id] = {};
+    if (st.key){
+      const opts = st.opts(); k.values = opts.map(o => o[0]);
+      const sw = makeSwitch("sw-" + st.id, st.name + ": manual", on => {
+        if (on) OVR[st.key] = parseVal(st, k.values[k.sel.get()]); else OVR[st.key] = null;
+        resynth(st.id);
+      });
+      k.sw = sw;
+      const box = document.createElement("div"); box.className = "knobbox";
+      const cap = document.createElement("div"); cap.className = "kname";
+      k.sel = makeKnob({labels:opts.map(o => o[1]), value:0, aria:st.name, onPaint:txt => { cap.innerHTML = `${st.knob || "Select"}<b>${esc(txt)}</b>`; },
+        onCommit:v => { OVR[st.key] = parseVal(st, k.values[v]); sw.setAttribute("aria-checked", "true"); resynth(st.id); }});
+      box.append(k.sel.el, cap);
+      const swBox = document.createElement("div"); swBox.className = "knobbox"; swBox.append(sw);
+      row.append(swBox, box);
+    }
+    if (st.range){
+      const box = document.createElement("div"); box.className = "knobbox";
+      const cap = document.createElement("div"); cap.className = "kname";
+      k.rng = makeKnob({small:true, min:st.range.min, max:st.range.max, step:st.range.step, value:OVR[st.range.key], reset:1, aria:st.name + " " + st.range.label, fmt:st.range.fmt,
+        onPaint:txt => { cap.innerHTML = `${st.range.label}<b>${txt}</b>`; },
+        onCommit:v => { OVR[st.range.key] = +(+v).toFixed(2); resynth(st.id); }});
+      box.append(k.rng.el, cap); row.append(box);
     }
   });
+}
+const parseVal = (st, v) => (st.key === "tpl" || st.key === "n") ? +v : v;
+function currentValue(st, p){
+  const c = p.ctx;
+  switch (st.key){
+    case "tpl": return String(p.tpl);
+    case "mod": return Object.keys(M).find(k => M[k] === c.mod) || null;
+    case "feature": return c.feature; case "area": return c.area; case "mech": return c.mech; case "effect": return c.effect;
+    case "method": return c.method; case "journal": return p.journal;
+    case "n": { const opts = KNOBS.obs.values.map(Number); return String(opts.reduce((a, b) => Math.abs(b - c.n) < Math.abs(a - c.n) ? b : a)); }
+  }
 }
 function syncLocks(){
   STATIONS.forEach(st => {
     const el = document.getElementById("st-" + st.id); if (!el) return;
     const locked = (st.key && OVR[st.key] !== null) || (st.range && OVR[st.range.key] !== 1);
     el.classList.toggle("locked", !!locked);
+    const k = KNOBS[st.id]; if (k && k.sw) k.sw.setAttribute("aria-checked", String(st.key && OVR[st.key] !== null));
   });
 }
 function updateStations(p){
   if (!worksBuilt || !p) return;
-  STATIONS.forEach(st => { const rd = document.getElementById("rd-" + st.id); if (rd) rd.innerHTML = st.read(p); });
+  STATIONS.forEach(st => {
+    const rd = document.getElementById("rd-" + st.id); if (rd) rd.innerHTML = st.read(p);
+    const k = KNOBS[st.id];
+    if (k && k.sel && OVR[st.key] === null){ const cv = currentValue(st, p), i = k.values.indexOf(cv); if (i >= 0) k.sel.set(i); }
+    if (k && k.rng) k.rng.set(OVR[st.range.key]);
+  });
   syncLocks();
   requestAnimationFrame(drawPipes);
 }
@@ -1555,7 +1687,8 @@ $("nutsBtn").addEventListener("click", () => setWorks(!worksOpen));
 new ResizeObserver(() => { if (worksOpen) drawPipes(); }).observe($("machine"));
 function resynth(stationId){
   if (busy) return;
-  const seed = $("holdSeed").checked && current ? current.seed : (Math.random() * 2**31) >>> 0;
+  pulseTitle(950);
+  const seed = $("holdSw").getAttribute("aria-checked") === "true" && current ? current.seed : (Math.random() * 2**31) >>> 0;
   const p = build(seed, eraValue());
   render(p, true); addHistory(p);
   const st = STATIONS.find(x => x.id === stationId);
@@ -1567,10 +1700,9 @@ function resynth(stationId){
 }
 $("unlockAll").addEventListener("click", () => {
   Object.assign(OVR, {tpl:null, mod:null, feature:null, area:null, mech:null, effect:null, method:null, journal:null, n:null, size:1, noise:1});
-  STATIONS.forEach(st => { const sel = document.getElementById("ctl-" + st.id); if (sel) sel.value = "";
-    const rg = document.getElementById("rg-" + st.id); if (rg){ rg.value = 1; document.getElementById("rv-" + st.id).textContent = st.range.fmt(1); } });
   resynth("hopper");
 });
+$("holdSw").addEventListener("click", () => { const sw = $("holdSw"), on = sw.getAttribute("aria-checked") !== "true"; sw.setAttribute("aria-checked", String(on)); knobTick(); });
 function litStations(f){ document.querySelectorAll(".station").forEach((el, i, all) => el.classList.toggle("lit", f > 0 && i < Math.ceil(f * all.length))); }
 /* ---------- Metameric title ---------- */
 (function metamerTitle(){
@@ -1589,6 +1721,17 @@ function litStations(f){ document.querySelectorAll(".station").forEach((el, i, a
   h.addEventListener("click", () => h.classList.toggle("reveal"));
   h.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " "){ e.preventDefault(); e.stopPropagation(); h.classList.toggle("reveal"); } });
 })();
+let pulseTimer = null;
+function pulseTitle(ms){
+  const h = $("mmTitle"); if (!h) return;
+  h.classList.add("pulse"); clearTimeout(pulseTimer);
+  pulseTimer = setTimeout(() => h.classList.remove("pulse"), ms || 900);
+}
+document.addEventListener("click", e => {
+  if (e.target.closest("#mmTitle")) return;
+  if (e.target.closest("button, .knob, label, input, select, a")) pulseTitle();
+});
+document.addEventListener("change", () => pulseTitle());
 const whatDlg = $("what");
 $("whatBtn").addEventListener("click", () => { try { whatDlg.showModal(); } catch(e){ whatDlg.setAttribute("open", ""); } });
 $("whatClose").addEventListener("click", () => whatDlg.close());
