@@ -1,4 +1,4 @@
-# Large Ling Model
+# LLM (Large Ling Model)
 
 A random Sam Ling paper generator. It dissects the 53 papers on the [Ling Lab publications page](https://sites.bu.edu/vision/publications/) (2004–2026) into title templates, modulators, methods, effect types and co-author patterns, then recombines them into new papers.
 

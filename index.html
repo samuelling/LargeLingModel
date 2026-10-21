@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Large Ling Model</title>
+<title>LLM (Large Ling Model)</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -58,6 +58,7 @@ body{
 .top h1{font-family:var(--f-display); font-weight:560; font-size:clamp(1.9rem, 4.2vw, 2.8rem); line-height:1.05; margin:0; letter-spacing:-0.01em; text-wrap:balance}
 .top p{margin:6px 0 0; color:var(--screen-muted); max-width:64ch; font-size:.95rem}
 .top{margin-bottom:4px}
+.top h1 .h1sub{font-weight:400; font-style:italic; color:var(--screen-muted)}
 .era{display:flex; flex-wrap:wrap; gap:4px; border:0; margin:0; padding:3px; background:color-mix(in srgb, var(--screen-ink) 9%, transparent); border-radius:999px}
 .era legend{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0)}
 .era input{position:absolute; opacity:0; pointer-events:none}
@@ -196,7 +197,7 @@ footer a{color:inherit}
   <header class="top">
     <canvas id="gabor" width="144" height="144" aria-hidden="true"></canvas>
     <div>
-      <h1>Large Ling Model</h1>
+      <h1>LLM <span class="h1sub">(Large Ling Model)</span></h1>
       <p>Built from a dissection of 53 real Ling Lab papers (2004–2026). Each draw writes a complete paper: title, abstract, introduction, methods, results with simulated observers and real statistics, four figures, a parameter table, discussion and references.</p>
     </div>
     <section class="machine" id="machine" aria-label="Paper generator">
