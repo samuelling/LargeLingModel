@@ -40,7 +40,10 @@
 *{box-sizing:border-box}
 body{margin:0}
 [hidden]{display:none!important}
+b, strong{font-weight:500}
+button, input, select{font-weight:inherit}
 body{
+  font-weight:300;
   font-variant-numeric:tabular-nums;
   background:var(--screen); color:var(--screen-ink);
   font-family:var(--f-body); font-size:16px; line-height:1.55;
@@ -55,22 +58,22 @@ body{
 .brand{display:flex; align-items:center; gap:clamp(12px, 2.5vw, 26px)}
 .titles{min-width:0}
 #gabor{width:120px; height:120px; flex:none; border-radius:50%; display:block}
-.top h1{font-family:var(--f-display); font-weight:700; font-size:clamp(1.9rem, 4.2vw, 2.8rem); line-height:1.05; margin:0; letter-spacing:-0.01em; text-wrap:balance}
+.top h1{font-family:var(--f-display); font-weight:300; font-size:clamp(1.9rem, 4.2vw, 2.8rem); line-height:1.05; margin:0; letter-spacing:-0.01em; text-wrap:balance}
 .whatbtn{margin-top:0; display:inline-flex; align-items:center; gap:8px; font:500 .8rem/1 var(--f-mono); padding:7px 12px 7px 7px; border-radius:999px; border:1px solid color-mix(in srgb, var(--screen-ink) 25%, transparent); background:transparent; color:var(--screen-ink); cursor:pointer}
 .whatbtn span{display:grid; place-items:center; width:18px; height:18px; border-radius:50%; background:var(--screen-ink); color:var(--screen); font-weight:700; font-size:.72rem}
 .whatbtn:hover{background:color-mix(in srgb, var(--screen-ink) 8%, transparent)}
 .whatbtn:focus-visible, .whatclose:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
 .what{max-width:min(460px, calc(100vw - 32px)); border:0; border-radius:8px; padding:22px 24px 20px; background:var(--paper); color:var(--ink); box-shadow:0 20px 50px -12px color-mix(in srgb, #000 55%, transparent)}
 .what::backdrop{background:color-mix(in srgb, #000 35%, transparent)}
-.what h2{font-family:var(--f-display); font-weight:700; font-size:1.4rem; margin:0 0 10px}
+.what h2{font-family:var(--f-display); font-weight:300; font-size:1.4rem; margin:0 0 10px}
 .what p{margin:0 0 18px; line-height:1.55}
-.whatclose{font:700 .9rem/1 var(--f-body); padding:10px 18px; border-radius:999px; border:0; background:var(--btn); color:#fff; cursor:pointer}
+.whatclose{font:500 .9rem/1 var(--f-body); padding:10px 18px; border-radius:999px; border:0; background:var(--btn); color:#fff; cursor:pointer}
 .top{margin-bottom:4px}
 .top > div{min-width:0}
 .top h1{font-size:clamp(2rem, 8.5vw, 4.8rem); letter-spacing:.03em; line-height:.95}
-.top .tagline{font-family:var(--f-display); font-weight:700; font-size:clamp(1.25rem, 4.2vw, 2.8rem); line-height:1.1; margin:6px 0 0; letter-spacing:-0.01em}
+.top .tagline{font-family:var(--f-display); font-weight:300; font-size:clamp(1.25rem, 4.2vw, 2.8rem); line-height:1.1; margin:6px 0 0; letter-spacing:-0.01em}
 
-.top .h1sub{font-weight:400; font-style:italic; color:var(--screen-muted)}
+.top .h1sub{font-weight:300; font-style:italic; color:var(--screen-muted)}
 .era{display:flex; flex-wrap:wrap; gap:4px; border:0; margin:0; padding:3px; background:color-mix(in srgb, var(--screen-ink) 9%, transparent); border-radius:999px}
 .era legend{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0)}
 .era input{position:absolute; opacity:0; pointer-events:none}
@@ -92,7 +95,7 @@ body{
   box-shadow:0 4px 10px color-mix(in srgb, #000 35%, transparent)}
 .ring{width:130px; height:130px; border-radius:50%; background:var(--haz-k); display:grid; place-items:center; box-shadow:inset 0 4px 8px color-mix(in srgb, #000 70%, transparent)}
 .big{width:108px; height:108px; border-radius:50%; border:0; cursor:pointer; color:#fff;
-  font:700 .74rem/1.15 var(--f-mono); letter-spacing:.1em; text-transform:uppercase; text-shadow:0 1px 0 color-mix(in srgb, #000 40%, transparent);
+  font:500 .74rem/1.15 var(--f-mono); letter-spacing:.1em; text-transform:uppercase; text-shadow:0 1px 0 color-mix(in srgb, #000 40%, transparent);
   background:radial-gradient(circle at 35% 28%, var(--btn-hi), var(--btn) 46%, var(--btn-lo) 100%);
   box-shadow:0 9px 0 var(--btn-lo), 0 13px 16px color-mix(in srgb, #000 50%, transparent), inset 0 -6px 10px color-mix(in srgb, #000 22%, transparent);
   transform:translateY(-7px); transition:transform .07s ease-out, box-shadow .07s ease-out, filter .2s}
@@ -134,9 +137,9 @@ body{
 .body{max-width:720px; margin:0 auto}
 .cite-line{font-family:var(--f-mono); font-size:.78rem; color:var(--ink-2); display:flex; flex-wrap:wrap; gap:4px 14px}
 .cite-line b{color:var(--ink); font-weight:500}
-.paper h2{font-family:var(--f-display); font-weight:700; font-size:clamp(1.6rem, 3.5vw, 2.3rem); line-height:1.14; margin:14px 0 12px; text-wrap:balance; letter-spacing:-0.005em}
+.paper h2{font-family:var(--f-display); font-weight:300; font-size:clamp(1.6rem, 3.5vw, 2.3rem); line-height:1.14; margin:14px 0 12px; text-wrap:balance; letter-spacing:-0.005em}
 .authors{margin:0 0 8px; font-size:1.02rem}
-.authors .me{font-weight:700; text-decoration:underline; text-decoration-color:var(--fix); text-decoration-thickness:2px; text-underline-offset:3px}
+.authors .me{font-weight:500; text-decoration:underline; text-decoration-color:var(--fix); text-decoration-thickness:2px; text-underline-offset:3px}
 .authors sup, .affs sup{font-size:.68em; color:var(--ink-2); margin-left:1px}
 .affs{list-style:none; margin:0 0 6px; padding:0; font-size:.82rem; color:var(--ink-2); display:flex; flex-direction:column; gap:2px}
 .dates{font-family:var(--f-mono); font-size:.72rem; color:var(--ink-2); margin:10px 0 26px; display:flex; flex-wrap:wrap; gap:4px 16px}
@@ -148,8 +151,8 @@ body{
 .lay p:not(.sec){margin:0; font-family:var(--f-display); font-style:italic; font-size:1.08rem; line-height:1.45}
 .kw{display:flex; flex-wrap:wrap; gap:6px; margin:0 0 8px; padding:0; list-style:none}
 .kw li{font-family:var(--f-mono); font-size:.75rem; padding:3px 9px; border:1px solid var(--rule); border-radius:3px; color:var(--ink-2)}
-.article h3{font-family:var(--f-display); font-weight:700; font-size:1.45rem; margin:38px 0 10px; padding-top:18px; border-top:1px solid var(--rule); scroll-margin-top:16px}
-.article h4{font-family:var(--f-body); font-weight:700; font-size:1rem; margin:22px 0 6px}
+.article h3{font-family:var(--f-display); font-weight:300; font-size:1.45rem; margin:38px 0 10px; padding-top:18px; border-top:1px solid var(--rule); scroll-margin-top:16px}
+.article h4{font-family:var(--f-body); font-weight:500; font-size:1rem; margin:22px 0 6px}
 .article p{margin:0 0 12px; hyphens:auto}
 .eq{display:flex; justify-content:space-between; align-items:baseline; gap:12px; margin:8px 0 16px; padding:10px 0 10px 18px; overflow-x:auto}
 .eq .m{font-family:var(--f-display); font-style:italic; font-size:1.1rem; white-space:nowrap}
@@ -163,11 +166,11 @@ body{
 .tbl caption{margin:0 0 8px}
 .tbl th, .tbl td{padding:6px 10px; text-align:right; white-space:nowrap}
 .tbl th:first-child, .tbl td:first-child{text-align:left}
-.tbl thead th{border-top:1.5px solid var(--ink); border-bottom:1px solid var(--ink); font-weight:700}
+.tbl thead th{border-top:1.5px solid var(--ink); border-bottom:1px solid var(--ink); font-weight:500}
 .tbl tbody tr:last-child td{border-bottom:1.5px solid var(--ink)}
 .refs{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:7px; font-size:.86rem}
 .refs li{padding-left:1.6em; text-indent:-1.6em}
-.refs b{font-weight:700}
+.refs b{font-weight:500}
 .backmatter p{font-size:.9rem}
 .remix{margin:0 0 18px; padding:0; list-style:none; display:flex; flex-direction:column; gap:6px; font-size:.86rem; color:var(--ink-2)}
 .remix i{color:var(--ink)}
@@ -1028,7 +1031,7 @@ function plateSetup(cv, H){
   g.fillStyle = LS.plate; g.fillRect(0,0,W,H);
   return {g, W, H};
 }
-const F = (size, it, wt) => `${it ? "italic " : ""}${wt || 400} ${size}px ${LS.font}`;
+const F = (size, it, wt) => `${it ? "italic " : ""}${wt || 300} ${size}px ${LS.font}`;
 function niceStep(raw){ const p = Math.pow(10, Math.floor(Math.log10(raw))); const m = raw/p; return (m < 1.5 ? 1 : m < 3 ? 2 : m < 7 ? 5 : 10) * p; }
 function fmtTick(v, step){ const dp = Math.max(0, -Math.floor(Math.log10(step) + 1e-9)); const s = (Math.abs(v) < 1e-9 ? 0 : v).toFixed(dp); return s; }
 function niceRange(lo, hi, nt){ const st = niceStep((hi-lo)/(nt||4)); return {lo:Math.floor(lo/st)*st, hi:Math.ceil(hi/st)*st, st}; }
