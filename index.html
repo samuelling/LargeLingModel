@@ -66,10 +66,14 @@ body{
 .whatbtn:focus-visible, .whatclose:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
 .what{max-width:min(460px, calc(100vw - 32px)); border:0; border-radius:8px; padding:22px 24px 20px; background:var(--paper); color:var(--ink); box-shadow:0 20px 50px -12px color-mix(in srgb, #000 55%, transparent)}
 .what::backdrop{background:color-mix(in srgb, #000 35%, transparent)}
+.what .sr-only{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0)}
 .what h2{font-family:var(--f-display); font-weight:300; font-size:1.4rem; margin:0 0 10px}
 .what{max-height:calc(100dvh - 48px); overflow-y:auto}
 .what p{margin:0 0 14px; line-height:1.55}
 .what p + .whatclose{margin-top:6px}
+.what .tomb{font-size:.86rem; line-height:1.5; color:var(--ink-2); padding:0 0 14px; margin:0 0 16px; border-bottom:1px solid var(--rule)}
+.what .tomb b{color:var(--ink); font-weight:500; font-size:1rem}
+.what .coda{font-style:italic; color:var(--ink-2)}
 .whatclose{font:500 .9rem/1 var(--f-body); padding:10px 18px; border-radius:999px; border:0; background:var(--btn); color:#fff; cursor:pointer}
 .top{margin-bottom:4px}
 .top > div{min-width:0}
@@ -344,10 +348,11 @@ footer a{color:inherit}
       <button class="whatbtn nutsbtn" id="nutsBtn" type="button" aria-expanded="false" aria-controls="works"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5 20.2 7.25v9.5L12 21.5 3.8 16.75v-9.5Z" fill="currentColor"/><circle cx="12" cy="12" r="3.6" fill="var(--screen)"/></svg>Nuts and bolts</button>
     </div>
     <dialog class="what" id="what" aria-labelledby="whatTitle">
-      <h2 id="whatTitle">What's happening?</h2>
-      <p>Built from a dissection of 53 real Ling Lab papers (2004–2026). Each draw writes a complete paper: title, abstract, introduction, methods, results with simulated observers and real statistics, three to eight figures in the lab's style, a parameter table, discussion and references.</p>
-      <p>Here is the uncomfortable part. Twenty-two years of my lab's papers reduce to a script of <b id="byteCount">a few hundred kilobytes</b>. It knows our questions, our stimuli, our methods, our figure style and the shape of our arguments, and it will write another paper every time you press the button. That is a little terrifying.</p>
-      <p>It is also a release. If the papers compress this easily, they were never the whole of the work. The work lives where the bytes don't reach: the questions that kept us up, the experiments that failed before one worked, the people who came through the lab and left as scientists. The papers are a record of that. Maybe I can stop treating them as the gold-standard currency of a scientific life.</p>
+      <h2 id="whatTitle" class="sr-only">What's happening?</h2>
+      <p class="tomb"><b>Metamers</b> <i>(LLM)</i>, 2026<br>Sam Ling<br>JavaScript, fifty-three papers, simulated observers<br><span id="byteCount">a few hundred kilobytes</span></p>
+      <p>Twenty-two years of papers from a visual neuroscience lab, taken apart into their working parts: the questions, the stimuli, the methods, the figure conventions, the habits of phrasing. Each press of the button puts the parts back together as a paper that was never written, with observers who never existed, statistics that agree with one another, and references to papers that did.</p>
+      <p>The whole machine weighs less than the PDF of a single one of the papers it was built from.</p>
+      <p class="coda">In vision science, metamers are stimuli that are physically different but look the same.</p>
       <button class="whatclose" id="whatClose" type="button">Got it</button>
     </dialog>
     <section class="machine" id="machine" aria-label="Paper generator">
@@ -406,7 +411,7 @@ footer a{color:inherit}
   <footer>Source titles from the <a href="https://sites.bu.edu/vision/publications/" target="_blank" rel="noopener">Ling Lab publications page</a>. Every paper here is fictional; references are real.</footer>
 </div>
 
-<script>
+<script id="engine">
 (function(){
 "use strict";
 
@@ -2809,7 +2814,7 @@ document.addEventListener("click", e => {
 document.addEventListener("change", () => pulseTitle());
 const whatDlg = $("what");
 $("whatBtn").addEventListener("click", () => {
-  try { const src = [...document.querySelectorAll("script:not([src])")].map(x => x.textContent).join(""), n = new TextEncoder().encode(src).length;
+  try { const n = new TextEncoder().encode(document.getElementById("engine").textContent).length;
     $("byteCount").textContent = `${n.toLocaleString()} bytes`; } catch(e){} try { whatDlg.showModal(); } catch(e){ whatDlg.setAttribute("open", ""); } });
 $("whatClose").addEventListener("click", () => whatDlg.close());
 whatDlg.addEventListener("click", e => { if (e.target === whatDlg) whatDlg.close(); });
