@@ -33,6 +33,12 @@ Each draw is an fMRI, behavioral or modeling paper. Figure 1 is generated to mat
 - **Sequence** (panel b): a trial cascade with a varying set of frames (cue, ISI, mask, response cue), a block-design scan timeline, a rapid event-related contrast sequence, or a dichoptic left-eye/right-eye/percept panel.
 - **Modeling papers** get a normalization-model schematic as Figure 1, plus model-only figures: a stimulus-size × attention-field-size prediction map, simulated population responses, and parameter recovery.
 
+### Figure variability
+
+Figure count follows the journal, as in the lab's own papers: 3–4 for Nature Neuroscience brief communications, 3–5 for Scientific Reports and Psychological Science, 4–7 for Journal of Vision, and up to 8 for Journal of Neuroscience, Journal of Neurophysiology, eLife, Neuron and NeuroImage. Extra figures each get their own Results section.
+
+Every figure type has layout variants modeled on specific papers, and the figure style follows the era: black-and-white boxed axes with filled and open symbols for the grad-school papers, and the lab's blue/red house style with offset axes for the BU papers, sometimes with a third green condition as in Ramirez et al. (2025). Figure 2 varies in the number of regions, an optional second row (per-observer differences, normalized curves or difference bars), and a by-condition layout. New types include decoding accuracy (Ling, Pratte & Tong 2015; Jehee et al. 2012), scale-invariant spatial frequency tuning (Wiecek et al. 2026), threshold-versus-contrast dipper functions (Ling & Carrasco 2006), appearance PSE functions (Carrasco, Ling & Read 2004), a reconstructed attentional field map (Bloem et al. 2025), pupil size versus luminance (Pan et al. 2022), and model-comparison matrices.
+
 ## Nuts and bolts
 
 The **Nuts and bolts** button opens the machine's housing and shows the publication machine: ten stations, one per representation, piped into the big red button.
