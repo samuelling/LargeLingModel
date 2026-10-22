@@ -25,6 +25,14 @@ Each draw writes a complete paper:
   - psychometric functions, per-observer scatter, ΔAIC model comparison, and ROI bar pairs
 - a reference list of real papers, filtered to those published before the fake paper's year
 
+### Paper types and Figure 1
+
+Each draw is an fMRI, behavioral or modeling paper. Figure 1 is generated to match:
+
+- **Stimuli** (shown in panel a, and described in the Methods): Gabors, annular counterphase gratings, radial gratings scaled for cortical magnification, band-pass noise with an RSVP letter stream, center–surround gratings, plaids, radial checkerboards, numerosity dot arrays, random-dot kinematograms, or dichoptic rivalry gratings.
+- **Sequence** (panel b): a trial cascade with a varying set of frames (cue, ISI, mask, response cue), a block-design scan timeline, a rapid event-related contrast sequence, or a dichoptic left-eye/right-eye/percept panel.
+- **Modeling papers** get a normalization-model schematic as Figure 1, plus model-only figures: a stimulus-size × attention-field-size prediction map, simulated population responses, and parameter recovery.
+
 ## Nuts and bolts
 
 The **Nuts and bolts** button opens the machine's housing and shows the publication machine: ten stations, one per representation, piped into the big red button.

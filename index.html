@@ -759,6 +759,10 @@ function generate(seed, eraSel){
   else if (["pupil","cognitive","emotional","caffeine"].includes(c.k) && c.mk === "fmri" && r.f() < 0.5){ c.method = "combined pupillometry with fMRI"; c.mk = "pupil"; }
   if (O.method){ const om = allMethods().find(x => x.t === O.method); c.method = om.t; c.mk = om.k; }
   c.mri = c.mk !== "psych";
+  c.model = figRng(c, 2).f() < (MODEL_SRC.includes(t.src) ? 0.75 : 0.2);
+  c.ptype = c.model ? "model" : c.mri ? "fmri" : "behavior";
+  if (c.model && !O.method) c.method = `combined a normalization model of population responses with ${c.mri ? "fMRI" : "psychophysics"}`;
+  c.stim = chooseStim(c, figRng(c, 3)); c.layout = chooseLayout(c, figRng(c, 4)); c.frames = designFrames(c, figRng(c, 5));
   c.n = c.mri ? r.int(10, 24) : r.int(6, 12); if (O.n) c.n = O.n;
   c.cA = c.mod.conds[0]; c.cB = c.mod.conds[1];
   c.authors = authorsFor(c);
@@ -981,14 +985,14 @@ function procedureText(c){
 }
 
 function stimulusText(c){
-  const a = c.axis;
-  if (c.fig === "crf") return c.mri
-    ? `Stimuli were full-field sinusoidal gratings (2 cycles/°) presented in an annulus spanning 1.5° to 9° of eccentricity, counterphase-flickering at 4 Hz. Seven contrasts were log-spaced between 1.5% and 100%.`
-    : `Stimuli were Gabor patches (2 cycles/°, σ = 0.8°) presented at 5° eccentricity on a uniform gray background. Seven pedestal contrasts were log-spaced between 1.5% and 100%.`;
-  if (c.feature === "numerosity") return `Stimuli were arrays of 1 to 64 black and white dots, presented in log₂ steps and matched for total surface area and convex hull so that numerosity could not be inferred from low-level cues${cite(c,"burr2008")}.`;
-  if (c.feature === "spatial frequency") return `Stimuli were band-pass filtered noise patterns with peak spatial frequencies spanning 0.25 to 16 cycles/° in half-octave steps, presented within an annulus from 1.5° to 9° of eccentricity.`;
-  if (c.feature === "motion direction") return `Stimuli were random-dot kinematograms (100% coherence, 6°/s) moving in one of eight directions spaced 45° apart.`;
-  return `Stimuli were sinusoidal gratings (2 cycles/°, 50% contrast) at one of eight orientations spaced 22.5° apart.`;
+  const st = c.stim;
+  if (st.type === "dots") return `Stimuli were arrays of 1 to 64 black and white dots, presented in log₂ steps and matched for total surface area and convex hull so that numerosity could not be inferred from low-level cues${cite(c,"burr2008")}.`;
+  if (st.type === "rdk") return `Stimuli were random-dot kinematograms (100% coherence, 6°/s) moving in one of eight directions spaced 45° apart.`;
+  let t = STIM_DESC[st.type](st);
+  if (c.fig === "crf" && st.type !== "checker") t += ` ${c.mri ? "Seven contrasts" : "Seven pedestal contrasts"} were log-spaced between 1.5% and 100%.`;
+  if (c.fig === "tuning" && c.feature === "orientation") t += " The stimulus appeared at one of eight orientations spaced 22.5° apart.";
+  if (c.fig === "tuning" && c.feature === "spatial frequency") t += " Peak spatial frequency spanned 0.25 to 16 cycles/° in half-octave steps.";
+  return t;
 }
 
 function introText(c){
@@ -1053,7 +1057,7 @@ function writePaper(c){
 
   const sig = /Neuroscience|PNAS/.test(c.journal) ? `<div class="sig"><p class="sec">Significance statement</p><p>${cap(c.mod.np)} is one of the strongest influences on what we see, yet the neural computation it engages is still debated. Using ${c.mri ? "fMRI" : "psychophysics"} and model-based analyses, we show that ${c.mod.np} ${HEADLINE[c.effect]} in ${c.area}. The result places ${c.mod.np} within the framework of ${c.mech}, linking it to a computation found throughout the brain.</p></div>` : "";
 
-  const kw = [...new Set([c.mod.np, c.mech, c.fig === "crf" ? "contrast response function" : c.feature + " tuning", c.mri ? (c.mk === "eegfmri" ? "EEG-fMRI" : c.mk === "pupil" ? "pupillometry" : "fMRI") : "psychophysics", c.area.replace(/^the /,"")])];
+  const kw = [...new Set([...(c.model ? ["computational modeling"] : []), c.mod.np, c.mech, c.fig === "crf" ? "contrast response function" : c.feature + " tuning", c.mri ? (c.mk === "eegfmri" ? "EEG-fMRI" : c.mk === "pupil" ? "pupillometry" : "fMRI") : "psychophysics", c.area.replace(/^the /,"")])];
 
   let h = `<div class="cite-line"><b>${c.journal}</b><span>${c.year}</span><span>${c.vol}: ${c.pages}</span></div>
 <h2>${c.title}</h2>
@@ -1074,8 +1078,9 @@ function writePaper(c){
   h += sec("methods","Materials and methods");
   h += `<h4>Participants</h4><p>${n} observers (${fem} female; aged ${ageLo}–${ageHi} years) with normal or corrected-to-normal vision took part. ${c.mri ? "All were screened for MRI safety." : (r.f()<0.5 ? "One observer was an author (S.L.); the rest were naive to the purpose of the study." : "All were naive to the purpose of the study.")} Procedures were approved by the ${irb} Institutional Review Board, and all observers gave written informed consent.</p>`;
   h += `<h4>Apparatus and stimuli</h4><p>Stimuli were generated in MATLAB with Psychtoolbox${cite(c,"brainard1997")} and ${c.mri ? "back-projected onto a screen at the rear of the bore (1920 × 1080, 120 Hz), viewed through a mirror mounted on the head coil" : "presented on a gamma-corrected CRT monitor (1024 × 768, 100 Hz) at a viewing distance of 57 cm, with head position stabilized by a chin rest"}. ${stimulusText(c)} The background was held at mean luminance (${r.int(38,60)} cd/m²) throughout.</p>`;
-  h += `<h4>Design and procedure</h4><p>${procedureText(c)} ${c.mri ? `Each run lasted ${r.int(5,7)} min and contained ${r.int(14,28)} stimulus blocks of 12 s separated by jittered 10–14 s blank intervals. Observers completed ${r.int(8,14)} runs across two sessions.` : `Contrast discrimination thresholds were estimated with interleaved QUEST staircases${cite(c,"watson1983")}, ${r.int(4,8)} staircases per condition per session.`} The trial sequence is shown in Figure 1.</p>`;
-  h += fig("design", `<b>Figure 1.</b> Experimental design. ${c.mri ? "Schematic of one stimulus block. Durations are given below each frame." : "Schematic of a single trial. Durations are given below each frame."} The gray background was held at mean luminance throughout.`);
+  h += `<h4>Design and procedure</h4><p>${procedureText(c)} ${c.mri ? `Each run lasted ${r.int(5,7)} min and contained ${r.int(14,28)} stimulus blocks of 12 s separated by jittered 10–14 s blank intervals. Observers completed ${r.int(8,14)} runs across two sessions.` : `Contrast discrimination thresholds were estimated with interleaved QUEST staircases${cite(c,"watson1983")}, ${r.int(4,8)} staircases per condition per session.`}${c.ptype === "model" ? "" : " The design is shown in Figure 1."}</p>`;
+  if (c.ptype === "model") h += `<h4>Computational model</h4><p>We modeled population responses with a normalization model (Fig. 1) in which the stimulus drive, E(x, θ), is multiplied by ${ATT.includes(c.k) ? "an attention" : "a modulation"} field, A(x, θ), and divided by a suppressive drive, S, computed by pooling the modulated drive over space and ${c.fig === "tuning" ? c.feature : "orientation"}${cite(c, "reynolds2009", "carandini2012")}. Free parameters (the width and gain of A, the width of the suppressive pool and the semi-saturation constant σ) were fit to each observer's data by minimizing squared error. We verified on simulated data that the fitting procedure recovered known parameters.</p>`;
+  h += fig("design", designCaption(c));
   if (c.mri){
     const seven = /7T/.test(c.method);
     h += `<h4>MRI acquisition</h4><p>Data were acquired on a ${seven ? "Siemens 7T scanner with a 32-channel head coil" : "Siemens Prisma 3T scanner with a 64-channel head coil"} (TR = ${seven ? "1.5" : "2"} s, TE = ${seven ? r.int(20,25) : r.int(28,32)} ms, ${seven ? "1.2" : "2"}-mm isotropic voxels, multiband factor ${r.pick([2,3,4])}). A T1-weighted MPRAGE (1-mm isotropic) was collected for cortical surface reconstruction in FreeSurfer${cite(c,"fischl2012")}. ${c.mk === "eegfmri" ? "EEG was recorded simultaneously from a 64-channel MR-compatible cap, and each 30-s epoch was scored for sleep stage according to AASM criteria. " : ""}${c.mk === "pupil" ? "Pupil diameter was recorded at 1 kHz with an MR-compatible EyeLink 1000 Plus. " : ""}Eye position was monitored throughout.</p>`;
@@ -1367,51 +1372,6 @@ function gaborInto(g, cx, cy, rad, ori, contrast, cycles){
   og.putImageData(img, 0, 0);
   g.save(); g.beginPath(); g.arc(cx, cy, rad, 0, Math.PI*2); g.clip(); g.drawImage(off, cx - rad, cy - rad, rad*2, rad*2); g.restore();
 }
-function drawDesign(cv, c){
-  const W0 = cv.clientWidth;
-  const s = Math.max(70, Math.min(150, (W0 - 40) / 2.95)), dx = s*0.62, dy = s*0.40;
-  const H = s + 3*dy + 74;
-  const {g} = plateSetup(cv, H);
-  const x0 = (W0 - (s + 3*dx))/2, y0 = 14;
-  const k = c.k, two = ["spatial","transient","sustained","divided","reward"].includes(k);
-  const dots = c.feature === "numerosity" && c.fig === "tuning";
-  const durs = c.mri
-    ? (c.mk === "eegfmri" ? [["Rest","10–14 s"],["State", k === "sleep" ? "EEG-scored" : "eyes shut/open"],["Flicker","12 s"],["Rest","10–14 s"]] : [["Fixation","2 s"],["Cue","1 s"],["Stimulus","12 s block"],["Blank","10–14 s"]])
-    : [["Fixation","500 ms"],["Cue", k === "transient" ? "60 ms" : "300 ms"],["Stimulus","100 ms"],["Response","until response"]];
-  for (let i = 0; i < 4; i++){
-    const x = x0 + i*dx, y = y0 + i*dy;
-    g.fillStyle = LS.mid; g.fillRect(x, y, s, s); g.strokeStyle = LS.ink; g.lineWidth = 1; g.strokeRect(x + .5, y + .5, s - 1, s - 1);
-    const cx = x + s/2, cy = y + s/2;
-    // fixation dot in every frame
-    const fix = () => { g.fillStyle = "#000"; g.beginPath(); g.arc(cx, cy, Math.max(1.6, s*0.018), 0, Math.PI*2); g.fill(); };
-    if (i === 0) fix();
-    if (i === 1){
-      fix(); g.fillStyle = "#fff"; g.strokeStyle = "#fff"; g.lineWidth = 1.6; g.font = F(Math.max(9, s*0.1), true); g.textAlign = "center"; g.textBaseline = "middle";
-      const txt = {temporal:"♪", cognitive:"823 − 7?", emotional:"!", emotion:"fearful face", caffeine:"espresso", learning:"day 1–5", expectation:"75% valid", memory:"remember", sleep:"zzz", eyes:"eyes shut", crossmodal:"+ " + (c.cA||"").toLowerCase(), factor:"high / low", pupil:"", state:"induction"}[k];
-      if (k === "transient"){ g.beginPath(); g.arc(cx + s*0.27, cy - s*0.2, s*0.025, 0, Math.PI*2); g.fill(); }
-      else if (k === "sustained" || k === "spatial" || k === "reward"){ g.beginPath(); g.moveTo(cx - s*0.08, cy - s*0.08); g.lineTo(cx + s*0.08, cy - s*0.08); g.lineTo(cx + s*0.04, cy - s*0.12); g.moveTo(cx + s*0.08, cy - s*0.08); g.lineTo(cx + s*0.04, cy - s*0.04); g.stroke(); }
-      else if (k === "divided"){ g.beginPath(); g.moveTo(cx - s*0.1, cy - s*0.08); g.lineTo(cx + s*0.1, cy - s*0.08); g.stroke(); }
-      else if (k === "feature"){ g.strokeStyle = LS.blueLight; g.lineWidth = 2.2; g.beginPath(); g.moveTo(cx - s*0.07, cy + s*0.05 - s*0.12); g.lineTo(cx + s*0.07, cy - s*0.05 - s*0.12); g.stroke(); }
-      else if (txt) g.fillText(txt, cx, cy - s*0.16);
-    }
-    if (i === 2){
-      if (dots){ g.fillStyle = "#000"; for (let j = 0; j < 12; j++){ const ang = j*2.399, rad = s*0.08*Math.sqrt(j+1); g.fillStyle = j%2 ? "#000" : "#fff"; g.beginPath(); g.arc(cx + Math.cos(ang)*rad, cy + Math.sin(ang)*rad, s*0.022, 0, Math.PI*2); g.fill(); } }
-      else if (two){ gaborInto(g, cx - s*0.27, cy, s*0.17, 0.5, 0.9, 4); gaborInto(g, cx + s*0.27, cy, s*0.17, 1.1, 0.9, 4); fix(); }
-      else { gaborInto(g, cx, cy, s*0.3, 0.6, 0.9, 6); fix(); }
-    }
-    if (i === 3){ fix(); if (!c.mri){ g.fillStyle = "#fff"; g.font = F(Math.max(10, s*0.11)); g.textAlign = "center"; g.textBaseline = "middle"; g.fillText("?", cx, cy - s*0.14); } }
-    // label beneath frame's lower-left (not covered by the next frame)
-    g.fillStyle = LS.ink; g.font = F(10.5, true); g.textAlign = "left"; g.textBaseline = "top";
-    g.fillText(durs[i][0], x, y + s + 4);
-    g.fillStyle = LS.ink2; g.font = F(10); g.fillText(durs[i][1], x, y + s + 17);
-  }
-  // time arrow, horizontal beneath the stack
-  const ty = y0 + 3*dy + s + 40, tx0 = x0, tx1 = x0 + 3*dx + s;
-  g.strokeStyle = LS.ink; g.fillStyle = LS.ink; g.lineWidth = 1;
-  g.beginPath(); g.moveTo(tx0, ty); g.lineTo(tx1, ty); g.stroke();
-  g.beginPath(); g.moveTo(tx1, ty); g.lineTo(tx1 - 8, ty - 4); g.lineTo(tx1 - 8, ty + 4); g.closePath(); g.fill();
-  g.font = F(11, true); g.textAlign = "right"; g.textBaseline = "top"; g.fillText("Time", tx1, ty + 5);
-}
 
 /* ---------- Header Gabor (page chrome) ---------- */
 const css = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
@@ -1440,6 +1400,274 @@ function driftGabor(){ if (reduceMotion.matches){ drawGabor(); return; } const t
 /* ---------- Render ---------- */
 const $ = id => document.getElementById(id);
 
+
+/* ---------- Stimuli and Figure 1 (generative, from the lab's papers) ---------- */
+const MODEL_SRC = [46, 20, 1, 8, 4, 38];
+function chooseStim(c, r){
+  const k = c.k, t = c.title.toLowerCase(), opts = [];
+  if (c.fig === "tuning" && c.feature === "numerosity") opts.push(["dots", 10]);
+  else if (c.fig === "tuning" && c.feature === "motion direction") opts.push(["rdk", 10]);
+  else {
+    if (k === "sleep" || k === "eyes") opts.push(["checker", 10]);
+    if (/rivalry|awareness|invisible|dichoptic/.test(t)) opts.push(["dichoptic", 12]);
+    if (/tuned|surround/.test(c.mech)) opts.push(["centsurr", 4]);
+    if (k === "feature") opts.push(["plaid", 5]);
+    if (c.feature === "spatial frequency" && c.fig === "tuning") opts.push(["noise", 6], ["radial", 3]);
+    if (c.mri) opts.push(["annulus", 4], ["radial", 3], ["noise", 1.5]); else opts.push(["gabor", 5], ["annulus", 1]);
+  }
+  const type = r.wpick(opts);
+  return {type, sf:r.pick([1, 1.5, 2, 3, 4]), ecc:r.pick([4, 5, 6, 7]), inner:r.pick([0.5, 1, 1.5, 2]), outer:r.pick([7, 8, 9, 10, 12]), hz:r.pick([4, 5, 8, 10]),
+    ori:r.num(0, Math.PI), ori2:r.num(0, Math.PI), cyc:r.num(3.2, 5.5), seed:r.int(1, 1e9), letter:type === "noise" && r.f() < 0.6, two:!c.mri && ATTN_LOC.includes(k) && type === "gabor"};
+}
+function chooseLayout(c, r){
+  if (c.stim.type === "dichoptic") return "dichoptic";
+  if (!c.mri) return "cascade";
+  const o = [["block", 4], ["cascade", 2]]; if (c.fig === "crf" && c.stim.type !== "checker") o.push(["contrastSeq", 4]);
+  return r.wpick(o);
+}
+const STIM_DESC = {
+  gabor: st => `Stimuli were Gabor patches (${st.sf} cycles/°, σ = ${(0.6 + st.sf*0.05).toFixed(1)}°) presented at ${st.ecc}° eccentricity${st.two ? " to the left and right of fixation" : ""}.`,
+  annulus: st => `Stimuli were sinusoidal gratings (${st.sf} cycles/°) presented in an annulus spanning ${st.inner}° to ${st.outer}° of eccentricity, counterphase-flickering at ${st.hz} Hz.`,
+  radial: st => `Stimuli were composed of gratings with radial orientations whose spatial frequency scaled with eccentricity to approximate cortical magnification, filling an annulus from ${st.inner}° to ${st.outer}°.`,
+  noise: st => `Stimuli were band-pass filtered noise patterns (peak ${st.sf} cycles/°, 1-octave bandwidth) filling an annulus from ${st.inner}° to ${st.outer}°${st.letter ? ", with a rapid serial stream of letters at fixation" : ""}.`,
+  centsurr: st => `Stimuli consisted of a central grating (${(1 + st.inner).toFixed(1)}° radius, ${st.sf} cycles/°) surrounded by an annular grating extending to ${st.outer}°, whose orientation differed from the center by 0° to 90°.`,
+  plaid: st => `Stimuli were two superimposed, orthogonal gratings (${st.sf} cycles/°) forming a plaid, presented in an annulus from ${st.inner}° to ${st.outer}° of eccentricity.`,
+  checker: st => `Stimuli were full-field radial checkerboards, contrast-reversing at ${st.hz} Hz.`,
+  dichoptic: st => `Orthogonal gratings (${st.sf} cycles/°, ±45°) were presented separately to the two eyes through a mirror stereoscope, each within a ${(1.5 + st.inner).toFixed(1)}° aperture surrounded by a fusion frame.`
+};
+const STIM_SHORT = {gabor:"Gabor patches", annulus:"an annular counterphase grating", radial:"radially oriented gratings scaled for cortical magnification", noise:"band-pass filtered noise", centsurr:"a center grating with an orientation-varying surround", plaid:"a plaid of two orthogonal gratings", checker:"a flickering radial checkerboard", dots:"a dot array", rdk:"a random-dot kinematogram", dichoptic:"orthogonal gratings shown to the two eyes"};
+
+function bandNoise(S, cyc, r){
+  const lp = N => { const grid = [...Array((N + 1)*(N + 1))].map(() => r.norm(0, 1)), out = new Float32Array(S*S);
+    for (let y = 0; y < S; y++) for (let x = 0; x < S; x++){ const gx = x/S*N, gy = y/S*N, x0 = Math.floor(gx), y0 = Math.floor(gy), fx = gx - x0, fy = gy - y0;
+      const sx = fx*fx*(3 - 2*fx), sy = fy*fy*(3 - 2*fy), i = y0*(N + 1) + x0;
+      out[y*S + x] = (grid[i]*(1 - sx) + grid[i + 1]*sx)*(1 - sy) + (grid[i + N + 1]*(1 - sx) + grid[i + N + 2]*sx)*sy; }
+    return out; };
+  const N = Math.max(4, Math.round(cyc*2.6)), a = lp(N), b = lp(Math.max(2, Math.round(N/2.5)));
+  const blur = (src, rad) => { const t = new Float32Array(S*S), o2 = new Float32Array(S*S);
+    for (let y = 0; y < S; y++){ let acc = 0; for (let x = -rad; x <= rad; x++) acc += src[y*S + Math.min(S - 1, Math.max(0, x))];
+      for (let x = 0; x < S; x++){ t[y*S + x] = acc/(2*rad + 1); acc += src[y*S + Math.min(S - 1, x + rad + 1)] - src[y*S + Math.max(0, x - rad)]; } }
+    for (let x = 0; x < S; x++){ let acc = 0; for (let y = -rad; y <= rad; y++) acc += t[Math.min(S - 1, Math.max(0, y))*S + x];
+      for (let y = 0; y < S; y++){ o2[y*S + x] = acc/(2*rad + 1); acc += t[Math.min(S - 1, y + rad + 1)*S + x] - t[Math.max(0, y - rad)*S + x]; } }
+    return o2; };
+  const rad = Math.max(1, Math.round(S/(N*3.2)));
+  for (let pass = 0; pass < 2; pass++){ const a2 = blur(a, rad); a.set(a2); }
+  const o = new Float32Array(S*S); let m = 1e-6; for (let i = 0; i < o.length; i++){ o[i] = a[i] - 0.7*b[i]; m = Math.max(m, Math.abs(o[i])); }
+  for (let i = 0; i < o.length; i++) o[i] /= m; return o;
+}
+// Render a stimulus into an offscreen canvas on a mean-gray background
+function stimCanvas(st, S, override){
+  const s = Object.assign({}, st, override || {});
+  if (s.type === "dichoptic") Object.assign(s, {type:"annulus", ori:Math.PI/4, cyc:4});
+  const cv = document.createElement("canvas"); cv.width = cv.height = S;
+  const g = cv.getContext("2d"), img = g.createImageData(S, S), R = S/2, r = rng(s.seed);
+  const noise = s.type === "noise" ? bandNoise(S, s.cyc*1.6, r) : null;
+  const sm = (e0, e1, v) => { const t = Math.min(1, Math.max(0, (v - e0)/(e1 - e0))); return t*t*(3 - 2*t); };
+  const win = (rad, a, b) => sm(a - 0.05, a + 0.03, rad) * (1 - sm(b - 0.06, b, rad));
+  const grat = (nx, ny, o, cyc) => Math.sin(2*Math.PI*cyc*(nx*Math.cos(o) + ny*Math.sin(o)));
+  for (let y = 0; y < S; y++) for (let x = 0; x < S; x++){
+    const nx = (x - R)/R, ny = (y - R)/R, rad = Math.hypot(nx, ny), th = Math.atan2(ny, nx); let v = 0;
+    switch (s.type){
+      case "gabor": v = grat(nx, ny, s.ori, s.cyc*0.75)*Math.exp(-(rad*rad)/(2*0.3*0.3)); break;
+      case "annulus": v = grat(nx, ny, s.ori, s.cyc*1.4)*win(rad, 0.2, 0.96); break;
+      case "plaid": v = 0.5*(grat(nx, ny, s.ori, s.cyc*1.3) + grat(nx, ny, s.ori + Math.PI/2, s.cyc*1.3))*win(rad, 0.2, 0.96); break;
+      case "radial": { const k = Math.floor(Math.log(Math.max(rad, 0.12)/0.12)/Math.log(1.32)); v = Math.sin(26*th + k*1.7)*win(rad, 0.16, 0.96)*(0.55 + 0.45*Math.cos(Math.PI*((Math.log(Math.max(rad, 0.12)/0.12)/Math.log(1.32)) % 1)*2)); break; }
+      case "noise": v = noise[y*S + x]*win(rad, 0.18, 0.96); break;
+      case "centsurr": v = grat(nx, ny, s.ori, s.cyc*1.4)*(1 - sm(0.3, 0.34, rad)) + grat(nx, ny, s.ori2, s.cyc*1.4)*win(rad, 0.44, 0.96); break;
+      case "checker": v = Math.sign(Math.sin(12*th)*Math.sin(9*Math.log(Math.max(rad, 0.05))))*win(rad, 0.08, 0.98)*0.95; break;
+    }
+    const i = (y*S + x)*4, L = 128 + 120*v*(s.contrast ?? 1);
+    img.data[i] = img.data[i + 1] = img.data[i + 2] = L; img.data[i + 3] = 255;
+  }
+  g.putImageData(img, 0, 0);
+  if (s.type === "dots" || s.type === "rdk"){
+    const n = s.type === "dots" ? r.pick([5, 8, 12, 16, 24]) : 70, pts = [];
+    for (let tries = 0; pts.length < n && tries < 4000; tries++){ const a = r.num(0, 2*Math.PI), rr = Math.sqrt(r.f())*0.82*R, p = [R + Math.cos(a)*rr, R + Math.sin(a)*rr], dr = s.type === "dots" ? S*r.num(0.025, 0.045) : S*0.012;
+      if (pts.every(q => Math.hypot(q[0] - p[0], q[1] - p[1]) > q[2] + dr + 2)) pts.push([p[0], p[1], dr]); }
+    pts.forEach((p, i) => { g.beginPath(); g.arc(p[0], p[1], p[2], 0, Math.PI*2); g.fillStyle = s.type === "dots" ? (i % 2 ? "#000" : "#fff") : "#fff"; g.fill(); });
+    if (s.type === "rdk"){ g.strokeStyle = "#ffd84a"; g.fillStyle = "#ffd84a"; g.lineWidth = Math.max(1.5, S*0.012); const a = s.ori, L = S*0.22;
+      g.beginPath(); g.moveTo(R - Math.cos(a)*L, R - Math.sin(a)*L); g.lineTo(R + Math.cos(a)*L, R + Math.sin(a)*L); g.stroke();
+      g.beginPath(); g.moveTo(R + Math.cos(a)*L, R + Math.sin(a)*L); g.lineTo(R + Math.cos(a - 2.6)*S*0.06 + Math.cos(a)*L, R + Math.sin(a - 2.6)*S*0.06 + Math.sin(a)*L); g.lineTo(R + Math.cos(a + 2.6)*S*0.06 + Math.cos(a)*L, R + Math.sin(a + 2.6)*S*0.06 + Math.sin(a)*L); g.closePath(); g.fill(); }
+  }
+  if (s.type === "noise" && s.letter){ g.fillStyle = "#808080"; g.beginPath(); g.arc(R, R, S*0.13, 0, Math.PI*2); g.fill(); g.fillStyle = "#fff"; g.font = `500 ${Math.round(S*0.16)}px ${LS.font}`; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(r.pick(["D","K","R","H","N"]), R, R + 1); }
+  if (!["noise", "dots", "rdk"].includes(s.type) || !s.letter){ g.fillStyle = "#000"; g.beginPath(); g.arc(R, R, Math.max(1.5, S*0.012), 0, Math.PI*2); g.fill(); }
+  return cv;
+}
+
+function grayFrame(g, x, y, s){ g.fillStyle = LS.mid; g.fillRect(x, y, s, s); g.strokeStyle = LS.ink; g.lineWidth = 1; g.strokeRect(x + .5, y + .5, s - 1, s - 1); }
+function fixDot(g, cx, cy, s){ g.fillStyle = "#000"; g.beginPath(); g.arc(cx, cy, Math.max(1.6, s*0.018), 0, Math.PI*2); g.fill(); }
+function drawCue(g, c, cx, cy, s){
+  const k = c.k; g.fillStyle = "#fff"; g.strokeStyle = "#fff"; g.lineWidth = 1.6; g.font = F(Math.max(9, s*0.1), true); g.textAlign = "center"; g.textBaseline = "middle";
+  const txt = {temporal:"♪", cognitive:"823 − 7?", emotional:"!", emotion:"fearful face", caffeine:"espresso", learning:"day 1–5", expectation:"75% valid", memory:"remember", sleep:"zzz", eyes:"eyes shut", crossmodal:"+ " + (c.cA || "").toLowerCase(), factor:"high / low", state:"induction"}[k];
+  if (k === "transient"){ g.beginPath(); g.arc(cx + s*0.27, cy - s*0.2, s*0.025, 0, Math.PI*2); g.fill(); }
+  else if (k === "sustained" || k === "spatial" || k === "reward"){ g.beginPath(); g.moveTo(cx - s*0.08, cy - s*0.08); g.lineTo(cx + s*0.08, cy - s*0.08); g.lineTo(cx + s*0.04, cy - s*0.12); g.moveTo(cx + s*0.08, cy - s*0.08); g.lineTo(cx + s*0.04, cy - s*0.04); g.stroke(); }
+  else if (k === "divided"){ g.beginPath(); g.moveTo(cx - s*0.1, cy - s*0.08); g.lineTo(cx + s*0.1, cy - s*0.08); g.stroke(); }
+  else if (k === "feature"){ g.strokeStyle = LS.blueLight; g.lineWidth = 2.2; g.beginPath(); g.moveTo(cx - s*0.07, cy - s*0.07); g.lineTo(cx + s*0.07, cy - s*0.17); g.stroke(); }
+  else if (txt) g.fillText(txt, cx, cy - s*0.16);
+  fixDot(g, cx, cy, s);
+}
+function designFrames(c, r){
+  const att = ATT.includes(c.k) || ["emotion","reward","expectation","memory"].includes(c.k);
+  if (c.mri) return [["Fixation", r.pick(["2 s","4 s"])], att ? ["Cue", "1 s"] : null, ["Stimulus", r.pick(["12 s block","16 s block","3 s"])], r.f() < 0.4 ? ["Task", "1.5 s"] : null, ["Blank", r.pick(["10–14 s","8 s","12 s"])]].filter(Boolean);
+  const f = [["Fixation", r.pick(["500 ms","400 ms","300–700 ms"])]];
+  if (att) f.push(["Cue", c.k === "transient" ? "60 ms" : r.pick(["300 ms","500 ms"])]);
+  if (r.f() < 0.5) f.push(["ISI", r.pick(["40 ms","50 ms","100 ms"])]);
+  f.push(["Stimulus", r.pick(["100 ms","60 ms","150 ms","40 ms"])]);
+  if (r.f() < 0.45) f.push(["Mask", r.pick(["100 ms","200 ms"])]);
+  if (r.f() < 0.35 && f.length < 6) f.push(["Response cue", "300 ms"]);
+  f.push(["Response", "until response"]);
+  return f;
+}
+function layoutHeight(c, w){
+  if (c.layout === "cascade"){ const n = c.frames.length, s = Math.max(56, Math.min(118, (w - 10)/(1 + 0.62*(n - 1)))); return s + (n - 1)*s*0.4 + 64; }
+  if (c.layout === "block") return 210;
+  if (c.layout === "contrastSeq") return 200;
+  return Math.min(118, w/3.6) + 120;
+}
+function drawCascade(g, x0, y0, w, c, st){
+  const fr = c.frames, n = fr.length, s = Math.max(56, Math.min(118, (w - 10)/(1 + 0.62*(n - 1)))), dx = s*0.62, dy = s*0.4;
+  const off = x0 + Math.max(0, (w - (s + (n - 1)*dx))/2);
+  const img = stimCanvas(st, Math.round(s*2)), mask = stimCanvas({type:"noise", cyc:5, seed:st.seed + 7}, Math.round(s*2));
+  fr.forEach(([lab, dur], i) => {
+    const x = off + i*dx, y = y0 + i*dy, cx = x + s/2, cy = y + s/2;
+    grayFrame(g, x, y, s);
+    if (lab === "Cue") drawCue(g, c, cx, cy, s);
+    else if (lab === "Stimulus"){
+      if (st.two){ const sub = s*0.42; g.drawImage(img, cx - s*0.27 - sub/2, cy - sub/2, sub, sub); g.drawImage(img, cx + s*0.27 - sub/2, cy - sub/2, sub, sub); fixDot(g, cx, cy, s); }
+      else g.drawImage(img, x + 1, y + 1, s - 2, s - 2);
+    }
+    else if (lab === "Mask") g.drawImage(mask, x + 1, y + 1, s - 2, s - 2);
+    else if (lab === "Response" && !c.mri){ fixDot(g, cx, cy, s); g.fillStyle = "#fff"; g.font = F(Math.max(10, s*0.11)); g.textAlign = "center"; g.textBaseline = "middle"; g.fillText("?", cx, cy - s*0.14); }
+    else if (lab === "Response cue"){ fixDot(g, cx, cy, s); g.strokeStyle = "#fff"; g.lineWidth = 1.6; g.beginPath(); g.moveTo(cx + s*0.06, cy); g.lineTo(cx + s*0.2, cy); g.stroke(); }
+    else if (lab === "Task"){ fixDot(g, cx, cy, s); g.fillStyle = "#fff"; g.font = F(Math.max(9, s*0.1), true); g.textAlign = "center"; g.textBaseline = "middle"; g.fillText("1-back", cx, cy - s*0.16); }
+    else fixDot(g, cx, cy, s);
+    const room = i < n - 1 ? dx - 4 : s + 20, fit = (t, base, it) => { let fs = base; g.font = F(fs, it); while (g.measureText(t).width > room && fs > 7.5){ fs -= 0.5; g.font = F(fs, it); } };
+    g.fillStyle = LS.ink; g.textAlign = "left"; g.textBaseline = "top"; fit(lab, 10.5, true); g.fillText(lab, x, y + s + 4);
+    g.fillStyle = LS.ink2; fit(dur, 10, false); g.fillText(dur, x, y + s + 17);
+  });
+  const ty = y0 + (n - 1)*dy + s + 40, tx1 = off + (n - 1)*dx + s;
+  g.strokeStyle = LS.ink; g.fillStyle = LS.ink; g.lineWidth = 1; g.beginPath(); g.moveTo(off, ty); g.lineTo(tx1, ty); g.stroke();
+  g.beginPath(); g.moveTo(tx1, ty); g.lineTo(tx1 - 8, ty - 4); g.lineTo(tx1 - 8, ty + 4); g.closePath(); g.fill();
+  g.font = F(11, true); g.textAlign = "right"; g.textBaseline = "top"; g.fillText("Time", tx1, ty + 5);
+}
+function drawBlock(g, x0, y0, w, c, st, r){
+  const green = "#2e9a4f", conds = [[c.cA, LS.blue], [c.cB, LS.red], ["Fixation", green]];
+  g.font = F(11.5, false, 500); g.textAlign = "left"; g.textBaseline = "top";
+  conds.forEach(([lab, col], i) => { g.fillStyle = col; g.fillText(lab, x0, y0 + 8 + i*16); });
+  g.font = F(13, false, 500); g.fillStyle = LS.ink; g.textAlign = "center"; g.fillText("Scan design", x0 + w*0.62, y0);
+  const ly = y0 + 150, lx0 = x0, lx1 = x0 + w - 10, seq = []; for (let i = 0; i < 7; i++) seq.push(i % 3);
+  const blk = (lx1 - lx0)/(seq.length*1.6 + 0.6), gap = blk*0.6;
+  g.strokeStyle = LS.ink; g.lineWidth = 1; g.beginPath(); g.moveTo(lx0, ly); g.lineTo(lx1, ly); g.stroke();
+  let x = lx0 + gap, first = null;
+  seq.forEach((ci, i) => { g.strokeStyle = conds[ci][1]; g.lineWidth = 6; g.beginPath(); g.moveTo(x, ly); g.lineTo(x + blk, ly); g.stroke(); if (i === 2) first = x; x += blk + gap; });
+  g.fillStyle = LS.ink; g.font = F(9.5); g.textAlign = "center"; g.textBaseline = "top";
+  const bl = lx0 + gap + blk + gap/2;
+  g.lineWidth = 1; g.strokeStyle = LS.ink;
+  [[lx0 + gap + blk/2, `${r.pick([12, 16, 20])}-s block`], [lx0 + 4*(blk + gap) + gap/2, `${r.pick([8, 10, 12])}-s blank`]].forEach(([px, t]) => { g.beginPath(); g.moveTo(px, ly + 6); g.lineTo(px, ly + 12); g.stroke(); g.fillText(t, px, ly + 15); });
+  g.textAlign = "right"; g.fillText(`${r.int(280, 340)} s`, lx1, ly + 15);
+  g.font = F(11, true); g.textAlign = "center"; g.fillText("Time (s)", (lx0 + lx1)/2, ly + 32);
+  const s = Math.min(78, w*0.2), img = stimCanvas(st, Math.round(s*2)), sx = first + blk/2 - s/2 - 10, sy = y0 + 30;
+  for (let i = 2; i >= 0; i--){ const ox = sx + i*9, oy = sy + i*7; g.globalAlpha = i ? 0.7 : 1; g.drawImage(img, ox, oy, s, s); g.strokeStyle = LS.ink; g.lineWidth = 1; g.strokeRect(ox + .5, oy + .5, s - 1, s - 1); g.globalAlpha = 1; }
+  g.strokeStyle = LS.ink; g.beginPath(); g.moveTo(first + blk/2, sy + s + 20); g.lineTo(first + blk/2, ly - 6); g.stroke();
+}
+function drawContrastSeq(g, x0, y0, w, c, st, r){
+  const box = {x:x0 + 40, y:y0 + 16, w:w - 50, h:120};
+  axes(g, box, linScale(0, 1, [], () => ""), linScale(0, 100, [0, 50, 100], v => String(v)), {ylabel:"Contrast (%)", ylw:30});
+  const X = f => box.x + f*box.w, Y = v => box.y + (1 - v/100)*box.h;
+  g.fillStyle = LS.shade; g.fillRect(X(0), Y(100), X(0.09) - X(0), box.h);
+  g.fillStyle = "#9a9a9a"; g.fillRect(X(0.1), Y(16), X(0.24) - X(0.1), Y(0) - Y(16));
+  const lev = [1.5, 3, 6, 12, 25, 50, 100]; let x = 0.27;
+  while (x < 0.98){ if (r.f() < 0.18){ g.fillStyle = "#9a9a9a"; g.fillRect(X(x), Y(16), X(x + 0.025) - X(x), Y(0) - Y(16)); x += 0.035; continue; }
+    const v = r.pick(lev); g.fillStyle = r.f() < 0.5 ? LS.blue : LS.red; g.fillRect(X(x), Y(v), X(x + 0.012) - X(x), Y(0) - Y(v)); x += 0.022; }
+  g.strokeStyle = LS.ink; g.lineWidth = 1; g.beginPath(); g.moveTo(box.x, Y(0)); g.lineTo(box.x + box.w, Y(0)); g.stroke();
+  g.fillStyle = LS.ink; g.font = F(10); g.textAlign = "center"; g.textBaseline = "top";
+  g.fillText("Baseline", X(0.045), Y(0) + 6); g.fillText("Adaptation", X(0.17), Y(0) + 6); g.fillText("Rapid event-related sequence", X(0.62), Y(0) + 6);
+  g.font = F(10.5, true); g.fillStyle = LS.blue; g.textAlign = "left"; g.fillText(c.cA, X(0.3), Y(100) - 14); g.fillStyle = LS.red; g.fillText(c.cB, X(0.3) + g.measureText(c.cA).width + 14, Y(100) - 14);
+  const ty = Y(0) + 30; g.strokeStyle = LS.ink; g.beginPath(); g.moveTo(box.x, ty); g.lineTo(box.x + box.w, ty); g.stroke(); g.fillStyle = LS.ink;
+  g.beginPath(); g.moveTo(box.x + box.w, ty); g.lineTo(box.x + box.w - 8, ty - 4); g.lineTo(box.x + box.w - 8, ty + 4); g.closePath(); g.fill();
+  g.font = F(11, true); g.textAlign = "right"; g.fillText("Time", box.x + box.w, ty + 5);
+}
+function drawDichoptic(g, x0, y0, w, c, st, r){
+  const s = Math.min(118, w/3.6), gap = (w - 3*s)/2.4;
+  const L = stimCanvas(st, Math.round(s*2), {type:"annulus", ori:Math.PI/4, cyc:4}), Rr = stimCanvas(st, Math.round(s*2), {type:"annulus", ori:-Math.PI/4, cyc:4});
+  const frame = (x, img, lab) => { grayFrame(g, x, y0 + 10, s); g.drawImage(img, x + s*0.12, y0 + 10 + s*0.12, s*0.76, s*0.76);
+    g.strokeStyle = "#fff"; g.lineWidth = 3; g.setLineDash([4, 4]); g.strokeRect(x + s*0.06, y0 + 10 + s*0.06, s*0.88, s*0.88); g.setLineDash([]);
+    g.fillStyle = LS.ink; g.font = F(11, true); g.textAlign = "center"; g.textBaseline = "top"; g.fillText(lab, x + s/2, y0 + 16 + s); };
+  frame(x0, L, "Left eye"); frame(x0 + s + gap*0.4, Rr, "Right eye");
+  const px = x0 + 2*s + gap*1.4;
+  g.strokeStyle = LS.ink; g.fillStyle = LS.ink; g.lineWidth = 1.2; const ay = y0 + 10 + s/2; g.beginPath(); g.moveTo(x0 + 2*s + gap*0.55, ay); g.lineTo(px - 8, ay); g.stroke();
+  g.beginPath(); g.moveTo(px - 4, ay); g.lineTo(px - 12, ay - 4); g.lineTo(px - 12, ay + 4); g.closePath(); g.fill();
+  frame(px, L, "Percept");
+  const ty = y0 + s + 52, tw = w - 10; let x = x0; g.font = F(10.5, true); g.textAlign = "left"; g.textBaseline = "bottom"; g.fillStyle = LS.ink; g.fillText("Dominance over time", x0, ty - 6);
+  let ci = 0; while (x < x0 + tw){ const len = Math.min(x0 + tw - x, tw*r.num(0.05, 0.14)); g.fillStyle = ci ? LS.red : LS.blue; g.fillRect(x, ty, len - 2, 8); x += len; ci = 1 - ci; }
+}
+
+function drawModel(cv, c){
+  const W0 = cv.clientWidth, narrow = W0 < 560, cols = narrow ? 2 : 5;
+  const opGap = narrow ? 34 : 30, p = Math.min(124, (W0 - 24 - opGap*(cols - 1))/cols), rows = Math.ceil(5/cols);
+  const H = 24 + rows*(p + 54);
+  const {g} = plateSetup(cv, H);
+  const S = c.sim, a = c.axis, xr = c.fig === "tuning" ? [a.lo, a.hi] : [-90, 90], mid = (xr[0] + xr[1])/2, span = xr[1] - xr[0];
+  const gauss = (x, m, s) => Math.exp(-((x - m)**2)/(2*s*s));
+  const att = ATT.includes(c.k) ? "Attention field" : ARO.includes(c.k) ? "Gain field" : "Modulation field";
+  const resp = (x, cond) => { const base = gauss(x, mid, span*0.12), e = c.effect;
+    if (!cond) return base;
+    if (e === "sharpen") return 1.15*gauss(x, mid, span*0.09); if (e === "broaden") return gauss(x, mid, span*0.16);
+    if (e === "shift") return gauss(x, mid + span*0.06, span*0.12); if (e === "null") return base; if (e === "invert") return -0.6*base; if (e === "additive") return base + 0.25;
+    return 1.35*base; };
+  const stages = [
+    {lab:"Stimulus", draw:(x, y) => { g.drawImage(stimCanvas(c.stim, Math.round(p*2)), x, y, p, p); }},
+    {lab:"Stimulus drive, E", op:"→", plot:[[...[-3,-2,-1,0,1,2,3].map(k => [t => gauss(t, mid + k*span/7, span*0.07), "#b5b5b5", 1.1]), [t => gauss(t, mid, span*0.07)*1, LS.ink, 1.8]]]},
+    {lab:att + ", A", op:"×", plot:[[[t => 0.35 + 0.65*gauss(t, mid, span*0.18), LS.blue, 2.2]]]},
+    {lab:"Suppressive drive, S", op:"∗", plot:[[[t => 0.15 + 0.85*gauss(t, mid, span*0.3), "#7d7d7d", 2.2]]]},
+    {lab:"Response, R = AE / (σ + S)", op:"÷", plot:[[[t => resp(t, 0), LS.red, 2.2], [t => resp(t, 1), LS.blue, 2.2]]]}
+  ];
+  stages.forEach((st, i) => {
+    const col = i % cols, row = Math.floor(i/cols), x = 12 + col*(p + opGap), y = 16 + row*(p + 54);
+    g.fillStyle = "#f2f2f2"; g.fillRect(x, y, p, p); g.strokeStyle = "#d4d4d4"; g.lineWidth = 1; g.strokeRect(x + .5, y + .5, p - 1, p - 1);
+    if (st.draw) st.draw(x, y);
+    else st.plot[0].forEach(([fn, colr, lw]) => {
+      const vals = []; for (let k = 0; k <= 60; k++) vals.push(fn(xr[0] + span*k/60));
+      const lo = Math.min(0, ...stages[i].plot[0].flatMap(q => { const v = []; for (let k = 0; k <= 60; k++) v.push(q[0](xr[0] + span*k/60)); return v; })) , hi = 1.45;
+      g.strokeStyle = colr; g.lineWidth = lw; g.beginPath();
+      vals.forEach((v, k) => { const px = x + 8 + (p - 16)*k/60, py = y + p - 10 - (v - lo)/(hi - lo)*(p - 22); k ? g.lineTo(px, py) : g.moveTo(px, py); }); g.stroke(); });
+    g.fillStyle = LS.ink; g.font = F(10.5, true); g.textAlign = "center"; g.textBaseline = "top";
+    const words = st.lab.split(", "); words.forEach((wd, li) => g.fillText(wd + (li < words.length - 1 ? "," : ""), x + p/2, y + p + 5 + li*12));
+    if (i > 0 && col > 0){ g.font = F(18, false, 300); g.textBaseline = "middle"; g.fillText(st.op, x - opGap/2, y + p/2); }
+  });
+  if (cols === 5){ const x = 12 + 4*(p + opGap); g.font = F(10, true); g.textAlign = "left"; g.textBaseline = "top"; g.fillStyle = LS.blue; g.fillText(c.cA, x + 6, y0top()); g.fillStyle = LS.red; g.fillText(c.cB, x + 6, y0top() + 12); }
+  function y0top(){ return 20; }
+}
+
+function drawDesign(cv, c){
+  if (c.ptype === "model") return drawModel(cv, c);
+  const st = c.stim, W0 = cv.clientWidth, narrow = W0 < 560, r = figRng(c, 21);
+  const A = narrow ? Math.min(170, W0 - 80) : Math.min(190, W0*0.28);
+  const bx = narrow ? 18 : 40 + A + 44, bw = narrow ? W0 - 36 : W0 - bx - 16;
+  const sh = layoutHeight(c, bw), by = narrow ? A + 80 : 30;
+  const H = narrow ? by + sh + 10 : Math.max(A + 80, sh + 40);
+  const {g} = plateSetup(cv, H);
+  const ax = narrow ? (W0 - A)/2 : 30;
+  panelLetter(g, "a", 6, 4);
+  g.drawImage(stimCanvas(st, Math.round(A*2)), ax, 30, A, A);
+  g.strokeStyle = LS.ink; g.lineWidth = 1; g.beginPath(); g.moveTo(ax, 30 + A + 10); g.lineTo(ax + A, 30 + A + 10); g.moveTo(ax, 30 + A + 6); g.lineTo(ax, 30 + A + 14); g.moveTo(ax + A, 30 + A + 6); g.lineTo(ax + A, 30 + A + 14); g.stroke();
+  g.fillStyle = LS.ink; g.font = F(10.5, true); g.textAlign = "center"; g.textBaseline = "top";
+  g.fillText(st.type === "gabor" ? `${(2*(0.6 + st.sf*0.05)*3).toFixed(1)}°` : st.type === "checker" ? "full field" : `${(2*st.outer).toFixed(0)}°`, ax + A/2, 30 + A + 16);
+  panelLetter(g, "b", narrow ? 6 : bx - 26, narrow ? by - 22 : 4);
+  if (c.layout === "block") drawBlock(g, bx, by, bw, c, st, r);
+  else if (c.layout === "contrastSeq") drawContrastSeq(g, bx, by, bw, c, st, r);
+  else if (c.layout === "dichoptic") drawDichoptic(g, bx, by, bw, c, st, r);
+  else drawCascade(g, bx, by, bw, c, st);
+}
+function designCaption(c){
+  if (c.ptype === "model") return `<b>Figure 1.</b> Model schematic. The stimulus drive (E) is multiplied by the ${ATT.includes(c.k) ? "attention" : "modulation"} field (A), and the product is pooled over space and feature to form the suppressive drive (S). The population response (R) is the modulated drive divided by σ + S. Right, predicted population responses in the ${c.cA.toLowerCase()} (blue) and ${c.cB.toLowerCase()} (red) conditions.`;
+  const lay = {cascade: c.mri ? "Schematic of one stimulus block, with durations below each frame." : "Schematic of a single trial, with durations below each frame.",
+    block:`Scan design. Blocks of the ${c.cA.toLowerCase()} (blue), ${c.cB.toLowerCase()} (red) and fixation (green) conditions alternated with blank periods.`,
+    contrastSeq:`Example run. After a baseline and an initial adaptation period, stimuli of varying contrast appeared in a rapid event-related sequence interleaved with top-up adaptation.`,
+    dichoptic:`Dichoptic presentation. Orthogonal gratings were shown to the two eyes; perception alternated between them, and observers reported the dominant grating continuously.`}[c.layout];
+  return `<b>Figure 1.</b> Experimental design. <b>a</b>, Example stimulus: ${STIM_SHORT[c.stim.type]}. <b>b</b>, ${lay}`;
+}
+
 /* ---------- Figure repertoire, drawn from the lab's papers ---------- */
 const figRng = (c, k) => rng((((c.seed >>> 0) * 31) + k * 7919 + 17) >>> 0);
 function pearson(x, y){
@@ -1462,7 +1690,9 @@ function planFigures(c){
   if (c.fig === "crf" && !mri && (ATT.includes(k) || k === "emotion")) f4.push(["appearance", 6]);
   if (/rivalry|awareness|invisible|flash suppression/i.test(c.title) || (c.era === "p" && !mri)) f4.push(["rivalry", 5]);
   if (!mri && c.fig === "crf") f4.push(["psychometric", 4]);
+  if (c.model){ f3.length = 0; f3.push(["population", 4], ["recovery", 3], ["aic", 3]); if (c.fig === "crf") f3.push(["heatmap", 6]); }
   c.f3 = r.wpick(f3);
+  if (c.model){ f4.length = 0; f4.push(["bars", 2]); ["population", "recovery", "heatmap"].forEach(t => { if (t !== c.f3 && (t !== "heatmap" || c.fig === "crf")) f4.push([t, 4]); }); if (c.mri) f4.push(["voxels", 1], ["ecc", 1]); }
   f3.forEach(([t]) => { if (!["scatter", "aic", c.f3].includes(t)) f4.push([t, 2]); });
   c.f4 = r.wpick(f4);
   c.vd = {};
@@ -1549,6 +1779,7 @@ const VBUILD = {
 };
 
 function variantText(type, c, N){
+  if (["heatmap", "population", "recovery"].includes(type)) return modelText(type, c, N);
   const d = c.vd[type] || {}, A = c.cA, B = c.cB, a = A.toLowerCase(), b = B.toLowerCase(), m = c.mod.np;
   switch (type){
     case "voxels": return {h:"Voxel-wise modulation", p:`To ask whether the effect was uniform across the population, we computed a modulation index, (${A} − ${B}) / (${A} + ${B}), for each voxel's ${d.kd.name} and ${d.sd.name}. Across ${d.nv} voxels pooled over V1–V3, the mean change in ${d.kd.name} was ${d.mx.toFixed(1)}%, and changes in the two parameters were ${d.q.r < 0 ? "negatively" : "positively"} correlated (${fmtR(d.q)}; Fig. ${N})${cite(c, "ramirez2025")}.`,
@@ -1769,7 +2000,72 @@ function drawAIC(cv, c){
   });
 }
 
-const DRAW = {design:drawDesign, main:drawMain, scatter:drawScatter, bars:drawBars, hrf:drawHRF, voxels:drawVoxels, ecc:drawEcc, afield:drawAfield, tunednorm:drawTunedNorm, pupil:drawPupil, appearance:drawAppearance, rivalry:drawRivalry, psychometric:drawPsychometric, aic:drawAIC};
+/* ---------- Modeling-paper figures ---------- */
+Object.assign(VBUILD, {
+  heatmap(c, r){
+    const N = 36, val = new Float32Array(N*N), j1 = r.num(0, 6.28), j2 = r.num(0, 6.28);
+    for (let i = 0; i < N; i++) for (let k = 0; k < N; k++){ const ss = i/(N - 1)*4, fs = k/(N - 1)*4;
+      val[k*N + i] = Math.tanh(1.25*(fs - ss) + 0.18*Math.sin(ss*1.7 + j1)*Math.cos(fs*1.3 + j2)); }
+    const pt = c.effect === "contrastGain" ? [r.num(0.6, 1.4), r.num(2.8, 3.6)] : c.effect === "responseGain" ? [r.num(2.8, 3.6), r.num(0.6, 1.4)] : [r.num(1.6, 2.4), r.num(1.6, 2.4)];
+    return {N, val, pt, regime: c.effect === "contrastGain" ? "contrast-gain" : c.effect === "responseGain" ? "response-gain" : "intermediate"};
+  },
+  population(c, r){
+    const a = c.axis, lo = c.fig === "tuning" ? a.lo : -90, hi = c.fig === "tuning" ? a.hi : 90, mu = (lo + hi)/2, sg = (hi - lo)*r.num(0.1, 0.14);
+    return {lo, hi, mu, sg, crf: c.fig === "crf", jit:[...Array(25)].map(() => r.norm(0, 0.02))};
+  },
+  recovery(c, r){
+    const S = c.sim, kd = S.defs[S.key], vals = S.B.concat(S.A).map(kd.get), lo = Math.min(...vals), hi = Math.max(...vals), sp = (hi - lo) || Math.abs(hi) || 1;
+    const tr = [...Array(60)].map(() => lo - sp*0.2 + r.f()*sp*1.4), rc = tr.map(v => v + r.norm(0, sp*r.num(0.06, 0.12)));
+    return {tr, rc, q:pearson(tr, rc), kd};
+  }
+});
+function modelText(type, c, N){
+  const d = c.vd[type], m = c.mod.np;
+  if (type === "heatmap") return {h:"Model predictions", p:`Simulating the model across stimulus and attention-field sizes reproduced the transition from response gain, when the attention field is small relative to the stimulus, to contrast gain, when it is large (Fig. ${N})${cite(c, "reynolds2009")}. The configuration of our experiment fell in the ${d.regime} regime, ${d.regime === "intermediate" ? "where the model predicts a mixture of the two" : "matching the effect we observed"}.`,
+    cap:`Predicted form of modulation as a function of stimulus size and attention-field size. Blue indicates contrast gain and red indicates response gain. The star marks the configuration used in the present experiment.`};
+  if (type === "population") return {h:"Simulated population responses", p:`To see how this computation reshapes the population code, we simulated responses across neurons tuned to different ${c.fig === "tuning" ? c.feature + " values" : "orientations"} (Fig. ${N}). In the model, ${m} ${HEADLINE[c.effect]}, as observed in the data.`,
+    cap:`Simulated population responses across neurons with different preferred ${c.fig === "tuning" ? c.feature : "orientation"}s in the ${c.cA.toLowerCase()} (blue) and ${c.cB.toLowerCase()} (red) conditions${d.crf ? ", at high (solid) and low (dashed) stimulus contrast" : ""}.`};
+  return {h:"Parameter recovery", p:`To confirm that the fitting procedure could distinguish these possibilities, we simulated 60 datasets with known parameters and refit them. Recovered values of the ${d.kd.name} closely tracked the true values (${fmtR(d.q)}; Fig. ${N}).`,
+    cap:`Parameter recovery. Recovered versus true ${d.kd.name} for 60 simulated datasets. The dashed line marks perfect recovery.`};
+}
+function drawHeatmap(cv, c){
+  const d = c.vd.heatmap, {g, box} = single(cv, 300, 260);
+  box.h = box.w; const N = d.N;
+  const cell = box.w/N;
+  for (let i = 0; i < N; i++) for (let k = 0; k < N; k++){ const v = d.val[k*N + i], col = v > 0 ? mixHex("#f7f7f7", "#2a68c4", Math.min(1, v)) : mixHex("#f7f7f7", "#d8302b", Math.min(1, -v));
+    g.fillStyle = col; g.fillRect(box.x + i*cell, box.y + box.h - (k + 1)*cell, cell + 0.6, cell + 0.6); }
+  const sc = {map:v => Math.log2(v)/4, ticks:[1, 2, 4, 8, 16], fmt:v => v + "°"};
+  axes(g, box, sc, sc, {xlabel:"Stimulus size", ylabel:"Attention field size", ylw:34});
+  const px = box.x + d.pt[0]/4*box.w, py = box.y + box.h - d.pt[1]/4*box.h;
+  g.fillStyle = LS.ink; g.beginPath(); for (let i = 0; i < 10; i++){ const rr = i % 2 ? 4 : 10, a = -Math.PI/2 + i*Math.PI/5; g.lineTo(px + rr*Math.cos(a), py + rr*Math.sin(a)); } g.closePath(); g.fill();
+  const cx = box.x + box.w + 22, ch = box.h;
+  for (let i = 0; i < 60; i++){ const v = 1 - 2*i/59; g.fillStyle = v > 0 ? mixHex("#f7f7f7", "#2a68c4", v) : mixHex("#f7f7f7", "#d8302b", -v); g.fillRect(cx, box.y + i*ch/60, 12, ch/60 + 0.6); }
+  g.fillStyle = LS.ink; g.font = F(10, true); g.textAlign = "left"; g.textBaseline = "top"; g.fillText("Contrast", cx + 16, box.y); g.fillText("gain", cx + 16, box.y + 12);
+  g.textBaseline = "bottom"; g.fillText("Response", cx + 16, box.y + ch - 12); g.fillText("gain", cx + 16, box.y + ch);
+}
+function drawPopulation(cv, c){
+  const d = c.vd.population, {g, box} = single(cv, 270, 420), gs = (x, m, s) => Math.exp(-((x - m)**2)/(2*s*s));
+  const e = c.effect, A = (x, k) => { const b = gs(x, d.mu, d.sg)*k;
+    if (e === "sharpen") return 1.15*gs(x, d.mu, d.sg*0.75)*k; if (e === "broaden") return gs(x, d.mu, d.sg*1.3)*k; if (e === "shift") return gs(x, d.mu + d.sg*0.6, d.sg)*k;
+    if (e === "contrastGain") return b*(k < 0.6 ? 1.8 : 1.08); if (e === "responseGain") return b*(k < 0.6 ? 1.15 : 1.4); if (e === "additive") return b + 0.18; if (e === "invert") return -0.6*b; if (e === "null") return b;
+    return b*1.3; };
+  const ks = d.crf ? [1, 0.45] : [1], top = 1.6, bot = e === "invert" ? -0.8 : 0;
+  const yr = niceRange(bot, top, 4), xT = c.fig === "tuning" ? c.axis.ticks : [-90, -45, 0, 45, 90], xf = c.fig === "tuning" ? c.axis.fmt : v => v + "°";
+  const ax = axes(g, box, linScale(d.lo, d.hi, xT, xf), linScale(yr.lo, yr.hi, ticksOf(yr), v => fmtTick(v, yr.st)), {xlabel:`Preferred ${c.fig === "tuning" ? c.feature : "orientation"} of neuron`, ylabel:"Model response (a.u.)", ylw:40});
+  ks.forEach((k, ki) => { g.setLineDash(ki ? [5, 4] : []);
+    curve(g, x => gs(x, d.mu, d.sg)*k, d.lo, d.hi, ax.X, ax.Y, LS.red); curve(g, x => A(x, k), d.lo, d.hi, ax.X, ax.Y, LS.blue); g.setLineDash([]); });
+  legendAt(g, box.x + 4, box.y + 2, [[c.cA, LS.blue], [c.cB, LS.red]]);
+}
+function drawRecovery(cv, c){
+  const d = c.vd.recovery, {g, box} = single(cv, 310, 250); box.h = box.w;
+  const all = d.tr.concat(d.rc), rr = niceRange(Math.min(...all), Math.max(...all), 4), sc = linScale(rr.lo, rr.hi, ticksOf(rr), v => fmtTick(v, rr.st));
+  const ax = axes(g, box, sc, sc, {xlabel:`True ${d.kd.ax}`, ylabel:`Recovered ${d.kd.ax}`, ylw:38});
+  dashed(g, ax.X(rr.lo), ax.Y(rr.lo), ax.X(rr.hi), ax.Y(rr.hi));
+  d.tr.forEach((t, i) => dot(g, ax.X(t), ax.Y(d.rc[i]), 3.2, "#5f5f5f", LS.ink));
+  g.fillStyle = LS.ink; g.font = F(10.5, true); g.textAlign = "left"; g.textBaseline = "top"; g.fillText(`r = ${d.q.r.toFixed(2)}`, box.x + 6, box.y + 4);
+}
+
+const DRAW = {heatmap:drawHeatmap, population:drawPopulation, recovery:drawRecovery, design:drawDesign, main:drawMain, scatter:drawScatter, bars:drawBars, hrf:drawHRF, voxels:drawVoxels, ecc:drawEcc, afield:drawAfield, tunednorm:drawTunedNorm, pupil:drawPupil, appearance:drawAppearance, rivalry:drawRivalry, psychometric:drawPsychometric, aic:drawAIC};
 function drawFigs(){
   if (!current) return;
   document.querySelectorAll("#body canvas[data-fig]").forEach(cv => { const f = current.figs[+cv.dataset.fig]; try { DRAW[f.type](cv, current.ctx); } catch(e){ console.error(e); } });
