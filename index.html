@@ -731,7 +731,7 @@ const MONTHS = ["January","February","March","April","May","June","July","August
 function generate(seed, eraSel){
   const r = rng(seed);
   const era = eraSel === "a" ? r.wpick([["g",1],["p",1],["i",2.2]]) : eraSel;
-  const c = {r, era, used:new Set()};
+  const c = {r, era, used:new Set(), seed};
   c.year = r.int(...ERA_YEARS[era]);
   const O = OVR;
   c.mod = M[r.wpick(MODS[era])];
@@ -1090,6 +1090,7 @@ function writePaper(c){
   h += `<p>in which ${c.mod.np} acted on the attention field <i>A</i> through different routes (${c.models.join(", ")}). Models were compared with the Akaike information criterion. Parameters were compared between conditions with paired <i>t</i> tests, and evidence for the null was quantified with Bayes factors${cite(c,"rouder2009")}. Differences across ${c.roiWord === "region" ? "regions" : "eccentricities"} were tested with a one-way repeated-measures ANOVA.</p>`;
 
   // Results
+  planFigures(c);
   h += sec("results","Results");
   // manipulation check
   const mcT = r.num(3.4, 8.5), mcDf = n-1, mcP = ibeta(mcDf/(mcDf+mcT*mcT), mcDf/2, 0.5);
@@ -1117,29 +1118,31 @@ function writePaper(c){
   const secLine = `whereas the ${sd2.name} did not change reliably (${fmtT(S.ss)})`;
   const sigLine = {contrastGain:"A leftward shift with an unchanged asymptote is the signature of contrast gain.", responseGain:"A multiplicative increase with an unchanged semi-saturation contrast is the signature of response gain.", additive:"Because the offset was constant across contrast, it cannot be explained by either gain mechanism.", invert: c.subFirst ? `The inversion was confined to cortex: the ${S.rois[0] === "SC" ? "collicular" : "thalamic"} response kept its positive sign.` : "The inversion was present in every cortical area we examined.", null:"The Bayes factor indicates moderate evidence that the contrast response was unaffected.", sharpen:"The narrower bandwidth, together with a higher peak, indicates a genuine change in selectivity rather than a change in gain alone.", broaden:"The wider bandwidth without a change in peak indicates a loss of selectivity.", shift:"The preferred value itself moved, which pure gain changes cannot produce.", gainTuning:"Bandwidth was preserved, so selectivity was unchanged."}[c.effect];
   const fitWord = c.fig === "crf" ? "Naka–Rushton fits" : "Gaussian fits";
-  h += `<h4>${cap(c.mod.np)} ${HEADLINE[c.effect]}</h4><p>${pool}, responses in the ${a} condition ${verb} (Fig. 2a). ${fitWord} to each observer's data (Eq. 1; Table 1) ${keyLine}, ${secLine}. ${sigLine} The difference between conditions was consistent in sign for most observers (Fig. 2b).</p>`;
+  h += `<h4>${cap(c.mod.np)} ${HEADLINE[c.effect]}</h4><p>${pool}, responses in the ${a} condition ${verb} (Fig. 2a). ${fitWord} to each observer's data (Eq. 1; Table 1) ${keyLine}, ${secLine}. ${sigLine} ${c.mainType === "hrf" ? "Averaging each response within the analysis window yielded the contrast response functions in Fig. 2b." : "The difference between conditions was consistent in sign for most observers (Fig. 2b)."}</p>`;
   const roiNames = S.rois.slice(0,3).join(", ").replace(/, ([^,]*)$/," and $1");
-  h += fig("main", `<b>Figure 2.</b> ${c.fig === "crf" ? "Contrast response functions" : `Population ${c.feature} tuning`} in ${roiNames}. <b>a</b>, Group-average responses in the ${a} (blue) and ${b} (red) conditions, with ${c.fig === "crf" ? "Naka–Rushton" : "Gaussian"} fits. Asterisks mark parameters that differed between conditions (*<i>p</i> < .05, **<i>p</i> < .01, ***<i>p</i> < .001). Error bars represent ±1 SEM across observers. <b>b</b>, Difference between conditions (${A} − ${B}) for each observer (gray) and the group mean (black). The dashed line indicates no difference.`);
+  h += fig(c.mainType, c.mainType === "hrf" ? `<b>Figure 2.</b> BOLD responses in ${roiNames}. <b>a</b>, Deconvolved hemodynamic responses at each stimulus contrast in the ${a} (blue) and ${b} (red) conditions, light to dark from lowest to highest contrast. The gray band marks the 4–10 s window used to estimate response amplitude; the dashed line marks stimulus onset. <b>b</b>, Contrast response functions with Naka–Rushton fits. Error bars represent ±1 SEM across observers.` : `<b>Figure 2.</b> ${c.fig === "crf" ? "Contrast response functions" : `Population ${c.feature} tuning`} in ${roiNames}. <b>a</b>, Group-average responses in the ${a} (blue) and ${b} (red) conditions, with ${c.fig === "crf" ? "Naka–Rushton" : "Gaussian"} fits. Asterisks mark parameters that differed between conditions (*<i>p</i> < .05, **<i>p</i> < .01, ***<i>p</i> < .001). Error bars represent ±1 SEM across observers. <b>b</b>, Difference between conditions (${A} − ${B}) for each observer (gray) and the group mean (black). The dashed line indicates no difference.`);
   // table
   const rows = Object.keys(d).map(k => { const da = S.A.map(d[k].get), db = S.B.map(d[k].get), st = pairedT(da, db);
     return `<tr><td>${d[k].th}</td><td>${mean(da).toFixed(d[k].dp)} ± ${sem(da).toFixed(d[k].dp)}</td><td>${mean(db).toFixed(d[k].dp)} ± ${sem(db).toFixed(d[k].dp)}</td><td>${st.t.toFixed(2)}</td><td>${st.p < .001 ? "<.001" : st.p.toFixed(3).replace(/^0/,"")}${stars(st.p)}</td></tr>`; }).join("");
   h += `<div class="tblwrap"><table class="tbl"><caption><b>Table 1.</b> ${fitWord.replace(" fits","")} parameters (mean ± SEM across observers, <i>N</i> = ${n})</caption><thead><tr><th>Parameter</th><th>${A}</th><th>${B}</th><th><i>t</i>(${n-1})</th><th><i>p</i></th></tr></thead><tbody>${rows}</tbody></table></div>`;
 
-  // model comparison
-  h += `<h4>Individual observers and model comparison</h4><p>The effect on the ${kd.name} was visible at the level of individual observers (Fig. 3): ${S.A.filter((x,i)=> (kd.get(x)-kd.get(S.B[i])) * (c.mA - c.mB) > 0).length} of ${n} fell on the expected side of the unity line. In model comparison, the ${c.winner} variant of the normalization model was preferred for ${c.wins} of ${n} observers, with a summed ΔAIC of ${c.dAIC.toFixed(1)} over the next-best model.</p>`;
-  h += fig("scatter", `<b>Figure 3.</b> ${cap(kd.name)} for each observer in the ${b} (horizontal) and ${a} (vertical) conditions. The dashed line marks equality. Points ${c.mA < c.mB ? "below" : "above"} the line indicate ${c.mA < c.mB ? "a decrease" : "an increase"} with ${c.mod.np}.`);
-
+  // model comparison and variant figures
+  h += `<h4>Individual observers and model comparison</h4><p>The effect on the ${kd.name} was visible at the level of individual observers${c.f3 === "scatter" ? " (Fig. 3)" : ""}: ${S.A.filter((x,i)=> (kd.get(x)-kd.get(S.B[i])) * (c.mA - c.mB) > 0).length} of ${n} fell on the expected side of the unity line. In model comparison, the ${c.winner} variant of the normalization model was preferred for ${c.wins} of ${n} observers, with a summed ΔAIC of ${c.dAIC.toFixed(1)} over the next-best model${c.f3 === "aic" ? " (Fig. 3)" : ""}.</p>`;
+  if (c.f3 === "scatter") h += fig("scatter", `<b>Figure 3.</b> ${cap(kd.name)} for each observer in the ${b} (horizontal) and ${a} (vertical) conditions. The dashed line marks equality. Points ${c.mA < c.mB ? "below" : "above"} the line indicate ${c.mA < c.mB ? "a decrease" : "an increase"} with ${c.mod.np}.`);
+  else if (c.f3 === "aic") h += fig("aic", `<b>Figure 3.</b> Model comparison. ΔAIC of each variant of the normalization model relative to the ${c.winner} model, for each observer (gray dots) and the group mean (bars). Lower values indicate a better fit. Error bars represent ±1 SEM across observers.`);
+  else { const vt = variantText(c.f3, c, 3); h += `<h4>${vt.h}</h4><p>${vt.p}</p>` + fig(c.f3, `<b>Figure 3.</b> ${vt.cap}`); }
   // ROI
-  const an = S.anova, cm = an.cm;
+  const an = S.anova, cm = an.cm, roiRef = c.f4 === "bars" ? "; Fig. 4" : "";
   const roiStat = `<i>F</i>(${an.d1}, ${an.d2}) = ${an.F.toFixed(2)}, ${fmtP(an.p)}`;
   const big = S.rois[cm.indexOf(Math.max(...cm.map(Math.abs)) === Math.abs(Math.max(...cm)) ? Math.max(...cm) : Math.min(...cm))];
   const roiText = c.effect === "null"
-    ? `No ${c.roiWord === "region" ? "visual area" : "eccentricity"} showed a reliable effect, and the size of the (absent) effect did not differ across them (${roiStat}; Fig. 4).`
+    ? `No ${c.roiWord === "region" ? "visual area" : "eccentricity"} showed a reliable effect, and the size of the (absent) effect did not differ across them (${roiStat}${roiRef}).`
     : an.p < .05
-      ? `The effect was present in every ${c.roiWord === "region" ? "area" : "eccentricity"} we examined, but its magnitude differed across them (${roiStat}; Fig. 4), being largest in ${big}${S.pattern === "increasing" ? (c.mri ? " and growing along the visual hierarchy" : " and growing with eccentricity") : S.pattern === "decreasing" ? (c.mri ? " and diminishing along the visual hierarchy" : " and diminishing with eccentricity") : ""}.`
-      : `The effect was of similar magnitude in every ${c.roiWord === "region" ? "area" : "eccentricity"} we examined (${roiStat}; Fig. 4).`;
+      ? `The effect was present in every ${c.roiWord === "region" ? "area" : "eccentricity"} we examined, but its magnitude differed across them (${roiStat}${roiRef}), being largest in ${big}${S.pattern === "increasing" ? (c.mri ? " and growing along the visual hierarchy" : " and growing with eccentricity") : S.pattern === "decreasing" ? (c.mri ? " and diminishing along the visual hierarchy" : " and diminishing with eccentricity") : ""}.`
+      : `The effect was of similar magnitude in every ${c.roiWord === "region" ? "area" : "eccentricity"} we examined (${roiStat}${roiRef}).`;
   h += `<h4>The effect across ${c.roiWord === "region" ? "visual areas" : "eccentricity"}</h4><p>${roiText}</p>`;
-  h += fig("bars", `<b>Figure 4.</b> ${cap(kd.name)} in the ${a} (dark) and ${b} (light) conditions for each ${c.roiWord === "region" ? "region of interest" : "eccentricity"}. Error bars represent ±1 SEM across observers. *<i>p</i> < .05, **<i>p</i> < .01, ***<i>p</i> < .001, paired <i>t</i> test.`);
+  if (c.f4 === "bars") h += fig("bars", `<b>Figure 4.</b> ${cap(kd.name)} in the ${a} (dark) and ${b} (light) conditions for each ${c.roiWord === "region" ? "region of interest" : "eccentricity"}. Error bars represent ±1 SEM across observers. *<i>p</i> < .05, **<i>p</i> < .01, ***<i>p</i> < .001, paired <i>t</i> test.`);
+  else { const vt = variantText(c.f4, c, 4); h += `<h4>${vt.h}</h4><p>${vt.p}</p>` + fig(c.f4, `<b>Figure 4.</b> ${vt.cap}`); }
 
   const fixA = r.num(0.18,0.42), fixD = r.num(-0.03,0.03), fixT = r.num(0.1,1.4), fixP = ibeta((n-1)/((n-1)+fixT*fixT),(n-1)/2,0.5);
   h += `<h4>Eye movements</h4><p>Fixation was stable and did not differ between conditions (mean deviation ${fixA.toFixed(2)}° vs. ${(fixA+fixD).toFixed(2)}°; <i>t</i>(${n-1}) = ${fixT.toFixed(2)}, ${fmtP(fixP)}), so the effects above cannot be attributed to differences in where observers looked.</p>`;
@@ -1436,7 +1439,337 @@ function driftGabor(){ if (reduceMotion.matches){ drawGabor(); return; } const t
 
 /* ---------- Render ---------- */
 const $ = id => document.getElementById(id);
-const DRAW = {design:drawDesign, main:drawMain, scatter:drawScatter, bars:drawBars};
+
+/* ---------- Figure repertoire, drawn from the lab's papers ---------- */
+const figRng = (c, k) => rng((((c.seed >>> 0) * 31) + k * 7919 + 17) >>> 0);
+function pearson(x, y){
+  const mx = mean(x), my = mean(y); let sxy = 0, sxx = 0, syy = 0;
+  x.forEach((v, i) => { sxy += (v-mx)*(y[i]-my); sxx += (v-mx)**2; syy += (y[i]-my)**2; });
+  const rr = sxy / Math.sqrt(sxx*syy), df = x.length - 2, t = rr * Math.sqrt(df / (1 - rr*rr));
+  return {r:rr, df, p: ibeta(df/(df+t*t), df/2, 0.5)};
+}
+const fmtR = q => `<i>r</i>(${q.df}) = ${q.r.toFixed(2).replace(/^(-?)0/, "$1")}, ${fmtP(q.p)}`;
+const ATTN_LOC = ["spatial","transient","sustained","divided","reward","feature"];
+function planFigures(c){
+  const r = figRng(c, 1), k = c.k, mri = c.mri;
+  c.mainType = c.fig === "crf" && mri && r.f() < 0.55 ? "hrf" : "main";
+  const f3 = [["scatter", 3], ["aic", 2]];
+  if (mri) f3.push(["voxels", 3], ["ecc", 3]);
+  if (mri && ATTN_LOC.includes(k)) f3.push(["afield", 4]);
+  if (/tuned|surround/.test(c.mech)) f3.push(["tunednorm", 4]);
+  const f4 = [["bars", 3]];
+  if (ARO.includes(k) || c.mk === "pupil") f4.push(["pupil", 5]);
+  if (c.fig === "crf" && !mri && (ATT.includes(k) || k === "emotion")) f4.push(["appearance", 6]);
+  if (/rivalry|awareness|invisible|flash suppression/i.test(c.title) || (c.era === "p" && !mri)) f4.push(["rivalry", 5]);
+  if (!mri && c.fig === "crf") f4.push(["psychometric", 4]);
+  c.f3 = r.wpick(f3);
+  f3.forEach(([t]) => { if (!["scatter", "aic", c.f3].includes(t)) f4.push([t, 2]); });
+  c.f4 = r.wpick(f4);
+  c.vd = {};
+  [c.f3, c.f4].forEach((t, i) => { if (VBUILD[t]) c.vd[t] = VBUILD[t](c, figRng(c, 100 + i*11 + t.length)); });
+}
+const meanParams = arr => { const o = {}; Object.keys(arr[0]).forEach(k => { o[k] = k === "c50" ? Math.exp(mean(arr.map(p => Math.log(p[k])))) : mean(arr.map(p => p[k])); }); return o; };
+const VBUILD = {
+  voxels(c, r){
+    const S = c.sim, kd = S.defs[S.key], sd = S.defs[S.sec];
+    const ami = (A, B) => (A - B) / ((Math.abs(A) + Math.abs(B)) || 1) * 100;
+    const mx = ami(c.mA, c.mB), my = ami(mean(S.A.map(sd.get)), mean(S.B.map(sd.get)));
+    const nv = r.int(240, 420), rho = r.num(0.25, 0.65) * (r.f() < 0.5 ? -1 : 1), sx = r.num(14, 26), sy = r.num(14, 26);
+    const xs = [], ys = [];
+    for (let i = 0; i < nv; i++){ const zx = r.norm(0, 1), zy = rho*zx + Math.sqrt(1 - rho*rho)*r.norm(0, 1); xs.push(mx + sx*zx); ys.push(my + sy*zy); }
+    return {xs, ys, nv, q:pearson(xs, ys), kd, sd, mx:mean(xs), my:mean(ys)};
+  },
+  ecc(c, r){
+    const S = c.sim, kd = S.defs[S.key], e = [1,2,3,4,5,6,7,8];
+    const trend = ({c50:x => 0.7 + 0.075*x, Rmax:x => 1.25 - 0.06*x, pref:x => Math.pow(x/4.5, -0.55), fwhm:x => 0.85 + 0.035*x, amp:x => 1.2 - 0.05*x})[S.key] || (() => 1);
+    const pm = ({increasing:x => 0.55 + 0.1*x, decreasing:x => 1.45 - 0.1*x, flat:() => 1})[S.pattern];
+    const d = c.mA - c.mB;
+    const B = e.map(x => c.mB * trend(x) * (1 + r.norm(0, 0.03)));
+    const A = e.map((x, i) => B[i] + d * pm(x) * (1 + r.norm(0, 0.08)));
+    const eB = B.map(v => Math.abs(v)*r.num(0.03, 0.07) + 1e-3), eA = A.map(v => Math.abs(v)*r.num(0.03, 0.07) + 1e-3);
+    const t1 = trend(1), t8 = trend(8);
+    return {e, A, B, eA, eB, kd, dir: t8 > t1*1.05 ? "rose" : t8 < t1*0.95 ? "fell" : "changed little", pattern:S.pattern};
+  },
+  afield(c, r){
+    const th = []; for (let a = -165; a <= 165; a += 30) th.push(a);
+    const sig = r.num(32, 80), peak = c.effect === "null" ? r.num(0.4, 1.5) : r.num(8, 26), base = r.num(-3, 1.5);
+    const y = th.map(x => base + peak*Math.exp(-(x*x)/(2*sig*sig)) + r.norm(0, peak*0.06 + 0.4)), e = th.map(() => r.num(0.8, 2.2));
+    return {th, y, e, sig, peak, base};
+  },
+  tunednorm(c, r){
+    const dx = [0,15,30,45,60,75,90], s0 = r.num(0.38, 0.62), w = r.num(18, 34), fl = r.num(0.05, 0.12);
+    const wA = w * (({sharpen:0.78, broaden:1.3})[c.effect] || r.num(0.95, 1.05));
+    const s0A = s0 * (c.effect === "null" ? r.num(0.97, 1.03) : r.num(0.72, 0.9));
+    const yB = dx.map(x => fl + s0*Math.exp(-x*x/(2*w*w)) + r.norm(0, 0.015)), yA = dx.map(x => fl + s0A*Math.exp(-x*x/(2*wA*wA)) + r.norm(0, 0.015));
+    return {dx, yA, yB, e:dx.map(() => r.num(0.015, 0.04)), w, wA, s0, s0A, fl};
+  },
+  pupil(c, r){
+    const t = []; for (let i = -10; i <= 60; i++) t.push(i/10);
+    const pkA = r.num(0.32, 0.6), pkB = pkA * r.num(0.35, 0.7), tp = r.num(1.2, 1.9);
+    const resp = (x, pk) => x <= 0 ? 0 : pk * Math.pow(x/tp, 2) * Math.exp(2*(1 - x/tp));
+    const yA = t.map(x => resp(x, pkA) + r.norm(0, 0.006)), yB = t.map(x => resp(x, pkB) + r.norm(0, 0.006));
+    const PA = [...Array(c.n)].map(() => pkA + r.norm(0, pkA*0.3)), PB = PA.map(v => v - (pkA - pkB) + r.norm(0, (pkA - pkB)*0.35));
+    return {t, yA, yB, eA:r.num(0.03, 0.06), eB:r.num(0.03, 0.06), pkA, pkB, tp, st:pairedT(PA, PB)};
+  },
+  appearance(c, r){
+    const S = c.sim, PA = meanParams(S.A), PB = meanParams(S.B);
+    const inv = R => { const y = R - PB.b; if (y <= 0) return 0.006; if (y >= PB.Rmax*0.995) return 1; return PB.c50 * Math.pow(y/(PB.Rmax - y), 1/PB.n); };
+    const perc = x => Math.min(1, Math.max(0.006, inv(S.f(x, PA))));
+    const xs = [0.025, 0.04, 0.06, 0.1, 0.16, 0.25, 0.4, 0.64];
+    const ys = xs.map(x => perc(x) * Math.exp(r.norm(0, 0.04))), es = ys.map(y => y*r.num(0.05, 0.1));
+    const rel = xs.map((x, i) => (ys[i] - x)/x*100); let bi = 0; rel.forEach((v, i) => { if (Math.abs(v) > Math.abs(rel[bi])) bi = i; });
+    return {xs, ys, es, perc, maxRel:rel[bi], atX:xs[bi]};
+  },
+  rivalry(c, r){
+    const k = r.pick([3, 4, 5]), mB = r.num(1.6, 3.0), mA = mB * (c.effect === "null" ? r.num(0.97, 1.03) : r.num(1.15, 1.5));
+    const samp = m => { let s = 0; for (let i = 0; i < k; i++) s += -Math.log(1 - r.f()) * m / k; return s; };
+    const dA = [...Array(600)].map(() => samp(mA)), dB = [...Array(600)].map(() => samp(mB));
+    const OB = [...Array(c.n)].map(() => mB*Math.exp(r.norm(0, 0.2))), OA = OB.map(v => v*(mA/mB)*Math.exp(r.norm(0, 0.08)));
+    return {k, mA, mB, dA, dB, st:pairedT(OA, OB)};
+  },
+  psychometric(c, r){
+    const beta = r.num(2.4, 3.6), aB = r.num(2.5, 6)/100;
+    const ratio = ({contrastGain:Math.pow(10, -Math.max(0.05, c.fxObs)*0.85), responseGain:r.num(0.88, 0.95), additive:r.num(0.78, 0.9), null:r.num(0.98, 1.02)})[c.effect] || 0.9;
+    const aA = aB * ratio, W = (x, a) => 0.5 + 0.5*(1 - Math.exp(-Math.pow(x/a, beta)));
+    const xs = [0.005, 0.01, 0.017, 0.025, 0.035, 0.05, 0.07, 0.1, 0.15], nt = 80;
+    const pts = a => xs.map(x => { const p = W(x, a); let k = 0; for (let i = 0; i < nt; i++) if (r.f() < p) k++; return k/nt; });
+    const TB = [...Array(c.n)].map(() => aB*100*Math.exp(r.norm(0, 0.18))), TA = TB.map(v => v*ratio*Math.exp(r.norm(0, 0.07)));
+    return {xs, yA:pts(aA), yB:pts(aB), aA, aB, beta, nt, st:pairedT(TA, TB), mTA:mean(TA), mTB:mean(TB)};
+  },
+  aic(c, r){
+    const others = c.models.filter(m => m !== c.winner), rows = [{m:c.winner, v:c.sim.A.map(() => 0)}];
+    others.forEach((m, i) => {
+      const mu = c.dAIC/c.n * [1, r.num(1.5, 2.2), r.num(2.3, 3.4)][i];
+      let v = c.sim.A.map(() => mu + r.norm(0, mu*0.55));
+      if (i === 0){ const s = v.reduce((a, b) => a + b, 0); v = v.map(x => x * c.dAIC / s); }
+      rows.push({m, v});
+    });
+    return {rows};
+  }
+};
+
+function variantText(type, c, N){
+  const d = c.vd[type] || {}, A = c.cA, B = c.cB, a = A.toLowerCase(), b = B.toLowerCase(), m = c.mod.np;
+  switch (type){
+    case "voxels": return {h:"Voxel-wise modulation", p:`To ask whether the effect was uniform across the population, we computed a modulation index, (${A} − ${B}) / (${A} + ${B}), for each voxel's ${d.kd.name} and ${d.sd.name}. Across ${d.nv} voxels pooled over V1–V3, the mean change in ${d.kd.name} was ${d.mx.toFixed(1)}%, and changes in the two parameters were ${d.q.r < 0 ? "negatively" : "positively"} correlated (${fmtR(d.q)}; Fig. ${N})${cite(c, "ramirez2025")}.`,
+      cap:`Voxel-wise modulation of ${d.kd.name} (horizontal) and ${d.sd.name} (vertical), expressed as a modulation index. Each point is one voxel; histograms show the marginal distributions, with arrows marking their means. Lines cross at zero modulation.`};
+    case "ecc": { const pat = c.effect === "null" ? "remained negligible at every eccentricity" : d.pattern === "increasing" ? "grew toward the periphery" : d.pattern === "decreasing" ? "shrank toward the periphery" : "was similar at every eccentricity";
+      return {h:"Dependence on eccentricity", p:`Binning voxels by pRF eccentricity, the ${d.kd.name} ${d.dir} with eccentricity in both conditions${cite(c, S_KEYCITE[c.sim.key] || "vinke2022")}, and the difference between conditions ${pat} (Fig. ${N}).`,
+        cap:`${cap(d.kd.name)} as a function of pRF eccentricity in the ${a} (blue) and ${b} (red) conditions. Voxels were binned in 1° steps; error bars represent ±1 SEM across observers.`}; }
+    case "afield": return c.effect === "null"
+      ? {h:"The spatial profile of attentional modulation", p:`Sorting voxels by the polar-angle distance between their pRF and the attended location revealed no consistent spatial profile of modulation (Fig. ${N})${cite(c, "bloem2025")}.`, cap:`Attentional modulation as a function of the polar-angle distance between each voxel's pRF and the attended location. Error bars represent ±1 SEM across observers.`}
+      : {h:"The spatial profile of attentional modulation", p:`Sorting voxels by the polar-angle distance between their pRF and the attended location revealed a smooth attentional field (Fig. ${N}). It was well described by a Gaussian with a width (σ) of ${d.sig.toFixed(0)}° and a peak modulation of ${d.peak.toFixed(1)}%${cite(c, "bloem2025", "bloem2019")}.`,
+        cap:`Attentional field. Modulation as a function of the polar-angle distance between each voxel's pRF and the attended location, with the best-fitting Gaussian (σ = ${d.sig.toFixed(0)}°). Error bars represent ±1 SEM across observers.`};
+    case "tunednorm": { const ratio = d.wA/d.w;
+      const tun = ratio < 0.9 ? `narrowed this tuning (σ = ${d.wA.toFixed(0)}° vs. ${d.w.toFixed(0)}°)` : ratio > 1.1 ? `broadened this tuning (σ = ${d.wA.toFixed(0)}° vs. ${d.w.toFixed(0)}°)` : `reduced the overall amount of suppression but left its orientation tuning intact (σ = ${d.wA.toFixed(0)}° vs. ${d.w.toFixed(0)}°)`;
+      return {h:"Orientation-tuned suppression", p:`Suppression from the surrounding grating depended on the orientation difference between target and surround, falling from ${(d.yB[0]).toFixed(2)} at 0° to ${(d.yB[6]).toFixed(2)} at 90° in the ${b} condition${cite(c, "klimova2021")}. ${cap(m)} ${tun}${cite(c, "klimova2023")} (Fig. ${N}).`,
+        cap:`Suppression index as a function of the orientation difference between target and surround, in the ${a} (blue) and ${b} (red) conditions, with Gaussian fits. Error bars represent ±1 SEM across observers.`}; }
+    case "pupil": return {h:"Pupil responses", p:`Pupil diameter rose after stimulus onset, peaking about ${d.tp.toFixed(1)} s later. The evoked dilation was larger in the ${a} than the ${b} condition (${d.pkA.toFixed(2)} vs. ${d.pkB.toFixed(2)} mm; ${fmtT(d.st)}; Fig. ${N})${cite(c, "pan2022", "pan2025")}.`,
+      cap:`Pupil dilation relative to pre-stimulus baseline in the ${a} (blue) and ${b} (red) conditions. Shaded bands represent ±1 SEM across observers; the dashed line marks stimulus onset and the gray band the analysis window.`};
+    case "appearance": { const up = d.maxRel > 0;
+      return {h:"Apparent contrast", p:c.effect === "null" ? `In a separate appearance task, observers reported which of two Gabors appeared higher in contrast. ${A} and ${b} stimuli appeared equal in contrast at every level (Fig. ${N})${cite(c, "carrasco2004")}.`
+        : `In a separate appearance task, observers reported which of two Gabors appeared higher in contrast. A ${a} stimulus appeared ${up ? "higher" : "lower"} in contrast than a ${b} stimulus of the same physical contrast, by as much as ${Math.abs(d.maxRel).toFixed(0)}% at ${(d.atX*100).toFixed(0)}% contrast (Fig. ${N})${cite(c, "carrasco2004", "ling2006a")}. The size of this change across contrast followed directly from the fitted contrast response functions.`,
+        cap:`Apparent contrast of the ${a} stimulus as a function of its physical contrast (points), with the prediction from the fitted contrast response functions (line). Points ${up ? "above" : "below"} the dashed identity line indicate that ${a} stimuli looked ${up ? "higher" : "lower"} in contrast. Error bars represent ±1 SEM.`}; }
+    case "rivalry": return {h:"Dominance durations", p:`Dominance durations were well described by gamma distributions in both conditions (Fig. ${N}). Mean dominance durations were ${d.mA > d.mB ? "longer" : "shorter"} in the ${a} than the ${b} condition (${d.mA.toFixed(2)} vs. ${d.mB.toFixed(2)} s; ${fmtT(d.st)})${cite(c, "lingblake2009", "lingblake2012")}.`,
+      cap:`Distributions of dominance durations in the ${a} (blue) and ${b} (red) conditions, pooled across observers, with gamma fits (shape = ${d.k}).`};
+    case "psychometric": return {h:"Contrast detection", p:`Detection performance followed a Weibull function in both conditions (Fig. ${N}). Contrast thresholds (81.6% correct) were ${d.mTA.toFixed(2)}% in the ${a} condition and ${d.mTB.toFixed(2)}% in the ${b} condition (${fmtT(d.st)})${cite(c, "ling2006a", "pestilli2009")}.`,
+      cap:`Psychometric functions for contrast detection in the ${a} (blue) and ${b} (red) conditions, pooled across observers, with Weibull fits. Ticks on the abscissa mark thresholds. Error bars represent binomial SEM.`};
+  }
+  return null;
+}
+const S_KEYCITE = {c50:"vinke2022", pref:"aghajari2020", fwhm:"ramirez2025", Rmax:"vinke2022"};
+
+/* ---------- Variant drawings (Ling Lab figure style) ---------- */
+const NAVY = "#1f3f8f";
+function mixHex(a, b, t){ const A = hexRGB(a), B = hexRGB(b); return "#" + A.map((v, i) => Math.round(v + (B[i] - v)*t).toString(16).padStart(2, "0")).join(""); }
+function ticksOf(rr){ const t = []; for (let v = rr.lo; v <= rr.hi + 1e-9; v += rr.st) t.push(+v.toFixed(6)); return t; }
+function single(cv, H, maxW){ const W0 = cv.clientWidth, w = Math.min(maxW || 400, W0 - 110); const {g} = plateSetup(cv, H); return {g, box:{x:Math.max(72, (W0 - w)/2 + 24), y:34, w, h:H - 92}}; }
+function legendAt(g, x, y, items){
+  g.font = F(11, true); g.textAlign = "left"; g.textBaseline = "top";
+  items.forEach(([lab, col], i) => { const yy = y + i*15; g.strokeStyle = col; g.lineWidth = 2.4; g.beginPath(); g.moveTo(x, yy + 6); g.lineTo(x + 16, yy + 6); g.stroke(); g.fillStyle = col; g.fillText(lab, x + 21, yy); });
+}
+function dot(g, x, y, r, fill, edge){ g.beginPath(); g.arc(x, y, r, 0, Math.PI*2); g.fillStyle = fill; g.fill(); if (edge){ g.strokeStyle = edge; g.lineWidth = 0.9; g.stroke(); } }
+function ebar(g, x, y0, y1, col){ g.strokeStyle = col; g.lineWidth = 1.2; g.beginPath(); g.moveTo(x, y0); g.lineTo(x, y1); g.stroke(); }
+function dashed(g, x0, y0, x1, y1, col){ g.setLineDash([3, 3]); g.strokeStyle = col || LS.ink2; g.lineWidth = 1; g.beginPath(); g.moveTo(x0, y0); g.lineTo(x1, y1); g.stroke(); g.setLineDash([]); }
+function curve(g, fn, x0, x1, X, Y, col, w){ g.strokeStyle = col; g.lineWidth = w || 2.4; g.beginPath(); for (let i = 0; i <= 120; i++){ const xv = x0 + (x1 - x0)*i/120, px = X(xv), py = Y(fn(xv)); i ? g.lineTo(px, py) : g.moveTo(px, py); } g.stroke(); }
+
+function drawHRF(cv, c){
+  const W0 = cv.clientWidth; if (W0 < 560) return drawMain(cv, c);
+  const S = c.sim, rois = S.roiData.slice(0, 3), r = figRng(c, 7);
+  const padL = 62, padR = 14, gapX = 46, pw = (W0 - padL - padR - gapX*2)/3;
+  const pt = Math.min(118, pw*0.6), pc = Math.min(160, pw*0.75);
+  const H = 30 + 2*(pt + 58) + 34 + pc + 70;
+  const {g} = plateSetup(cv, H);
+  const tt = []; for (let t = -4; t <= 20; t += 2) tt.push(t);
+  const gam = (t, k, th) => t <= 0 ? 0 : Math.pow(t, k-1)*Math.exp(-t/th);
+  const p1 = gam(5*0.9, 6, 0.9), p2 = gam(13*0.9, 14, 0.9);
+  const hrf = t => gam(t, 6, 0.9)/p1 - 0.12*gam(t, 14, 0.9)/p2;
+  const series = rois.map(d => [d.pA, d.pB].map(P => d.xs.map(x => { const amp = S.f(x, P); return tt.map(t => amp*hrf(t) + r.norm(0, 0.04*S.amp)); })));
+  const all = series.flat(3), yr = niceRange(Math.min(0, ...all) - 0.1, Math.max(...all) + 0.1, 4), yT = ticksOf(yr);
+  const xsT = linScale(-4, 20, [-4, 0, 4, 8, 12, 16, 20], v => String(v));
+  const shades = [[LS.blueLight, "#0d2f6b"], [LS.redLight, "#7a1410"]];
+  panelLetter(g, "a", 6, 4);
+  [0, 1].forEach(ci => rois.forEach((d, j) => {
+    const box = {x:padL + j*(pw + gapX), y:44 + ci*(pt + 58), w:pw, h:pt};
+    const ax = axes(g, box, xsT, linScale(yr.lo, yr.hi, yT, v => fmtTick(v, yr.st)), {title: ci === 0 ? d.name : "", xlabel: ci === 1 ? "Time (s)" : "", ylabel: j === 0 ? "BOLD (%)" : "", ylw:34});
+    g.fillStyle = LS.shade; g.fillRect(ax.X(4), box.y, ax.X(10) - ax.X(4), box.h);
+    dashed(g, ax.X(0), box.y, ax.X(0), box.y + box.h); dashed(g, box.x, ax.Y(0), box.x + box.w, ax.Y(0), LS.gray);
+    series[j][ci].forEach((ys, li) => {
+      const col = mixHex(shades[ci][0], shades[ci][1], li/(ys.length ? series[j][ci].length - 1 : 1));
+      g.strokeStyle = col; g.lineWidth = 1.5; g.beginPath(); tt.forEach((t, ti) => { const px = ax.X(t), py = ax.Y(ys[ti]); ti ? g.lineTo(px, py) : g.moveTo(px, py); }); g.stroke();
+      tt.forEach((t, ti) => { if (ti % 2 === 0) ebar(g, ax.X(t), ax.Y(ys[ti] - 0.05*S.amp), ax.Y(ys[ti] + 0.05*S.amp), col); });
+    });
+    if (j === 0){ g.font = F(12, true); g.textAlign = "left"; g.textBaseline = "top"; g.fillStyle = ci ? LS.red : LS.blue; g.fillText(ci ? c.cB : c.cA, box.x + 4, box.y + 2); }
+    if (j === 2){ const labs = [["100%", 1], ["12%", 0.5], ["1.5%", 0]]; g.font = F(10, true); g.textAlign = "left"; g.textBaseline = "top";
+      labs.forEach(([lab, f], li) => { const col = mixHex(shades[ci][0], shades[ci][1], f), yy = box.y + 2 + li*12; g.strokeStyle = col; g.lineWidth = 2; g.beginPath(); g.moveTo(box.x + box.w - 52, yy + 5); g.lineTo(box.x + box.w - 38, yy + 5); g.stroke(); g.fillStyle = LS.ink2; g.fillText(lab, box.x + box.w - 34, yy); }); }
+  }));
+  // b: CRFs
+  const top = 44 + 2*(pt + 58) + 14;
+  panelLetter(g, "b", 6, top - 6);
+  const xsF = xScaleFor(c);
+  const vals = []; rois.forEach(d => [d.yA, d.yB].forEach(Y => d.xs.forEach((_, j) => { const col = Y.map(q => q[j]); vals.push(mean(col) + sem(col), mean(col) - sem(col)); })));
+  const cr = niceRange(Math.min(0, ...vals), Math.max(...vals), 4), cT = ticksOf(cr);
+  rois.forEach((d, j) => {
+    const box = {x:padL + j*(pw + gapX), y:top + 20, w:pw, h:pc};
+    const ax = axes(g, box, xsF.axis, linScale(cr.lo, cr.hi, cT, v => fmtTick(v, cr.st)), {xlabel:xsF.label, ylabel: j === 0 ? "BOLD response (%)" : "", ylw:34, title:d.name});
+    [[d.yB, d.pB, LS.red], [d.yA, d.pA, LS.blue]].forEach(([Y, P, col]) => {
+      curve(g, x => S.f(Math.pow(10, x), P), -2, 0, v => ax.X(Math.pow(10, v)), ax.Y, col);
+      d.xs.forEach((x, k) => { const cv2 = Y.map(q => q[k]), mm = mean(cv2), e = sem(cv2); ebar(g, ax.X(x), ax.Y(mm - e), ax.Y(mm + e), col); dot(g, ax.X(x), ax.Y(mm), 2.8, col); });
+    });
+    if (j === 0) legendAt(g, box.x + 4, box.y + 2, [[c.cA, LS.blue], [c.cB, LS.red]]);
+  });
+}
+
+function drawVoxels(cv, c){
+  const d = c.vd.voxels, W0 = cv.clientWidth, side = Math.min(250, W0 - 170), hs = 46;
+  const H = side + hs + 96; const {g} = plateSetup(cv, H);
+  const box = {x:Math.max(74, (W0 - side - hs)/2 + 10), y:30 + hs, w:side, h:side};
+  const rx = niceRange(Math.min(0, ...d.xs), Math.max(0, ...d.xs), 4), ry = niceRange(Math.min(0, ...d.ys), Math.max(0, ...d.ys), 4);
+  const ax = axes(g, box, linScale(rx.lo, rx.hi, ticksOf(rx), v => fmtTick(v, rx.st)), linScale(ry.lo, ry.hi, ticksOf(ry), v => fmtTick(v, ry.st)), {xlabel:`Change in ${d.kd.name} (%)`, ylabel:`Change in ${d.sd.name} (%)`, ylw:36});
+  g.strokeStyle = LS.ink2; g.lineWidth = 1; g.beginPath(); g.moveTo(ax.X(0), box.y); g.lineTo(ax.X(0), box.y + box.h); g.moveTo(box.x, ax.Y(0)); g.lineTo(box.x + box.w, ax.Y(0)); g.stroke();
+  g.globalAlpha = 0.75; d.xs.forEach((x, i) => dot(g, ax.X(x), ax.Y(d.ys[i]), 2.4, LS.blue, "#0d2f6b")); g.globalAlpha = 1;
+  dot(g, ax.X(d.mx), ax.Y(d.my), 6.5, "#0d2f6b", LS.plate);
+  const hist = (vals, lo, hi, nb) => { const h = Array(nb).fill(0); vals.forEach(v => { const k = Math.min(nb - 1, Math.max(0, Math.floor((v - lo)/(hi - lo)*nb))); h[k]++; }); return h; };
+  const nb = 22, hx = hist(d.xs, rx.lo, rx.hi, nb), hy = hist(d.ys, ry.lo, ry.hi, nb), mxh = Math.max(...hx, ...hy);
+  g.fillStyle = LS.blue;
+  hx.forEach((v, k) => { const x0 = box.x + k/nb*box.w, w = box.w/nb - 1, hh = v/mxh*(hs - 10); g.fillRect(x0, box.y - 8 - hh, w, hh); });
+  hy.forEach((v, k) => { const y0 = box.y + box.h - (k + 1)/nb*box.h, hh = box.h/nb - 1, ww = v/mxh*(hs - 10); g.fillRect(box.x + box.w + 8, y0, ww, hh); });
+  g.fillStyle = LS.ink; const ax0 = ax.X(d.mx); g.beginPath(); g.moveTo(ax0, box.y - 2); g.lineTo(ax0 - 4, box.y - 9); g.lineTo(ax0 + 4, box.y - 9); g.closePath(); g.fill();
+  const ay0 = ax.Y(d.my); g.beginPath(); g.moveTo(box.x + box.w + 2, ay0); g.lineTo(box.x + box.w + 9, ay0 - 4); g.lineTo(box.x + box.w + 9, ay0 + 4); g.closePath(); g.fill();
+  g.font = F(10.5, true); g.textAlign = "right"; g.textBaseline = "top"; g.fillStyle = LS.ink;
+  const q = d.q, rt = `r = ${q.r.toFixed(2)}`, pt = q.p < .001 ? "p < 0.001" : `p = ${q.p.toFixed(3)}`;
+  const tx = q.r < 0 ? box.x + box.w - 4 : box.x + 70, ty = box.y + 4;
+  g.fillText(rt, tx, ty); g.fillText(pt, tx, ty + 13); g.fillText(`${d.nv} voxels`, tx, ty + 26);
+}
+
+function drawEcc(cv, c){
+  const d = c.vd.ecc, {g, box} = single(cv, 280, 420);
+  const vals = [...d.A.map((v, i) => [v + d.eA[i], v - d.eA[i]]), ...d.B.map((v, i) => [v + d.eB[i], v - d.eB[i]])].flat();
+  const pad = (Math.max(...vals) - Math.min(...vals))*0.1 || 1;
+  const yr = niceRange(Math.min(...vals) - pad, Math.max(...vals) + pad, 4);
+  const ax = axes(g, box, linScale(0, 9, [0, 2, 4, 6, 8], v => String(v)), linScale(yr.lo, yr.hi, ticksOf(yr), v => fmtTick(v, yr.st)), {xlabel:"Eccentricity (°)", ylabel:d.kd.ax, ylw:40});
+  [[d.B, d.eB, LS.red], [d.A, d.eA, LS.blue]].forEach(([Y, E, col]) => {
+    g.strokeStyle = col; g.lineWidth = 2; g.beginPath(); d.e.forEach((x, i) => { const px = ax.X(x), py = ax.Y(Y[i]); i ? g.lineTo(px, py) : g.moveTo(px, py); }); g.stroke();
+    d.e.forEach((x, i) => { ebar(g, ax.X(x), ax.Y(Y[i] - E[i]), ax.Y(Y[i] + E[i]), col); dot(g, ax.X(x), ax.Y(Y[i]), 3.2, col); });
+  });
+  legendAt(g, box.x + box.w - 120, box.y + 2, [[c.cA, LS.blue], [c.cB, LS.red]]);
+}
+
+function drawAfield(cv, c){
+  const d = c.vd.afield, {g, box} = single(cv, 280, 440);
+  const vals = d.y.flatMap((v, i) => [v + d.e[i], v - d.e[i]]);
+  const yr = niceRange(Math.min(0, ...vals), Math.max(...vals) + 1, 4);
+  const ax = axes(g, box, linScale(-180, 180, [-180, -90, 0, 90, 180], v => v + "°"), linScale(yr.lo, yr.hi, ticksOf(yr), v => fmtTick(v, yr.st)), {xlabel:"Distance from attended location (polar angle)", ylabel:"Attentional modulation (%)", ylw:38});
+  dashed(g, box.x, ax.Y(0), box.x + box.w, ax.Y(0), LS.gray);
+  curve(g, x => d.base + d.peak*Math.exp(-(x*x)/(2*d.sig*d.sig)), -180, 180, ax.X, ax.Y, LS.blue);
+  d.th.forEach((x, i) => { ebar(g, ax.X(x), ax.Y(d.y[i] - d.e[i]), ax.Y(d.y[i] + d.e[i]), LS.ink); dot(g, ax.X(x), ax.Y(d.y[i]), 3.4, LS.ink); });
+  g.font = F(11, true); g.textAlign = "right"; g.textBaseline = "top"; g.fillStyle = LS.ink; g.fillText(`σ = ${d.sig.toFixed(0)}°`, box.x + box.w, box.y + 2);
+}
+
+function drawTunedNorm(cv, c){
+  const d = c.vd.tunednorm, {g, box} = single(cv, 280, 400);
+  const top = Math.max(...d.yB, ...d.yA) + 0.08, yr = niceRange(0, top, 4);
+  const ax = axes(g, box, linScale(0, 90, [0, 30, 60, 90], v => v + "°"), linScale(yr.lo, yr.hi, ticksOf(yr), v => fmtTick(v, yr.st)), {xlabel:"Target–surround orientation difference", ylabel:"Suppression index", ylw:40});
+  [[d.yB, d.s0, d.w, LS.red], [d.yA, d.s0A, d.wA, LS.blue]].forEach(([Y, s0, w, col]) => {
+    curve(g, x => d.fl + s0*Math.exp(-x*x/(2*w*w)), 0, 90, ax.X, ax.Y, col);
+    d.dx.forEach((x, i) => { ebar(g, ax.X(x), ax.Y(Y[i] - d.e[i]), ax.Y(Y[i] + d.e[i]), col); dot(g, ax.X(x), ax.Y(Y[i]), 3.2, col); });
+  });
+  legendAt(g, box.x + box.w - 130, box.y + 2, [[c.cA, LS.blue], [c.cB, LS.red]]);
+}
+
+function drawPupil(cv, c){
+  const d = c.vd.pupil, {g, box} = single(cv, 270, 440);
+  const yr = niceRange(-0.08, Math.max(...d.yA) + d.eA + 0.05, 4);
+  const ax = axes(g, box, linScale(-1, 6, [0, 2, 4, 6], v => String(v)), linScale(yr.lo, yr.hi, ticksOf(yr), v => fmtTick(v, yr.st)), {xlabel:"Time from stimulus onset (s)", ylabel:"Pupil dilation (mm)", ylw:40});
+  g.fillStyle = LS.shade; g.fillRect(ax.X(0.5), box.y, ax.X(3) - ax.X(0.5), box.h);
+  dashed(g, ax.X(0), box.y, ax.X(0), box.y + box.h); dashed(g, box.x, ax.Y(0), box.x + box.w, ax.Y(0), LS.gray);
+  [[d.yB, d.eB, LS.red, LS.redLight], [d.yA, d.eA, LS.blue, LS.blueLight]].forEach(([Y, e, col, light]) => {
+    g.fillStyle = light; g.globalAlpha = 0.55; g.beginPath();
+    d.t.forEach((t, i) => { const px = ax.X(t), py = ax.Y(Y[i] + e); i ? g.lineTo(px, py) : g.moveTo(px, py); });
+    for (let i = d.t.length - 1; i >= 0; i--) g.lineTo(ax.X(d.t[i]), ax.Y(Y[i] - e));
+    g.closePath(); g.fill(); g.globalAlpha = 1;
+    g.strokeStyle = col; g.lineWidth = 2.2; g.beginPath(); d.t.forEach((t, i) => { const px = ax.X(t), py = ax.Y(Y[i]); i ? g.lineTo(px, py) : g.moveTo(px, py); }); g.stroke();
+  });
+  legendAt(g, box.x + box.w - 140, box.y + 2, [[c.cA, LS.blue], [c.cB, LS.red]]);
+}
+
+function drawAppearance(cv, c){
+  const d = c.vd.appearance, {g, box} = single(cv, 330, 300);
+  const lo = Math.log10(1.5), hi = Math.log10(100), L = v => (Math.log10(v) - lo)/(hi - lo);
+  const sc = {map:L, ticks:[2, 5, 10, 20, 50, 100], fmt:v => String(v)};
+  box.h = box.w = Math.min(box.w, 238);
+  const ax = axes(g, box, sc, sc, {xlabel:"Physical contrast (%)", ylabel:`Apparent contrast, ${c.cA.toLowerCase()} (%)`, ylw:36});
+  dashed(g, ax.X(1.5), ax.Y(1.5), ax.X(100), ax.Y(100));
+  curve(g, lx => d.perc(Math.pow(10, lx)/100)*100, Math.log10(2), Math.log10(80), v => ax.X(Math.pow(10, v)), ax.Y, LS.blue);
+  d.xs.forEach((x, i) => { const X = x*100, Y = d.ys[i]*100, E = d.es[i]*100; ebar(g, ax.X(X), ax.Y(Math.max(1.6, Y - E)), ax.Y(Math.min(99, Y + E)), "#0d2f6b"); dot(g, ax.X(X), ax.Y(Y), 3.8, LS.blue, "#0d2f6b"); });
+}
+
+function drawRivalry(cv, c){
+  const d = c.vd.rivalry, {g, box} = single(cv, 270, 440);
+  const bw = 0.5, nb = 20, hist = v => { const h = Array(nb).fill(0); v.forEach(x => { const k = Math.floor(x/bw); if (k < nb) h[k]++; }); return h.map(q => q/v.length); };
+  const hA = hist(d.dA), hB = hist(d.dB), yr = niceRange(0, Math.max(...hA, ...hB)*1.15, 4);
+  const ax = axes(g, box, linScale(0, 10, [0, 2, 4, 6, 8, 10], v => String(v)), linScale(yr.lo, yr.hi, ticksOf(yr), v => fmtTick(v, yr.st)), {xlabel:"Dominance duration (s)", ylabel:"Proportion", ylw:40});
+  const gamma = (x, m) => { const th = m/d.k; return Math.pow(x, d.k - 1)*Math.exp(-x/th)/(Math.exp(lgamma(d.k))*Math.pow(th, d.k)); };
+  [[hB, d.mB, LS.red, LS.redLight], [hA, d.mA, LS.blue, LS.blueLight]].forEach(([h, m, col, light]) => {
+    g.fillStyle = light; g.globalAlpha = 0.45; h.forEach((v, k) => g.fillRect(ax.X(k*bw), ax.Y(v), ax.X((k + 1)*bw) - ax.X(k*bw), ax.Y(0) - ax.Y(v))); g.globalAlpha = 1;
+    g.strokeStyle = col; g.lineWidth = 1.3; g.beginPath(); h.forEach((v, k) => { g.lineTo(ax.X(k*bw), ax.Y(v)); g.lineTo(ax.X((k + 1)*bw), ax.Y(v)); }); g.stroke();
+    curve(g, x => gamma(Math.max(1e-3, x), m)*bw, 0.01, 10, ax.X, ax.Y, col, 2.2);
+  });
+  legendAt(g, box.x + box.w - 150, box.y + 2, [[`${c.cA} (${d.mA.toFixed(1)} s)`, LS.blue], [`${c.cB} (${d.mB.toFixed(1)} s)`, LS.red]]);
+}
+
+function drawPsychometric(cv, c){
+  const d = c.vd.psychometric, {g, box} = single(cv, 280, 420);
+  const lo = Math.log10(0.004), hi = Math.log10(0.2), sc = {map:v => (Math.log10(v) - lo)/(hi - lo), ticks:[0.005, 0.01, 0.02, 0.05, 0.1, 0.2], fmt:v => String(+(v*100).toFixed(1))};
+  const ax = axes(g, box, sc, linScale(0.4, 1, [0.4, 0.6, 0.8, 1.0], v => v.toFixed(1)), {xlabel:"Contrast (%)", ylabel:"Proportion correct", ylw:40});
+  dashed(g, box.x, ax.Y(0.5), box.x + box.w, ax.Y(0.5), LS.gray);
+  const W = (x, a) => 0.5 + 0.5*(1 - Math.exp(-Math.pow(x/a, d.beta)));
+  [[d.yB, d.aB, LS.red], [d.yA, d.aA, LS.blue]].forEach(([Y, a, col]) => {
+    curve(g, lx => W(Math.pow(10, lx), a), lo, hi, v => ax.X(Math.pow(10, v)), ax.Y, col);
+    d.xs.forEach((x, i) => { const e = Math.sqrt(Y[i]*(1 - Y[i])/d.nt); ebar(g, ax.X(x), ax.Y(Math.max(0.4, Y[i] - e)), ax.Y(Math.min(1, Y[i] + e)), col); dot(g, ax.X(x), ax.Y(Math.max(0.4, Y[i])), 3.2, col); });
+    g.strokeStyle = col; g.lineWidth = 2; g.beginPath(); g.moveTo(ax.X(a), box.y + box.h + 2); g.lineTo(ax.X(a), box.y + box.h - 6); g.stroke();
+  });
+  legendAt(g, box.x + 4, box.y + 2, [[c.cA, LS.blue], [c.cB, LS.red]]);
+}
+
+function drawAIC(cv, c){
+  const d = c.vd.aic, r = figRng(c, 9), {g, box} = single(cv, 290, 380);
+  const all = d.rows.flatMap(q => q.v), yr = niceRange(Math.min(0, ...all), Math.max(...all)*1.1, 4), k = d.rows.length;
+  const ax = axes(g, box, {map:v => (v + 0.5)/k, ticks:d.rows.map((_, i) => i), fmt:() => ""}, linScale(yr.lo, yr.hi, ticksOf(yr), v => fmtTick(v, yr.st)), {ylabel:"ΔAIC vs. best model", ylw:40});
+  dashed(g, box.x, ax.Y(0), box.x + box.w, ax.Y(0), LS.ink2);
+  const bw = Math.min(34, box.w/k*0.5);
+  d.rows.forEach((q, i) => {
+    const cx = ax.X(i), m = mean(q.v), e = sem(q.v) || 0;
+    g.fillStyle = i === 0 ? NAVY : LS.blueLight; g.fillRect(cx - bw/2, Math.min(ax.Y(0), ax.Y(m)), bw, Math.max(1.5, Math.abs(ax.Y(m) - ax.Y(0))));
+    q.v.forEach(v => dot(g, cx + r.num(-bw*0.35, bw*0.35), ax.Y(v), 2, "#8a8a8a"));
+    if (i > 0) ebar(g, cx, ax.Y(m - e), ax.Y(m + e), LS.ink);
+    g.fillStyle = LS.ink; g.font = F(10, true); g.textAlign = "center"; g.textBaseline = "top";
+    const words = q.m.split(/[- ]/), half = Math.ceil(words.length/2);
+    [words.slice(0, half).join("-"), words.slice(half).join("-")].filter(Boolean).forEach((ln, li) => g.fillText(ln, cx, box.y + box.h + 16 + li*12));
+  });
+}
+
+const DRAW = {design:drawDesign, main:drawMain, scatter:drawScatter, bars:drawBars, hrf:drawHRF, voxels:drawVoxels, ecc:drawEcc, afield:drawAfield, tunednorm:drawTunedNorm, pupil:drawPupil, appearance:drawAppearance, rivalry:drawRivalry, psychometric:drawPsychometric, aic:drawAIC};
 function drawFigs(){
   if (!current) return;
   document.querySelectorAll("#body canvas[data-fig]").forEach(cv => { const f = current.figs[+cv.dataset.fig]; try { DRAW[f.type](cv, current.ctx); } catch(e){ console.error(e); } });
